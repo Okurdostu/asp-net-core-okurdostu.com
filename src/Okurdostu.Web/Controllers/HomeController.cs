@@ -11,27 +11,29 @@ namespace Okurdostu.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
         public IActionResult Index()
         {
             return View();
         }
-
-        public IActionResult Privacy()
+        [Route("~/gizlilik-politikasi")]
+        public IActionResult PrivacyPolicy()
         {
             return View();
         }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [Route("~/kullanici-sozlesmesi")]
+        public IActionResult UserAgreement()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View();
+        }
+        [Route("~/sss")]
+        public IActionResult FAQ()
+        {
+            return View();
+        }
+        [Route("~/kvkk")]
+        public IActionResult KVKK()
+        {
+            return View();
         }
     }
 }
