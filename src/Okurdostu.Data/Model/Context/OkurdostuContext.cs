@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Okurdostu.Data.Model.ModelConfiguration;
 
 namespace Okurdostu.Data.Model.Context
 {
@@ -23,5 +24,33 @@ namespace Okurdostu.Data.Model.Context
         public virtual DbSet<UserEducation> UserEducation { get; set; }
         public virtual DbSet<UserEducationDocument> UserEducationDocument { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseNpgsql("Host=localhost;Database=Okurdostu;Username=postgres;Password=root");
+            }
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfiguration(new NeedConfiguration());
+
+            modelBuilder.ApplyConfiguration(new NeedItemConfiguration());
+
+            modelBuilder.ApplyConfiguration(new NeedLikeConfiguration());
+
+            modelBuilder.ApplyConfiguration(new UniversityConfiguration());
+
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
+
+            modelBuilder.ApplyConfiguration(new UserEducationConfiguration());
+
+            modelBuilder.ApplyConfiguration(new UserEducationDocumentConfiguration());
+
+            OnModelCreatingPartial(modelBuilder);
+        }
+
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }
