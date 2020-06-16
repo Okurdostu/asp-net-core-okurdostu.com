@@ -1,4 +1,4 @@
-$("#modalLogingButton").click(function () {
+$("#modalLoginButton").click(function () {
     $('#signup').modal('hide')
     $('#login').modal('show')
 });

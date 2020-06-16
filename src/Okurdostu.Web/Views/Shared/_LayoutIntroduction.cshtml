@@ -57,6 +57,11 @@
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700,700i" rel="stylesheet">
     <link href="~/css/bs-edited.css" rel="stylesheet" />
     <link href="~/css/style-introduction.css" rel="stylesheet" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @if (Context.Request.Path.Value.ToLower() != "/girisyap" && Context.Request.Path.Value.ToLower() != "/kaydol")
+    {
+        <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
+    }
 </head>
 
 <body data-spy="scroll" data-target=".fixed-top">
@@ -90,12 +95,15 @@
                 @{
                     if (true)
                     {
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="modal" data-target="#login" style="cursor:pointer;">Giriş yap</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="modal" data-target="#signup" style="cursor:pointer;">Kaydol</a>
-                        </li>
+                        @if (Context.Request.Path.Value.ToLower() != "/girisyap" && Context.Request.Path.Value.ToLower() != "/kaydol")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="modal" data-target="#login" style="cursor:pointer;">Giriş yap</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="modal" data-target="#signup" style="cursor:pointer;">Kaydol</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link" href="/beta">Beta</a>
                         </li>
@@ -103,30 +111,31 @@
                     else
                     {
                         <li class="nav-item page-scroll">
-                            @if (@*SessionUser != null && SessionUser.PictureUrl == null*@ true)
-{
-<div class="dropdown show">
-    <a class="dropdown-toggle" href="" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="far fa-user lg-fa"></i>
-    </a>
-    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="background-color:transparent">
-        <a class="btn dropdown-item rounded-custom font-weight-bold" href="/beta">Beta</a>
-        <a class="btn dropdown-item rounded-custom font-weight-bold" href="@*@Html.Raw(" /"+SessionUser.Username)*@">Profil</a>
-    </div>
-</div>
-}
-else
-{
-<div class="dropdown show">
-    <a class="dropdown-toggle" href="" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <img src="@*@Html.Raw(SessionUser.PictureUrl)*@" class="rounded-circle" style="width:60px;" alt="">
-    </a>
-    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="background-color:transparent">
-        <a class="btn dropdown-item rounded-custom font-weight-bold" href="/beta">Beta</a>
-        <a class="btn dropdown-item rounded-custom font-weight-bold" href="@*@Html.Raw(" /"+SessionUser.Username)*@">Profil</a>
-    </div>
-</div>
-}
+                            @*SessionUser != null && SessionUser.PictureUrl == null*@
+                            @*@if (true)*@
+                            {
+                            <div class="dropdown show">
+                                <a class="dropdown-toggle" href="" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="far fa-user lg-fa"></i>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="background-color:transparent">
+                                    <a class="btn dropdown-item rounded-custom font-weight-bold" href="/beta">Beta</a>
+                                    <a class="btn dropdown-item rounded-custom font-weight-bold" href="">Profil</a>
+                                </div>
+                            </div>
+                            }
+                            else
+                            {
+                            <div class="dropdown show">
+                                <a class="dropdown-toggle" href="" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <img src="@*@Html.Raw(SessionUser.PictureUrl)*@" class="rounded-circle" style="width:60px;" alt="">
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="background-color:transparent">
+                                    <a class="btn dropdown-item rounded-custom font-weight-bold" href="/beta">Beta</a>
+                                    <a class="btn dropdown-item rounded-custom font-weight-bold" href="">Profil</a>
+                                </div>
+                            </div>
+                            }
                         </li>
                     }
                 }
@@ -134,8 +143,6 @@ else
         </div>
     </nav>
     @RenderBody()
-
-
     <div class="footer">
         <div class="container">
             <div class="row">
@@ -213,14 +220,13 @@ else
             </center>
         </div>
     </div>
-    @if (true)
+    @if (Context.Request.Path.Value.ToLower() != "/girisyap" && Context.Request.Path.Value.ToLower() != "/kaydol")
     {
         <div class="modal fade" id="signup" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                 <div class="modal-content" style="background: transparent;">
                     <div class="modal-body p-0" style="border-radius: 25px;">
-                        test
-                        @*@Html.Partial("/Views/Kaydol/partialForm.cshtml")*@
+                        <partial name="~/Views/SignUp/_PartialSignUpForm.cshtml">
                     </div>
                 </div>
             </div>
@@ -229,17 +235,14 @@ else
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content" style="background: transparent;">
                     <div class="modal-body p-0" style="border-radius: 25px;">
-                        Test
-                        @*@Html.Partial("/Views/Girisyap/partialForm.cshtml")*@
+                        <partial name="~/Views/Login/_PartialLoginForm.cshtml">
                     </div>
                 </div>
             </div>
         </div>
     }
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/bootstrap.min.js"></script>
     <script src="~/js/script-introduction.js"></script>
-
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-13125894-3"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
