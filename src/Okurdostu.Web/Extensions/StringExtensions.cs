@@ -11,11 +11,11 @@ namespace Okurdostu.Web.Extensions
         {
             using (var hash = System.Security.Cryptography.SHA512.Create())
             {
-                var hashGirdi = hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(str));
-                var stringhashGirdi = new System.Text.StringBuilder(128);
-                foreach (var a in hashGirdi)
-                    stringhashGirdi.Append(a.ToString("X2"));
-                return (stringhashGirdi.ToString());
+                var StringBytes = hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(str));
+                var StringBuilder = new System.Text.StringBuilder(128);
+                foreach (var charbyte in StringBytes)
+                    StringBuilder.Append(charbyte.ToString("X2"));
+                return (StringBuilder.ToString());
             }
         }
     }

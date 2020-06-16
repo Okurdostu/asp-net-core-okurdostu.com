@@ -7,12 +7,17 @@ namespace Okurdostu.Data.Model
     {
         public User()
         {
+            Id = Guid.NewGuid();
+            CreatedOn = DateTime.Now;
+            IsActive = true;
+            IsEmailConfirmed = false;
+
             Need = new HashSet<Need>();
             NeedLike = new HashSet<NeedLike>();
             UserEducation = new HashSet<UserEducation>();
         }
 
-        public Guid Id { get; set; }
+        public Guid Id { get; private set; }
         public string Username { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
@@ -20,7 +25,7 @@ namespace Okurdostu.Data.Model
         public string Biography { get; set; }
         public string Telephone { get; set; }
         public string PictureUrl { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreatedOn { get; private set; }
         public string Twitter { get; set; }
         public string Github { get; set; }
         public string ContactEmail { get; set; }

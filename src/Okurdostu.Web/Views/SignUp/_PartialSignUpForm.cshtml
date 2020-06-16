@@ -16,14 +16,11 @@
         }
     </h6>
     <hr class="mb-2 mt-0" />
-    @if (TempData["dangerMesaj"] != null)
+    @if (TempData["SignUpMessage"] != null)
     {
-        <div class="alert alert-danger rounded" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            @Html.Raw(TempData["dangerMesaj"])
-        </div>
+        <h4 class="font-weight-bold text-danger">
+            @Html.Raw(TempData["SignUpMessage"])
+        </h4>
     }
     @using (Html.BeginForm("Index", "Kaydol", FormMethod.Post, new { id = "SignupForm" }))
     {

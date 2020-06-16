@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Okurdostu.Data.Model;
 using Okurdostu.Data.Model.Context;
 using Okurdostu.Web.Extensions;
@@ -33,7 +35,7 @@ namespace Okurdostu.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var User = Authenticate(Model);
+                var User = await AuthenticateAsync(Model);
                 if (User != null)
                 {
                     var ClaimList = new List<Claim>();
@@ -62,14 +64,12 @@ namespace Okurdostu.Web.Controllers
             }
             return View();
         }
-        public readonly OkurdostuContext okurdostuContext = new OkurdostuContext();
-        public User Authenticate(LoginModel Model)
+        private readonly OkurdostuContext Context;
+        public LoginController(OkurdostuContext _context) => Context = _context;
+        public async Task<User> AuthenticateAsync(LoginModel Model)
         {
-            var Context = okurdostuContext;
-            var User = Context.User.Where(x => x.Username == Model.Username || x.Telephone == Model.Username || x.Email == Model.Username).FirstOrDefault();
-            //return User != null && User.Password == Model.Password.SHA512() ? User : null;
-            return User != null && User.Password == Model.Password ? User : null;
-
+            var User = await Context.User.Where(x => x.Username == Model.Username || x.Telephone == Model.Username || x.Email == Model.Username).FirstOrDefaultAsync();
+            return User != null && User.Password == Model.Password.SHA512() ? User : null;
         }
     }
 }
