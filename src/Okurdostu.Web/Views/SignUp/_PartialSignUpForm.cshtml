@@ -15,7 +15,7 @@
             @: Öyleyse <span class="btn od font-weight-bold m-0 p-0" id="modalLoginButton" style="cursor:pointer;">Giriş yap</span>
         }
     </h6>
-    <hr />
+    <hr class="mb-2 mt-0" />
     @if (TempData["dangerMesaj"] != null)
     {
         <div class="alert alert-danger rounded" role="alert">
@@ -45,15 +45,9 @@
             @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger font-weight-bold float-left" })
         </div>
         <hr class="mb-1 mt-1" />
-        <div class="form-group mb-0">
-            @if (TempData["InvalidCaptcha"] != null)
-            {
-                <span class="font-weight-bold text-danger">@TempData["InvalidCaptcha"]</span>
-            }
-        </div>
-        <div class="text-black-50 text-center font-weight-bold pb-1" style="font-size:14px !important;">
+        <p class="text-black-50 text-center font-weight-bold pb-1" style="font-size:14px !important;">
             Kaydol seçeneğine basarak <a href="/kullanici-sozlesmesi" target="_blank" class="od">Kullanıcı Sözleşmesini</a>, <a href="/gizlilik-politikasi" target="_blank" class="od">Gizlilik politikasını</a> ve <a href="/kvkk" target="_blank" class="od">KVKK Politikasını</a> <span class="text-danger">okumuş</span> ve <span class="text-danger">kabul etmiş</span> sayılırsınız.
-        </div>
+        </p>
         <div class="form-group">
             <input type="submit" id="Signup" value="Kaydol" class="btn-purple btn-block" />
             @if (Context.Request.Path.Value.ToLower() != "/kaydol")
@@ -61,8 +55,6 @@
                 <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
             }
         </div>
-        <hr />
-
         <div class="text-black-50 text-center small font-weight-bold">
             This site is protected by reCAPTCHA and the Google
             <a target="_blank" href="https://policies.google.com/privacy" class="od">Privacy Policy</a> and
