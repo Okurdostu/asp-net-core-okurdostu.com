@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
+@{
+    bool IsAuthenticated = HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
+}
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="utf-8">
@@ -58,9 +62,12 @@
     <link href="~/css/bs-edited.css" rel="stylesheet" />
     <link href="~/css/style-introduction.css" rel="stylesheet" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    @if (Context.Request.Path.Value.ToLower() != "/girisyap" && Context.Request.Path.Value.ToLower() != "/kaydol")
+    @if (!IsAuthenticated)
     {
-        <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
+        @if (Context.Request.Path.Value.ToLower() != "/girisyap" && Context.Request.Path.Value.ToLower() != "/kaydol")
+        {
+            <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
+        }
     }
 </head>
 
@@ -93,7 +100,7 @@
             </ul>
             <ul class="navbar-nav ml-auto">
                 @{
-                    if (true)
+                    @if (!IsAuthenticated)
                     {
                         @if (Context.Request.Path.Value.ToLower() != "/girisyap" && Context.Request.Path.Value.ToLower() != "/kaydol")
                         {
@@ -111,30 +118,29 @@
                     else
                     {
                         <li class="nav-item page-scroll">
-                            @*SessionUser != null && SessionUser.PictureUrl == null*@
-                            @*@if (true)*@
+                            @if (HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "PictureUrl")?.Value == null)
                             {
-                            <div class="dropdown show">
-                                <a class="dropdown-toggle" href="" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="far fa-user lg-fa"></i>
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="background-color:transparent">
-                                    <a class="btn dropdown-item rounded-custom font-weight-bold" href="/beta">Beta</a>
-                                    <a class="btn dropdown-item rounded-custom font-weight-bold" href="">Profil</a>
+                                <div class="dropdown show">
+                                    <a class="dropdown-toggle" href="" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="far fa-user lg-fa"></i>
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="background-color:transparent">
+                                        <a class="btn dropdown-item rounded-custom font-weight-bold" href="/beta">Beta</a>
+                                        <a class="btn dropdown-item rounded-custom font-weight-bold" href="@HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Username")?.Value">Profil</a>
+                                    </div>
                                 </div>
-                            </div>
                             }
                             else
                             {
-                            <div class="dropdown show">
-                                <a class="dropdown-toggle" href="" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <img src="@*@Html.Raw(SessionUser.PictureUrl)*@" class="rounded-circle" style="width:60px;" alt="">
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="background-color:transparent">
-                                    <a class="btn dropdown-item rounded-custom font-weight-bold" href="/beta">Beta</a>
-                                    <a class="btn dropdown-item rounded-custom font-weight-bold" href="">Profil</a>
+                                <div class="dropdown show">
+                                    <a class="dropdown-toggle" href="" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <img src="@HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "PictureUrl")?.Value" class="rounded-circle" style="width:60px;" alt="">
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="background-color:transparent">
+                                        <a class="btn dropdown-item rounded-custom font-weight-bold" href="/beta">Beta</a>
+                                        <a class="btn dropdown-item rounded-custom font-weight-bold" href="@HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Username")?.Value">Profil</a>
+                                    </div>
                                 </div>
-                            </div>
                             }
                         </li>
                     }
@@ -220,7 +226,7 @@
             </center>
         </div>
     </div>
-    @if (Context.Request.Path.Value.ToLower() != "/girisyap" && Context.Request.Path.Value.ToLower() != "/kaydol")
+    @if (Context.Request.Path.Value.ToLower() != "/girisyap" && Context.Request.Path.Value.ToLower() != "/kaydol" && !IsAuthenticated)
     {
         <div class="modal fade" id="signup" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered" role="document">

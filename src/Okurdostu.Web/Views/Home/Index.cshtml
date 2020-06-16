@@ -2,7 +2,7 @@
     Layout = "~/Views/Shared/_LayoutIntroduction.cshtml";
     ViewData["Title"] = "Okurdostu | Öğrenci ve öğrenci dostunu bir araya getiren platform";
 }
-
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
 <header id="header" class="header">
     <div class="header-content">
         <div class="container">
@@ -16,7 +16,10 @@
                         <h1>Bir öğrenci için dost ol </h1>
                         <p class="p-large">Bir öğrencinin ihtiyaçlarını maddi olarak gidermesi için destekle. Bu çok kolay olacak göreceksin. İstersen bu iyiliğini gizli tut istersen bütün dünyaya duyur.</p>
                         <a class="btn-solid-reg text-center" href="/ihtiyaclar" style="width:200px;">İhtiyaçlar</a>
-                        <a class="btn-solid-reg mt-1 text-center" data-toggle="modal" data-target="#signup" style="width:200px;" href="">Kaydol</a>
+                        @if (!HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+                        {
+                            <a class="btn-solid-reg mt-1 text-center" data-toggle="modal" data-target="#signup" style="width:200px;" href="">Kaydol</a>
+                        }
                     </div>
                 </div>
                 <div class="col-lg-6 d-none d-lg-block">

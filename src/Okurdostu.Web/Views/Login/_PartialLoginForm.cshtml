@@ -4,7 +4,6 @@
 {
     <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
 }
-
 <div class="shadow p-2 bg-white rounded-custom mt-5 mb-5">
     <h3 class="text-center text-black-50"> Hoş geldin </h3>
     @if (Context.Request.Path.Value.ToLower() == "/girisyap")
@@ -16,19 +15,16 @@
         <h6 class="text-center text-black-50">Hesabın yoksa: hemen <span class="btn od font-weight-bold m-0 p-0" id="modalSignupButton" style="cursor:pointer;">Kaydol</span></h6>
     }
     <hr class="mt-0 mb-2" />
-    @if (TempData["ErrorMessage"] != null)
+    @if (TempData["LoginMessage"] != null)
     {
-        <div class="alert alert-danger rounded" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            @Html.Raw(TempData["ErrorMessage"])
-        </div>
+        <p class="font-weight-bold text-danger">
+            @Html.Raw(TempData["LoginMessage"])
+        </p>
     }
     @using (Html.BeginForm("Index", "Login", FormMethod.Post, new { id = "LoginForm" }))
     {
         @Html.AntiForgeryToken()
-        @Html.Hidden("r")
+        @Html.Hidden("ReturnUrl")
         <div class="form-group mb-2">
             @Html.EditorFor(model => model.Username, new { htmlAttributes = new { @class = "form-control rounded-pill font-weight-bold text-black-50", @placeholder = "Kullanıcı adı, telefon veya email", autocomplete = "username" } })
             @Html.ValidationMessageFor(model => model.Username, "", new { @class = "text-danger font-weight-bold float-left" })
