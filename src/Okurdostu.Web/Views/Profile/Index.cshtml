@@ -1,7 +1,18 @@
 ﻿@model Okurdostu.Data.Model.User
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
+@{ bool isAuthenticatedUserEqualModelUser = false; }
+
 @{
-    bool isAuthenticatedUserEqualModelUser = true;
+    if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+    {
+        string AuthenticatedUsername = HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Username")?.Value;
+        if (AuthenticatedUsername == Model.Username.ToString())
+        {
+            isAuthenticatedUserEqualModelUser = true;
+        }
+    }
 }
+
 @{
     ViewData["Title"] = Model.FullName + "@" + Model.Username + " | Okurdostu";
     ViewData["OGType"] = "profile";
@@ -234,4 +245,125 @@ else
 {
     <hr class="mb-1" />
     <h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim</h4>
+}
+@if (Model.UserEducation.Count == 0)
+{
+    <h5 class="text-black-50 text-center">
+        Eğitim bilgisi yok
+    </h5>
+}
+else
+{
+    @foreach (var item in Model.UserEducation.Where(x => x.IsRemoved != true).ToList().OrderByDescending(x => x.StartYear))
+    {
+        <hr class="mb-2 mt-2" />
+        <div class="row pr-3 egitim">
+            <div class="col-auto pr-0 pl-2">
+                @if (item.University.LogoUrl != null)
+                {
+                    <a href="/universite/@item.University.FriendlyName" target="_blank">
+                        <img src="@item.University.LogoUrl"
+                             class="profil-image rounded-pill" style="width:100px;" />
+                    </a>
+                }
+                else
+                {
+                    <a href="/universite/@item.University.FriendlyName" target="_blank">
+                        <img src="~/Content/image/building.svg"
+                             class="profil-image rounded-pill" style="width:100px;" />
+                    </a>
+                }
+            </div>
+            <div class="col p-0">
+                <h5>
+                    <a class="od" href="/universite/@item.University.FriendlyName" target="_blank">
+                        @Html.Raw(item.University.Name)
+                    </a>
+                    @if (item.IsConfirmed == true)
+                    {
+                        <a class="od" href=""><i class="fas fa-check-double"></i></a>
+                    }
+                </h5>
+                <h6 class="text-black-50 pl-2 text-break">@Html.Raw(item.Department)</h6>
+                <h6 class="text-black-50 pl-2 text-break">@Html.Raw(@item.StartYear + "-" + @item.EndYear)</h6>
+                @if (@item.ActivitiesSocieties != null)
+                {
+                    <h6 class="text-black-50 pl-2 text-break">@Html.Raw(item.ActivitiesSocieties)</h6>
+                }
+                @if (!item.IsConfirmed && isAuthenticatedUserEqualModelUser)
+                {
+                    if (item.IsSentToConfirmation)
+                    {
+                        <a href="" class="text-info small font-weight-bold"><i class="fas fa-cogs"></i> Onaylanma aşamasında</a>
+                    }
+                    else
+                    {
+                        <a class="text-warning small font-weight-bold" href="/education-confirm/@item.Id"><i class="fas fa-exclamation-circle"></i> Onaylatmak için tıklayın</a>
+                    }
+                }
+                else if (!item.IsConfirmed)
+                {
+                    <a class="text-warning small font-weight-bold" href="#"><i class="fas fa-exclamation-circle"></i> Onay bekliyor</a>
+                }
+                @if (isAuthenticatedUserEqualModelUser)
+                {
+
+                    <div class="row">
+                        <div class="col-auto" style="padding-right:3px">
+                            <a class="btn btn-outline-info rounded-custom" href="" data-toggle="modal" data-target="#education-edit-@item.Id" style="cursor:pointer;">
+                                <i class="far fa-edit mr-3 ml-3"></i>
+                            </a>
+                        </div>
+                        <div class="col-auto" style="padding-left:3px;">
+                            <a class="btn btn-outline-danger rounded-custom" href="" data-toggle="modal" data-target="#education-remove-@item.Id" style="cursor:pointer;">
+                                <i class="fas fa-trash-alt mr-3 ml-3"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="education-remove-@item.Id" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+                            <div class="modal-content" style="background: transparent;">
+                                <div class="modal-body bg-light" style="border-radius: 25px;">
+                                    <p class="text-md-center">
+                                        @item.University.Name okulunda varolan eğitiminiz kaldıralacak
+                                    </p>
+                                    <hr />
+                                    <div>
+                                        @using (Html.BeginForm("", "", FormMethod.Post))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" id="username" name="username" value="@item.User.Username" />
+                                            <input type="hidden" id="id" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-danger btn-block font-weight-bold rounded-custom">
+                                                Kaldır
+                                            </button>
+                                        }
+                                        <hr />
+                                        <button type="button" class="btn btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="education-edit-@item.Id" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                            <div class="modal-content" style="background: transparent;">
+                                <div class="modal-body bg-light" style="border-radius: 25px;">
+                                    <h3 class="font-weight-bold text-center">
+                                        Eğitim düzenleme
+                                    </h3>
+                                    <hr />
+                                    @{
+                                        //partial education edit
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
 }
