@@ -7,12 +7,15 @@ namespace Okurdostu.Data.Model
     {
         public User()
         {
+            IsEmailConfirmed = false;
+            IsActive = true;
+            CreatedOn = DateTime.Now;
             Need = new HashSet<Need>();
             NeedLike = new HashSet<NeedLike>();
             UserEducation = new HashSet<UserEducation>();
         }
 
-        public long Id { get; set; }
+        public long Id { get; private set; }
         public string Username { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
