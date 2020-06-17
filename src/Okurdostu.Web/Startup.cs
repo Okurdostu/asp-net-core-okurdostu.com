@@ -27,7 +27,7 @@ namespace Okurdostu.Web
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddControllersWithViews();
-            services.AddDbContext<OkurdostuContext>(option => option.UseNpgsql(Configuration.GetConnectionString("OkurdostuConnectionString")));
+            services.AddDbContext<OkurdostuContext>(option => option.UseSqlServer(Configuration.GetConnectionString("OkurdostuConnectionString")));
 
         }
 

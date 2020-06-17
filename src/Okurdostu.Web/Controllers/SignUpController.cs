@@ -63,12 +63,12 @@ namespace Okurdostu.Web.Controllers
                 }
                 catch (Exception e)
                 {
-                    if (e.InnerException.Message.Contains("user_username_uindex"))
+                    if (e.InnerException.Message.Contains("Unique_Key_Username"))
                         TempData["SignUpMessage"] = "Bu kullanıcı adını kullanamazsınız";
-                    else if (e.InnerException.Message.Contains("user_email_uindex"))
+                    else if (e.InnerException.Message.Contains("Unique_Key_Email"))
                         TempData["SignUpMessage"] = "Bu e-mail adresini kullanamazsınız";
                     else
-                        TempData["SignUpMessage"] = "Başaramadık ve ne olduğunu bilmiyoruz";
+                        TempData["SignUpMessage"] = "Başaramadık ve ne olduğunu bilmiyoruz"; //ex.innerex.message db log
                 }
             }
             else
