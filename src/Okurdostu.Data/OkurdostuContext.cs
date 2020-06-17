@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+using Okurdostu.Data.Model;
 using Okurdostu.Data.Model.ModelConfiguration;
 
-namespace Okurdostu.Data.Model.Context
+namespace Okurdostu.Data
 {
     public partial class OkurdostuContext : DbContext
     {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -9,9 +8,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
+using Okurdostu.Data;
 using Okurdostu.Data.Model;
-using Okurdostu.Data.Model.Context;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 
@@ -41,8 +39,8 @@ namespace Okurdostu.Web.Controllers
                     var ClaimList = new List<Claim>();
                     ClaimList.Add(new Claim("Id", User.Id.ToString()));
                     ClaimList.Add(new Claim("Username", User.Username));
-                    ClaimList.Add(new Claim("Email", User.Username));
-                    ClaimList.Add(new Claim("FullName", User.Username));
+                    ClaimList.Add(new Claim("Email", User.Email));
+                    ClaimList.Add(new Claim("FullName", User.FullName));
                     if (User.PictureUrl != null)
                         ClaimList.Add(new Claim("PictureUrl", User.PictureUrl.ToString()));
 

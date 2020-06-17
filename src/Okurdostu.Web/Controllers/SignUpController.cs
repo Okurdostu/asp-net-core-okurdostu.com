@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Okurdostu.Data;
 using Okurdostu.Data.Model;
-using Okurdostu.Data.Model.Context;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 
@@ -39,12 +41,25 @@ namespace Okurdostu.Web.Controllers
                     var result = await Context.SaveChangesAsync();
                     if (result > 0)
                     {
-                        //coming events: login with created user and after that return the beta page
+                        var ClaimList = new List<Claim>();
+                        ClaimList.Add(new Claim("Id", User.Id.ToString()));
+                        ClaimList.Add(new Claim("Username", User.Username));
+                        ClaimList.Add(new Claim("Email", User.Email));
+                        ClaimList.Add(new Claim("FullName", User.FullName));
+                        var ClaimsIdentity = new ClaimsIdentity(ClaimList, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var AuthProperties = new AuthenticationProperties
+                        {
+                            AllowRefresh = true
+                        };
+                        await HttpContext.SignInAsync(
+                            CookieAuthenticationDefaults.AuthenticationScheme,
+                            new ClaimsPrincipal(ClaimsIdentity),
+                            AuthProperties);
+
+                        return Redirect("/beta");
                     }
                     else
-                    {
-                        //coming events: feedback(SignUpMessage)
-                    }
+                        TempData["SignUpMessage"] = "Başaramadık ve ne olduğunu bilmiyoruz";
                 }
                 catch (Exception e)
                 {
@@ -53,10 +68,12 @@ namespace Okurdostu.Web.Controllers
                     else if (e.InnerException.Message.Contains("user_email_uindex"))
                         TempData["SignUpMessage"] = "Bu e-mail adresini kullanamazsınız";
                     else
-                        TempData["SignUpMessage"] = "Başaramadık ne olduğunu bilmiyoruz";
+                        TempData["SignUpMessage"] = "Başaramadık ve ne olduğunu bilmiyoruz";
                 }
             }
-            //feedback(SignUpMessage)
+            else
+                TempData["SignUpMessage"] = "Verdiğiniz bilgilerin doğruluğunu kontrol edin";
+
             return View();
         }
     }

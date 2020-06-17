@@ -11,7 +11,7 @@ namespace Okurdostu.Web.Models
         [Required(ErrorMessage = "E-mail adresinizi yazmalısınız")]
         [Display(Name = "Email adresi")]
         [DataType(DataType.EmailAddress, ErrorMessage = "Lütfen geçerli bir e-mail adresi olsun")]
-        [MaxLength(50, ErrorMessage = "Çok uzun, en fazla 50 karakter")]
+        [MaxLength(25, ErrorMessage = "Çok uzun, en fazla 50 karakter")]
         public string Email { get; set; }
 
         [Required(ErrorMessage = "Parola seçmelisiniz")]

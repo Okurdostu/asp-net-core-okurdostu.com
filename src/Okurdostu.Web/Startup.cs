@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Okurdostu.Data.Model.Context;
+using Okurdostu.Data;
 
 namespace Okurdostu.Web
 {
