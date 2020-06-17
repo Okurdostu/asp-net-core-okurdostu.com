@@ -24,10 +24,21 @@ namespace Okurdostu.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = "okurdostu-authentication";
+                    options.LoginPath = "/girisyap";
+                    
+                    options.ExpireTimeSpan = System.TimeSpan.FromDays(1);
+                    options.SlidingExpiration = true;
+                    options.Cookie.HttpOnly = true;
+                });
+
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddControllersWithViews();
             services.AddDbContext<OkurdostuContext>(option => option.UseSqlServer(Configuration.GetConnectionString("OkurdostuConnectionString")));
+
 
         }
 
