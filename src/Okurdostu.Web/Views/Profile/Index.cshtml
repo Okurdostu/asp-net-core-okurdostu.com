@@ -1,4 +1,5 @@
-﻿@{
-    ViewData["Title"] = "Index";
+﻿@model Okurdostu.Data.Model.User
+@{
+    ViewData["Title"] = Model.FullName + "@" + Model.Username + " | Okurdostu";
     Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
 }
