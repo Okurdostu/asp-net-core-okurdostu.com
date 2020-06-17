@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Okurdostu.Data;
+using System.Linq;
 
 namespace Okurdostu.Web
 {
@@ -54,8 +56,30 @@ namespace Okurdostu.Web
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}");
+
+                endpoints.MapControllerRoute(
+                    name: "usernameredirect",
+                    pattern: "{username}",
+                    constraints: new { user = new UserConstraint() },
+                    defaults: new { controller = "Profile", action = "Index", });
             });
+        }
+        public class UserConstraint : IRouteConstraint
+        {
+            public bool Match(HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection)
+            {
+                using (var Context = new OkurdostuContext())
+                {
+                    var Usernames = Context.User.Select(x => new
+                    {
+                        x.Username
+                    }).ToList();
+                    var ValueFromRoute = values["username"].ToString().ToLower();
+                    return Usernames.Any(x => x.Username.ToLower() == ValueFromRoute);
+                }
+                //her kayýt olan ve deðiþtirilen kullanýcýdan sonra bir xml'e usernames aktarýlabilir ve veriler oradan okunabilir performansý ilerleyen dönemde analiz et.
+            }
         }
     }
 }
