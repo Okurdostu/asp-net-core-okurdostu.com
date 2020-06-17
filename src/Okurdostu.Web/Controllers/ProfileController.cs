@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Okurdostu.Data;
+using Okurdostu.Web.Base;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class ProfileController : Controller
+    public class ProfileController : OkurdostuContextController
     {
-        private readonly OkurdostuContext Context;
-        public ProfileController(OkurdostuContext _context) => Context = _context;
-
         public async Task<IActionResult> Index(string username)
         {
             if (!string.IsNullOrEmpty(username))
@@ -24,5 +18,6 @@ namespace Okurdostu.Web.Controllers
             //404
             return null;
         }
+
     }
 }

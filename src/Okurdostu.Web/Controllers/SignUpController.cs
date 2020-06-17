@@ -5,22 +5,20 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using Okurdostu.Data;
 using Okurdostu.Data.Model;
+using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class SignUpController : Controller
+    public class SignUpController : OkurdostuContextController
     {
         [Route("~/Kaydol")]
         public IActionResult Index()
         {
             return View();
         }
-        private readonly OkurdostuContext Context;
-        public SignUpController(OkurdostuContext _context) => Context = _context;
 
         [HttpPost, ValidateAntiForgeryToken]
         [Route("~/Kaydol")]

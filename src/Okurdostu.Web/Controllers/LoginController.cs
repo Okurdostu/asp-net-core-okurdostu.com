@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -8,14 +7,14 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Okurdostu.Data;
 using Okurdostu.Data.Model;
+using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class LoginController : Controller
+    public class LoginController : OkurdostuContextController
     {
         [Route("~/Girisyap")]
         public IActionResult Index(string ReturnUrl)
@@ -62,8 +61,6 @@ namespace Okurdostu.Web.Controllers
             }
             return View();
         }
-        private readonly OkurdostuContext Context;
-        public LoginController(OkurdostuContext _context) => Context = _context;
         public async Task<User> AuthenticateAsync(LoginModel Model)
         {
             var User = await Context.User.Where(x => x.Username == Model.Username || x.Telephone == Model.Username || x.Email == Model.Username).FirstOrDefaultAsync();
