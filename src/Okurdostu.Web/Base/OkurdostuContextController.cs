@@ -14,11 +14,11 @@ namespace Okurdostu.Web.Base
         //başka bir controllera alınacak
         public async Task<User> GetAuthenticatedUserFromDatabase()
         {
-            var Username = User.Identity.GetUsername();
-            if (Username == null)
+            var Id = User.Identity.GetUserId();
+            if (Id == null)
                 return null;
 
-            var _User = await Context.User.FirstOrDefaultAsync(x => x.Username == Username && x.IsActive);
+            var _User = await Context.User.FirstOrDefaultAsync(x => x.Id == long.Parse(Id) && x.IsActive);
             return _User != null ? _User : null;
         }
     }

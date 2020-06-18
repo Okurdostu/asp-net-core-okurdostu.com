@@ -324,16 +324,16 @@ else
                         <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
                             <div class="modal-content" style="background: transparent;">
                                 <div class="modal-body bg-light" style="border-radius: 25px;">
-                                    <p class="text-md-center">
+                                    <p class="text-md-center font-weight-bold text-black-50">
                                         @item.University.Name okulunda varolan eğitiminiz kaldıralacak
                                     </p>
                                     <hr />
                                     <div>
-                                        @using (Html.BeginForm("", "", FormMethod.Post))
+                                        @using (Html.BeginForm("RemoveEducation", "Account", FormMethod.Post))
                                         {
                                             @Html.AntiForgeryToken()
-                                            <input type="hidden" id="username" name="username" value="@item.User.Username" />
-                                            <input type="hidden" id="id" name="id" value="@item.Id" />
+                                            <input type="hidden" id="Username" name="Username" value="@item.User.Username" />
+                                            <input type="hidden" id="Id" name="Id" value="@item.Id" />
                                             <button type="submit" class="btn btn-danger btn-block font-weight-bold rounded-custom">
                                                 Kaldır
                                             </button>

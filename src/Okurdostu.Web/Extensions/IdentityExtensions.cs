@@ -12,5 +12,12 @@ namespace Okurdostu.Web
             Claim claim = CI?.FindFirst("Username");
             return claim != null ? claim.Value : null;
         }
+
+        public static string GetUserId(this IIdentity identity)
+        {
+            ClaimsIdentity CI = identity as ClaimsIdentity;
+            Claim claim = CI?.FindFirst("Id");
+            return claim != null ? claim.Value : null;
+        }
     }
 }

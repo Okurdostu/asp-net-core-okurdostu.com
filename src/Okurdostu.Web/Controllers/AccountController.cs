@@ -87,5 +87,34 @@ namespace Okurdostu.Web.Controllers
             return Redirect("/" + User.Identity.GetUsername());
         }
 
+        [HttpPost]
+        [Route("~/egitim-kaldir")]
+        public async Task<IActionResult> RemoveEducation(long Id, string Username)
+        {
+            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && x.User.Username == Username && !x.IsRemoved);
+            if (Education != null)
+            {
+                var AuthenticatedUser = await GetAuthenticatedUserFromDatabase();
+                if (AuthenticatedUser != null && AuthenticatedUser.Id == Education.UserId)
+                {
+                    var AuthenticatedUserNeedCount = Context.Need.Where(x => !x.IsRemoved && x.UserId == AuthenticatedUser.Id).Count();
+                    if (Education.IsActiveEducation && AuthenticatedUserNeedCount > 0)
+                        TempData["ProfileMessage"] = "İhtiyaç kampanyanız olduğu için" +
+                            "<br />" +
+                            "Aktif olan eğitim bilginizi silemezsiniz." +
+                            "Aktif olan eğitim bilgisi, hala burada okuduğunuzu iddia ettiğiniz bir eğitim bilgisidir.";
+                    else
+                    {
+                        Education.IsRemoved = true;
+                        var result = await Context.SaveChangesAsync();
+                        if (result !> 0)
+                            TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
+                    }
+                }
+                else
+                    TempData["ProfileMessage"] = "MC Hammer: You can't touch this";
+            }
+            return Redirect("/" + User.Identity.GetUsername());
+        }
     }
 }
