@@ -1,7 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Web.Base;
+using Okurdostu.Data.Model;
+using Okurdostu.Data;
 
 namespace Okurdostu.Web.Controllers
 {
@@ -11,8 +14,12 @@ namespace Okurdostu.Web.Controllers
         {
             if (!string.IsNullOrEmpty(username))
             {
-                var User = await Context.User.FirstOrDefaultAsync(x => x.Username == username && x.IsActive);
-                if (User != null) return View(User);
+                var _User = await Context.User.
+                    Include(user => user.UserEducation).
+                    ThenInclude(x => x.University).
+                    FirstOrDefaultAsync(x => x.Username == username && x.IsActive);
+
+                if (_User != null) return View(_User);
             }
 
             //404

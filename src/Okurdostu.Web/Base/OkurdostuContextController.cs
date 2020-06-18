@@ -15,7 +15,10 @@ namespace Okurdostu.Web.Base
         public async Task<User> GetAuthenticatedUserFromDatabase()
         {
             var Username = User.Identity.GetUsername();
-            var _User = await Context.User.FirstOrDefaultAsync(x => x.Username == Username);
+            if (Username == null)
+                return null;
+
+            var _User = await Context.User.FirstOrDefaultAsync(x => x.Username == Username && x.IsActive);
             return _User != null ? _User : null;
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data.Model;
+using Okurdostu.Data.Model.ModelConfiguration;
 
 namespace Okurdostu.Data
 {
@@ -32,6 +33,14 @@ namespace Okurdostu.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfiguration(new NeedConfiguration());
+            modelBuilder.ApplyConfiguration(new NeedItemConfiguration());
+            modelBuilder.ApplyConfiguration(new NeedLikeConfiguration());
+            modelBuilder.ApplyConfiguration(new UniversityConfiguration());
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new UserEducationConfiguration());
+            modelBuilder.ApplyConfiguration(new UserEducationDocConfiguration());
+
             OnModelCreatingPartial(modelBuilder);
         }
 

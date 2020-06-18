@@ -14,7 +14,7 @@
 }
 
 @{
-    ViewData["Title"] = Model.FullName + "@" + Model.Username + " | Okurdostu";
+    ViewData["Title"] = Model.FullName + " (@" + Model.Username + ") | Okurdostu";
     ViewData["OGType"] = "profile";
     ViewData["Description"] = Model.FullName + " (@" + Model.Username + ") Okurdostu profili, ihtiyaçları, üniversite eğitim bilgileri";
     ViewData["OGImage"] = "https://okurdostu.com" + Model.PictureUrl;
@@ -232,9 +232,7 @@
                                 Eğitim ekleme
                             </h3>
                             <hr />
-                            @{
-                                //add education partial
-                            }
+                            @await Component.InvokeAsync("AddEducation")
                         </div>
                     </div>
                 </div>
