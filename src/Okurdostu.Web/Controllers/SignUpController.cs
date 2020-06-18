@@ -47,7 +47,9 @@ namespace Okurdostu.Web.Controllers
                         var ClaimsIdentity = new ClaimsIdentity(ClaimList, CookieAuthenticationDefaults.AuthenticationScheme);
                         var AuthProperties = new AuthenticationProperties
                         {
-                            AllowRefresh = true
+                            AllowRefresh = true,
+                            IsPersistent = true
+
                         };
                         await HttpContext.SignInAsync(
                             CookieAuthenticationDefaults.AuthenticationScheme,

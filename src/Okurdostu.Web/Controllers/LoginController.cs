@@ -47,7 +47,8 @@ namespace Okurdostu.Web.Controllers
 
                     var AuthProperties = new AuthenticationProperties
                     {
-                        AllowRefresh = true
+                        AllowRefresh = true,
+                        IsPersistent = true
                     };
 
                     await HttpContext.SignInAsync(

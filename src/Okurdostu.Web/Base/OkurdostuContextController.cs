@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data;
 using Okurdostu.Data.Model;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Base

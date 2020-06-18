@@ -2,6 +2,18 @@
 @{
     bool IsAuthenticated = HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
 }
+@{
+    Okurdostu.Data.Model.User AuthUser = null;
+}
+
+@if (IsAuthenticated)
+{
+    long Id = long.Parse(HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value);
+    using (var Context = new Okurdostu.Data.OkurdostuContext())
+    {
+        AuthUser = Context.User.FirstOrDefault(x => x.Id == Id);
+    };
+}
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -20,7 +32,6 @@
         <meta name="twitter:card" content="summary_large_image" />
     }
     <meta name="twitter:site" content="@Html.Raw("@okurdostucom")" />
-
     <meta property="og:site_name" content="Okurdostu" />
     <meta property="og:locale" content="tr_TR" />
     <meta property="og:url" content="Url" />
@@ -55,7 +66,6 @@
     {
         <meta property="og:type" content="website" />
     }
-
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700,700i" rel="stylesheet">
@@ -70,7 +80,6 @@
         }
     }
 </head>
-
 <body data-spy="scroll" data-target=".fixed-top">
     <div class="spinner-form" id="spinner-form" style="display:none;">
         <div class="spinner">
@@ -118,7 +127,7 @@
                     else
                     {
                         <li class="nav-item page-scroll">
-                            @if (HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "PictureUrl")?.Value == null)
+                            @if (AuthUser.PictureUrl == null)
                             {
                                 <div class="dropdown show">
                                     <a class="dropdown-toggle" href="" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -126,7 +135,7 @@
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="background-color:transparent">
                                         <a class="btn dropdown-item rounded-custom font-weight-bold" href="/beta">Beta</a>
-                                        <a class="btn dropdown-item rounded-custom font-weight-bold" href="@HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Username")?.Value">Profil</a>
+                                        <a class="btn dropdown-item rounded-custom font-weight-bold" href="/@AuthUser.Username">Profil</a>
                                     </div>
                                 </div>
                             }
@@ -134,11 +143,11 @@
                             {
                                 <div class="dropdown show">
                                     <a class="dropdown-toggle" href="" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <img src="@HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "PictureUrl")?.Value" class="rounded-circle" style="width:60px;" alt="">
+                                        <img src="@AuthUser.PictureUrl" class="rounded-circle" style="width:60px;" alt="">
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="background-color:transparent">
                                         <a class="btn dropdown-item rounded-custom font-weight-bold" href="/beta">Beta</a>
-                                        <a class="btn dropdown-item rounded-custom font-weight-bold" href="@HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Username")?.Value">Profil</a>
+                                        <a class="btn dropdown-item rounded-custom font-weight-bold" href="/@AuthUser.Username">Profil</a>
                                     </div>
                                 </div>
                             }
