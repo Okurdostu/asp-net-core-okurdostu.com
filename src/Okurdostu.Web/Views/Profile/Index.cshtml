@@ -5,8 +5,8 @@
 @{
     if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
     {
-        string AuthenticatedUsername = HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Username")?.Value;
-        if (AuthenticatedUsername == Model.Username.ToString())
+        string AuthenticatedUserId = HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+        if (AuthenticatedUserId == Model.Id.ToString())
         {
             IsAuthenticatedUserEqualModelUser = true;
         }
@@ -114,7 +114,7 @@
                         document.getElementById('AddPhotoButton').click();
                     }
                 </script>
-                using (Html.BeginForm("", "", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                using (Html.BeginForm("AddPhoto", "Account", FormMethod.Post, new { enctype = "multipart/form-data" }))
                 {
                     @Html.AntiForgeryToken()
                     <input hidden="hidden" id="file" name="file" type="file" onchange="Selected()" accept="image/*" />
@@ -131,9 +131,11 @@
                                 <button class="btn btn-block btn-outline-info rounded-custom font-weight-bold" onclick="FileSelect();">
                                     Yeni fotoğraf yükle
                                 </button>
-                                <a class="btn btn-block btn-danger rounded-custom font-weight-bold" href="#">
-                                    Şuan ki fotoğrafı kaldır
-                                </a>
+                                @using (Html.BeginForm("RemovePhoto", "Account", FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn btn-block btn-danger rounded-custom font-weight-bold mb-1 mt-1" type="submit">Şuan ki fotoğrafı kaldır</button>
+                                }
                                 <button class="btn btn-block btn-outline-secondary rounded-custom font-weight-bold" data-dismiss="modal">
                                     Vazgeçtim
                                 </button>

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data;
 using Okurdostu.Data.Model;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Base
@@ -12,7 +13,7 @@ namespace Okurdostu.Web.Base
         public OkurdostuContext Context => _con ?? (OkurdostuContext)HttpContext?.RequestServices.GetService(typeof(OkurdostuContext));
 
         //başka bir controllera alınacak
-        public async Task<User> GetAuthenticatedUserFromDatabase()
+        public async Task<User> GetAuthenticatedUserFromDatabaseAsync()
         {
             var Id = User.Identity.GetUserId();
             if (Id == null)
