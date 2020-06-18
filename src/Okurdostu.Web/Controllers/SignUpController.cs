@@ -22,7 +22,7 @@ namespace Okurdostu.Web.Controllers
 
         [HttpPost, ValidateAntiForgeryToken]
         [Route("~/Kaydol")]
-        public async Task<IActionResult> Index(SignUpModel Model)
+        public async Task<IActionResult> Index(ProfileModel Model)
         {
             if (ModelState.IsValid)
             {
