@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data.Model;
 using Okurdostu.Web.Base;
+using Okurdostu.Web.Extensions;
 
 namespace Okurdostu.Web.Controllers
 {
@@ -34,7 +35,7 @@ namespace Okurdostu.Web.Controllers
                             EndYear = Model.Finishyear.ToString(),
                             ActivitiesSocieties = Model.ActivitiesSocieties
                         };
-                        await Context.AddAsync(Education);
+                        await Context.UserEducation.AddAsync(Education);
                         var result = await Context.SaveChangesAsync();
                         if (result > 0)
                             TempData["ProfileMessage"] = "Eğitim bilginiz eklendi<br />Onaylanması için belge yollamayı unutmayın.";
@@ -44,9 +45,45 @@ namespace Okurdostu.Web.Controllers
                 }
                 else
                     TempData["ProfileMessage"] = "Başlangıç yılınız, bitiriş yılınızdan büyük olmamalı";
-
             }
-            TempData["ProfileMessage"] = "Böyle bir üniversite yok";
+            return Redirect("/" + User.Identity.GetUsername());
+        }
+
+        [HttpPost]
+        [Route("~/egitim-duzenle")]
+        public async Task<IActionResult> EditEducation(EducationModel Model)
+        {
+            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Model.EducationId);
+            if (Education != null)
+            {
+                var AuthenticatedUser = await GetAuthenticatedUserFromDatabase();
+                if (User != null && Education.UserId == AuthenticatedUser.Id)
+                {
+                    Education.ActivitiesSocieties = Model.ActivitiesSocieties;
+
+                    if (Education.IsUniversityInformationsCanEditable())
+                    {
+                        Education.UniversityId = (short)Model.UniversityId;
+                        Education.Department = Model.Department;
+                    }
+
+                    if (Model.Startyear < Model.Finishyear)
+                    {
+                        Education.StartYear = Model.Startyear.ToString();
+                        Education.EndYear = Model.Finishyear.ToString();
+                        TempData["ProfileMessage"] = "Eğitim bilgileriniz düzenlendi";
+                    }
+                    else
+                        TempData["ProfileMessage"] = "Başlangıç yılınız, bitiriş yılınızdan büyük olmamalı" +
+                            "<br />" + "Bunlar dışında ki eğitim bilgileriniz düzenlendi";
+
+                    var result = await Context.SaveChangesAsync();
+                    if (result! > 0)
+                        TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
+                }
+                else
+                    TempData["ProfileMessage"] = "MC Hammer: You can't touch this";
+            }
             return Redirect("/" + User.Identity.GetUsername());
         }
 

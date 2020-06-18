@@ -355,7 +355,7 @@ else
                                     </h3>
                                     <hr />
                                     @{
-                                        //partial education edit
+                                        @await Component.InvokeAsync("EditEducation", new { EducationdId = item.Id });
                                     }
                                 </div>
                             </div>
