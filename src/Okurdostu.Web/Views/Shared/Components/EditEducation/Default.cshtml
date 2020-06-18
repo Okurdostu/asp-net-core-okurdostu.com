@@ -1,5 +1,11 @@
 ﻿@model EducationModel
-
+@{
+    Layout = "~/Views/Shared/BtstrapModalLayouts/_LayoutLg.cshtml";
+}
+<h3 class="font-weight-bold text-center font-weight-bold text-black-50">
+    Eğitim düzenleme
+</h3>
+<hr />
 @using (Html.BeginForm("EditEducation", "Account", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
@@ -12,7 +18,7 @@
                     Üniversiteniz
                 </span>
                 <div>
-                    @Html.DropDownListFor(model => model.UniversityId, Model.Universities, new { @class = "form-control" })
+                    @Html.DropDownListFor(model => model.UniversityId, Model.Universities, new { @class = "form-control font-weight-bold" })
                     @Html.ValidationMessageFor(model => model.UniversityId, "", new { @class = "text-danger font-weight-bold" })
                 </div>
             </div>
@@ -21,7 +27,7 @@
                     Bölümünüz
                 </span>
                 <div>
-                    @Html.EditorFor(model => model.Department, new { htmlAttributes = new { @class = "form-control", @autocomplete = "off", @maxlength = "200" } })
+                    @Html.EditorFor(model => model.Department, new { htmlAttributes = new { @class = "form-control font-weight-bold", @autocomplete = "off", @maxlength = "200" } })
                     @Html.ValidationMessageFor(model => model.Department, "", new { @class = "text-danger font-weight-bold" })
                 </div>
             </div>
@@ -29,7 +35,7 @@
         else
         {
             <div class="form-group">
-                <div class="col-md-12 text-center text-black-50">
+                <div class="col-md-12 text-center text-black-50 font-weight-bold">
                     Eğitiminiz onaylandığı için: üniversite ve bölüm değişikliği yapamazsınız
                 </div>
             </div>
@@ -40,7 +46,7 @@
                 Aktiviteler veya topluluklar
             </span>
             <div>
-                @Html.EditorFor(model => model.ActivitiesSocieties, new { htmlAttributes = new { @class = "form-control", @autocomplete = "off", @maxlength = "200" } })
+                @Html.EditorFor(model => model.ActivitiesSocieties, new { htmlAttributes = new { @class = "form-control font-weight-bold", @autocomplete = "off", @maxlength = "200" } })
                 @Html.ValidationMessageFor(model => model.ActivitiesSocieties, "", new { @class = "text-danger font-weight-bold" })
             </div>
         </div>
@@ -50,14 +56,14 @@
                     <span class="control-label pl-0 pr-0 font-weight-bold text-black-50">
                         Başlangıç yılı
                     </span>
-                    @Html.DropDownListFor(model => model.Startyear, Model.StartYears, new { @class = "form-control" })
+                    @Html.DropDownListFor(model => model.Startyear, Model.StartYears, new { @class = "form-control font-weight-bold" })
                     @Html.ValidationMessageFor(model => model.Startyear, "", new { @class = "text-danger font-weight-bold" })
                 </div>
                 <div class="col-6">
                     <span class="control-label pl-0 pr-0 font-weight-bold text-black-50">
                         Bitiş yılı
                     </span>
-                    @Html.DropDownListFor(model => model.Finishyear, Model.FinishYears, new { @class = "form-control" })
+                    @Html.DropDownListFor(model => model.Finishyear, Model.FinishYears, new { @class = "form-control font-weight-bold" })
                     @Html.ValidationMessageFor(model => model.Finishyear, "", new { @class = "text-danger font-weight-bold" })
                 </div>
             </div>

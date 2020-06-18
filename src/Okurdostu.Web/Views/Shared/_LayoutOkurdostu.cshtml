@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
+@{
+    bool IsAuthenticated = HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
+}
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="utf-8">
@@ -60,7 +64,6 @@
     <link href="~/css/preloader.css" rel="stylesheet" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
 </head>
-
 <body class="bg-white">
     <div class="spinner-form" id="spinner-form" style="display:none;">
         <div class="spinner">
@@ -83,14 +86,14 @@
             <div>
                 <a class="@ViewData["UnivercityActiveClass"]" href="/universiteler" id="universiteler"><i class="fas fa-school"></i> <span>Üniversiteler</span></a>
             </div>
-            @if (false)
+            @if (IsAuthenticated)
             {
                 //partialmenu for user
             }
             else
             {
                 <div>
-                    <a href="/girisyap"><i class="fas fa-sign-in-alt"></i> <span>Giriş yap</span></a>
+                    <a href="/girisyap"><i class="fas fa-sign-in-alt"></i><span>Giriş yap</span></a>
                 </div>
             }
         </div>
@@ -146,7 +149,7 @@
             </div>
         </div>
     </div>
-    @if (false)
+    @if (IsAuthenticated)
     {
         <div class="modal fade" id="LogoutModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-sm modal-dialog-centered" role="document">

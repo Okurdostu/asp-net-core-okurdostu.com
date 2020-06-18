@@ -227,21 +227,10 @@
                 <a class="btn od rounded-custom p-0 font-weight-bold" data-toggle="modal" data-target="#AddEducation" style="cursor:pointer; font-size:18px"><i class="fas fa-plus"></i> Eğitim</a>
             </div>
         </div>
-        @{ //it should be rendered while .a clicking
-            <div class="modal fade" id="AddEducation" tabindex="-1" role="dialog" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                    <div class="modal-content" style="background: transparent;">
-                        <div class="modal-body bg-light" style="border-radius: 25px;">
-                            <h3 class="font-weight-bold text-center">
-                                Eğitim ekleme
-                            </h3>
-                            <hr />
-                            @await Component.InvokeAsync("AddEducation")
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
+
+        <div class="modal fade" id="AddEducation" tabindex="-1" role="dialog" aria-hidden="true">
+            @await Component.InvokeAsync("AddEducation")
+        </div>
     </div>
 }
 else
@@ -264,14 +253,14 @@ else
             <div class="col-auto pr-0 pl-2">
                 @if (item.University.LogoUrl != null)
                 {
-                    <a href="/universite/@item.University.FriendlyName" target="_blank">
+                    <a href="/universite/@item.University.FriendlyName">
                         <img src="@item.University.LogoUrl"
                              class="profil-image rounded-pill" style="width:100px;" />
                     </a>
                 }
                 else
                 {
-                    <a href="/universite/@item.University.FriendlyName" target="_blank">
+                    <a href="/universite/@item.University.FriendlyName">
                         <img src="~/Content/image/building.svg"
                              class="profil-image rounded-pill" style="width:100px;" />
                     </a>
@@ -279,7 +268,7 @@ else
             </div>
             <div class="col p-0">
                 <h5>
-                    <a class="od" href="/universite/@item.University.FriendlyName" target="_blank">
+                    <a class="od" href="/universite/@item.University.FriendlyName">
                         @Html.Raw(item.University.Name)
                     </a>
                     @if (item.IsConfirmed == true)
@@ -349,21 +338,10 @@ else
                             </div>
                         </div>
                     </div>
-
                     <div class="modal fade" id="education-edit-@item.Id" tabindex="-1" role="dialog" aria-hidden="true">
-                        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                            <div class="modal-content" style="background: transparent;">
-                                <div class="modal-body bg-light" style="border-radius: 25px;">
-                                    <h3 class="font-weight-bold text-center">
-                                        Eğitim düzenleme
-                                    </h3>
-                                    <hr />
-                                    @{
-                                        @await Component.InvokeAsync("EditEducation", new { EducationdId = item.Id });
-                                    }
-                                </div>
-                            </div>
-                        </div>
+                        @{
+                            @await Component.InvokeAsync("EditEducation", new { EducationdId = item.Id });
+                        }
                     </div>
                 }
             </div>

@@ -1,5 +1,7 @@
 # ignores about project
 universite-logo/
+profil-fotograf/
+
 #vscode
 .vscode/*
 !.vscode/settings.json
@@ -31,3 +33,4 @@ msbuild.wrn
 *.user
 *.userosscache
 *.sln.docstates
+
