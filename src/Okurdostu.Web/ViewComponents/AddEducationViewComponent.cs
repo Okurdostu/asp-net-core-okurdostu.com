@@ -17,16 +17,8 @@ namespace Okurdostu.Web.ViewComponents
         public async Task<IViewComponentResult> InvokeAsync()
         {
             var Model = new EducationModel();
-
-            //2 yerde kullanılıyor: modele taşınacak, modelden çağrılacak.
-            var _Universities = new List<SelectListItem>();
-            foreach (var item in await Context.University.ToListAsync())
-                _Universities.Add(new SelectListItem() { Text = item.Name, Value = item.Id.ToString() });
-            Model.Universities = _Universities;
-            //2 yerde kullanılıyor: modele taşınacak, modelden çağrılacak.
-
+            await Model.ListUniversitiesAsync();
             Model.ListYears();
-
             return View(Model);
         }
     }

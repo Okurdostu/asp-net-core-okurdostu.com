@@ -34,12 +34,7 @@ namespace Okurdostu.Web.ViewComponents
                     Model.UniversityId = Education.UniversityId;
                     Model.Department = Education.Department;
 
-                    //2 yerde kullanılıyor: modele taşınacak, modelden çağrılacak.
-                    var _Universities = new List<SelectListItem>();
-                    foreach (var item in Context.University.ToList())
-                        _Universities.Add(new SelectListItem() { Text = item.Name, Value = item.Id.ToString() });
-                    Model.Universities = _Universities;
-                    //2 yerde kullanılıyor: modele taşınacak, modelden çağrılacak.
+                    await Model.ListUniversitiesAsync();
                 }
                 return View(Model);
             }

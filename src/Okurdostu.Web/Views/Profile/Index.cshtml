@@ -24,6 +24,8 @@
 @if (IsAuthenticatedUserEqualModelUser)
 {
     <script src="~/js/popper.min.js"></script>
+    <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
+
     <div class="text-center">
         <div class="btn-group btn-block">
             <button class="btn btn-outline-primary rounded-custom btn-block font-weight-bold mb-2" type="button" id="dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
