@@ -7,6 +7,11 @@ namespace Okurdostu.Data.Model
     {
         public UserEducation()
         {
+            CreatedOn = DateTime.Now;
+            IsRemoved = false;
+            IsSentToConfirmation = false;
+            IsActiveEducation = false;
+            IsConfirmed = false;
             UserEducationDoc = new HashSet<UserEducationDoc>();
         }
 
@@ -17,7 +22,7 @@ namespace Okurdostu.Data.Model
         public string ActivitiesSocieties { get; set; }
         public string StartYear { get; set; }
         public string EndYear { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreatedOn { get; private set; }
         public bool IsRemoved { get; set; }
         public bool IsSentToConfirmation { get; set; }
         public bool IsActiveEducation { get; set; }
