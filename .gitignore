@@ -1,3 +1,6 @@
+# ignores about project
+universite-logo/
+#vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
