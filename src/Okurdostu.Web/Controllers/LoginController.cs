@@ -55,7 +55,7 @@ namespace Okurdostu.Web.Controllers
                         new ClaimsPrincipal(ClaimsIdentity),
                         AuthProperties);
 
-                    return ReturnUrl != null ? Redirect(ReturnUrl) : Redirect("/beta");
+                    return ReturnUrl != null && !ReturnUrl.ToLower().Contains("account") ? Redirect(ReturnUrl) : Redirect("/beta");
                 }
                 TempData["LoginMessage"] = "Kullanıcı adınız veya parolanız geçersiz";
             }
