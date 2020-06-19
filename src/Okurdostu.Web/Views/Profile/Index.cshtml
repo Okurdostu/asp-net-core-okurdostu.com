@@ -1,7 +1,6 @@
 ﻿@model Okurdostu.Data.Model.User
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
 @{ bool IsAuthenticatedUserEqualModelUser = false; }
-
 @{
     if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
     {
@@ -12,7 +11,6 @@
         }
     }
 }
-
 @{
     ViewData["Title"] = Model.FullName + " (@" + Model.Username + ") | Okurdostu";
     ViewData["OGType"] = "profile";
@@ -20,12 +18,10 @@
     ViewData["OGImage"] = "https://okurdostu.com" + Model.PictureUrl;
     Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
 }
-
 @if (IsAuthenticatedUserEqualModelUser)
 {
     <script src="~/js/popper.min.js"></script>
     <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
-
     <div class="text-center">
         <div class="btn-group btn-block">
             <button class="btn btn-outline-primary rounded-custom btn-block font-weight-bold mb-2" type="button" id="dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -46,22 +42,18 @@
                     </h3>
                     <ul class="nav nav-tabs font-weight-bold justify-content-center" id="tab" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" id="basic-tab" data-toggle="tab" href="#basic" role="tab" aria-controls="basic" aria-selected="true">Temel</a>
+                            <a class="nav-link active" id="username-tab" data-toggle="tab" href="#username" role="tab" aria-controls="basic" aria-selected="true">Kullanıcı adı</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" id="password-tab" data-toggle="tab" href="#password" role="tab" aria-controls="password" aria-selected="false">Parola</a>
                         </li>
                     </ul>
                     <div class="tab-content">
-                        <div class="tab-pane fade show active" id="basic" role="tabpanel" aria-labelledby="basic-tab">
-                            @{
-                                //change basic account informations: username, e-mail
-                            }
+                        <div class="tab-pane fade show active" id="username" role="tabpanel" aria-labelledby="basic-tab">
+                            @await Component.InvokeAsync("EditUsername", null)
                         </div>
                         <div class="tab-pane fade" id="password" role="tabpanel" aria-labelledby="password-tab">
-                            @{
-                                //change password
-                            }
+                            @await Component.InvokeAsync("EditPassword", null)
                         </div>
                     </div>
                 </div>
@@ -85,14 +77,10 @@
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profil-tab">
-                            @{
-                                //change FullName, bio
-                            }
+                            @await Component.InvokeAsync("ProfileBasic")
                         </div>
                         <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-                            @{
-                                //change or add contact informations ex: github,twitter profiles, showable e-mail
-                            }
+                            @await Component.InvokeAsync("Contact")
                         </div>
                     </div>
 
@@ -116,7 +104,6 @@
                 </script>
                 using (Html.BeginForm("AddPhoto", "Account", FormMethod.Post, new { enctype = "multipart/form-data" }))
                 {
-                    @Html.AntiForgeryToken()
                     <input hidden="hidden" id="file" name="file" type="file" onchange="Selected()" accept="image/*" />
                     <button hidden="hidden" type="submit" id="AddPhotoButton"></button>
                 }
@@ -133,7 +120,6 @@
                                 </button>
                                 @using (Html.BeginForm("RemovePhoto", "Account", FormMethod.Post))
                                 {
-                                    @Html.AntiForgeryToken()
                                     <button class="btn btn-block btn-danger rounded-custom font-weight-bold mb-1 mt-1" type="submit">Şuan ki fotoğrafı kaldır</button>
                                 }
                                 <button class="btn btn-block btn-outline-secondary rounded-custom font-weight-bold" data-dismiss="modal">
@@ -321,19 +307,16 @@ else
                                         @item.University.Name okulunda varolan eğitiminiz kaldıralacak
                                     </p>
                                     <hr />
-                                    <div>
-                                        @using (Html.BeginForm("RemoveEducation", "Account", FormMethod.Post))
-                                        {
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" id="Username" name="Username" value="@item.User.Username" />
-                                            <input type="hidden" id="Id" name="Id" value="@item.Id" />
-                                            <button type="submit" class="btn btn-danger btn-block font-weight-bold rounded-custom">
-                                                Kaldır
-                                            </button>
-                                        }
-                                        <hr />
-                                        <button type="button" class="btn btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>
-                                    </div>
+                                    @using (Html.BeginForm("RemoveEducation", "Account", FormMethod.Post))
+                                    {
+                                        <input type="hidden" id="Username" name="Username" value="@item.User.Username" />
+                                        <input type="hidden" id="Id" name="Id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-danger btn-block font-weight-bold rounded-custom">
+                                            Kaldır
+                                        </button>
+                                    }
+                                    <hr />
+                                    <button type="button" class="btn btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>
                                 </div>
                             </div>
                         </div>
@@ -348,3 +331,4 @@ else
         </div>
     }
 }
+

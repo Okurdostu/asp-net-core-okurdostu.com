@@ -1,0 +1,42 @@
+﻿@model Okurdostu.Web.Models.ProfileModel
+@using (Html.BeginForm("Contact", "Account", FormMethod.Post))
+{
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            <span class="control-label col-md-2 font-weight-bold text-black-50">
+                Twitter (Profilinizde sergilenecek)
+            </span>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon3">https://twitter.com/</span>
+                </div>
+                @Html.EditorFor(model => model.Twitter, new { htmlAttributes = new { @class = "form-control font-weight-bold" } })
+            </div>
+            @Html.ValidationMessageFor(model => model.Twitter, "", new { @class = "text-danger font-weight-bold" })
+        </div>
+        <div class="form-group">
+            <span class="control-label col-md-2 font-weight-bold text-black-50">
+                Github (Profilinizde sergilenecek)
+            </span>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon3">https://github.com/</span>
+                </div>
+                @Html.EditorFor(model => model.Github, new { htmlAttributes = new { @class = "form-control font-weight-bold" } })
+            </div>
+            @Html.ValidationMessageFor(model => model.Github, "", new { @class = "text-danger font-weight-bold" })
+        </div>
+        <div class="form-group">
+            <span class="control-label col-md-2 font-weight-bold text-black-50">
+                E-mail (Profilinizde sergilenecek)
+            </span>
+            @Html.EditorFor(model => model.ContactEmail, new { htmlAttributes = new { @class = "form-control font-weight-bold" } })
+            @Html.ValidationMessageFor(model => model.ContactEmail, "", new { @class = "text-danger font-weight-bold" })
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
+            <input type="submit" value="Kaydet" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" />
+        </div>
+    </div>
+}

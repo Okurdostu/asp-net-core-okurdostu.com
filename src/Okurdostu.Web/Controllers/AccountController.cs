@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data.Model;
 using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
+using Okurdostu.Web.Models;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 
@@ -28,8 +30,106 @@ namespace Okurdostu.Web.Controllers
 #pragma warning restore CS0618 // Type or member is obsolete
 
         #region account
+        [NonAction]
+        public async Task<bool> ConfirmIdentityWithPassword(string ConfirmPassword)
+        {
+            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+            return ConfirmPassword == AuthUser.Password ? true : false;
+        }
+
+        //  email editleme:
+
+        //  1.  Guid ile bir key oluşturulacak ve kullanıcı ile bu key eşleştirilip veritabanına alınacak
+        //  2.  Keye ulaşabileceği bir link o an kullandığı e-mail adresine yollanacak
+        //  3.  O keyli link kullanılarak yeni bir e-mail adresi girişi yapabilecek
+        //  4.  Yeni girişin yapıldığı e-mail ilk başta veritabanında eşleştirdiğimiz(key ve kullanıcı) kullanıcıya atanıp: yeni e-mail için onay istenecek
+
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/fotograf")]
+        [Route("~/password")]
+        public async Task EditPassword(ProfileModel Model)
+        {
+            if (await ConfirmIdentityWithPassword(Model.ConfirmPassword.SHA512()))
+            {
+                if (Model.RePassword == Model.Password)
+                {
+                    AuthUser.Password = Model.Password.SHA512();
+                    var result = await Context.SaveChangesAsync();
+                    if (result! > 0)
+                        TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
+                }
+                else
+                    TempData["ProfileMessage"] = "Yeni parolalarınız birbiri ile eşleşmedi";
+            }
+            else
+                TempData["ProfileMessage"] = "Kimliğinizi doğrulayamadık";
+
+            Response.Redirect("/" + AuthUser.Username);
+        }
+
+        [HttpPost,ValidateAntiForgeryToken]
+        [Route("~/username")]
+        public async Task EditUsername(ProfileModel Model)
+        {
+            if (await ConfirmIdentityWithPassword(Model.ConfirmPassword.SHA512()))
+            {
+                if (Model.Username.ToLower() != AuthUser.Username)
+                {
+                    if (AuthUser.Username != Model.Username)
+                    {
+                        string NowUsername = AuthUser.Username;
+                        AuthUser.Username = Model.Username;
+                        try
+                        {
+                            await Context.SaveChangesAsync();
+                        }
+                        catch (Exception e)
+                        {
+                            TempData["ProfileMessage"] = e.InnerException.Message.Contains("Unique_Key_Username")
+                                ? "Bu kullanıcı adını kullanamazsınız"
+                                : "Başaramadık, neler olduğunu bilmiyoruz";
+
+                            AuthUser.Username = NowUsername;
+                            //log ex message
+                        }
+                    }
+                }
+            }
+            else
+                TempData["ProfileMessage"] = "Kimliğinizi doğrulayamadık";
+
+            Response.Redirect("/" + AuthUser.Username);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        [Route("~/contact")]
+        public async Task Contact(ProfileModel Model) //editing, adding contacts
+        {
+            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+            AuthUser.ContactEmail = Model.ContactEmail;
+            AuthUser.Twitter = Model.Twitter;
+            AuthUser.Github = Model.Github;
+            var result = await Context.SaveChangesAsync();
+            if (result! > 0)
+                TempData["ProfileMessage"] = "Başaramadık neler olduğunu bilmiyoruz";
+
+            Response.Redirect("/" + AuthUser.Username);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        [Route("~/basic")]
+        public async Task ProfileBasic(ProfileModel Model) //editing, adding bio and fullname
+        {
+            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+            AuthUser.Biography = Model.Biography;
+            AuthUser.FullName = Model.FullName;
+            var result = await Context.SaveChangesAsync();
+            if (result! > 0)
+                TempData["ProfileMessage"] = "Başaramadık neler olduğunu bilmiyoruz";
+            Response.Redirect("/" + AuthUser.Username);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        [Route("~/photo")]
         public async Task AddPhoto()
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
@@ -46,11 +146,12 @@ namespace Okurdostu.Web.Controllers
                         image.Mutate(x => x.Resize(200, 200));
                     image.Save(FilePathWithName);
                     AuthUser.PictureUrl = "/image/profil-fotograf/" + NewName;
-                    await Context.SaveChangesAsync();
+                    var result = await Context.SaveChangesAsync();
+                    if (result! > 0)
+                        TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
                 }
                 else
-                    TempData["ProfileMessage"] = "PNG, JPG ve JPEG türünde resim yükleyiniz";
-
+                    TempData["ProfileMessage"] = "PNG, JPG ve JPEG türünde fotoğraf yükleyiniz";
             }
             else
                 TempData["ProfileMessage"] = "Seçtiğiniz dosya 1 megabyte'dan fazla";
@@ -59,19 +160,21 @@ namespace Okurdostu.Web.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/fotograf-kaldir")]
+        [Route("~/remove-photo")]
         public async Task RemovePhoto()
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             AuthUser.PictureUrl = null;
+            //file server'dan silenecek, kullanılmayan hiç bir kullanıcı verisi sunucuda tutulmayacak
             await Context.SaveChangesAsync();
             Response.Redirect("/" + AuthUser.Username);
         }
         #endregion
 
+
         #region Education
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/egitim")]
+        [Route("~/education")]
         public async Task AddEducation(EducationModel Model)
         {
             var University = await Context.University.FirstOrDefaultAsync(x => x.Id == Model.UniversityId);
@@ -94,10 +197,10 @@ namespace Okurdostu.Web.Controllers
                         };
                         await Context.UserEducation.AddAsync(Education);
                         var result = await Context.SaveChangesAsync();
-                        if (result > 0)
-                            TempData["ProfileMessage"] = "Eğitim bilginiz eklendi<br />Onaylanması için belge yollamayı unutmayın.";
-                        else
-                            TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
+
+                        TempData["ProfileMessage"] = result > 0
+                            ? "Eğitim bilginiz eklendi<br />Onaylanması için belge yollamayı unutmayın."
+                            : "Başaramadık, neler olduğunu bilmiyoruz";
                     }
                 }
                 else
@@ -107,7 +210,7 @@ namespace Okurdostu.Web.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/egitim-duzenle")]
+        [Route("~/edit-education")]
         public async Task EditEducation(EducationModel Model)
         {
             var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Model.EducationId);
@@ -144,7 +247,7 @@ namespace Okurdostu.Web.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/egitim-kaldir")]
+        [Route("~/remove-education")]
         public async Task RemoveEducation(long Id, string Username)
         {
             var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && x.User.Username == Username && !x.IsRemoved);
