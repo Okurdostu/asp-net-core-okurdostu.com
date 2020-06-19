@@ -30,36 +30,33 @@ namespace Okurdostu.Web.Controllers
         [Route("~/Girisyap")]
         public async Task<IActionResult> Index(LoginModel Model, string ReturnUrl)
         {
-            if (ModelState.IsValid)
+            var User = await AuthenticateAsync(Model);
+            if (User != null)
             {
-                var User = await AuthenticateAsync(Model);
-                if (User != null)
+                var ClaimList = new List<Claim>();
+                ClaimList.Add(new Claim("Id", User.Id.ToString()));
+                ClaimList.Add(new Claim("Username", User.Username));
+                ClaimList.Add(new Claim("Email", User.Email));
+                ClaimList.Add(new Claim("FullName", User.FullName));
+                if (User.PictureUrl != null)
+                    ClaimList.Add(new Claim("PictureUrl", User.PictureUrl.ToString()));
+
+                var ClaimsIdentity = new ClaimsIdentity(ClaimList, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                var AuthProperties = new AuthenticationProperties
                 {
-                    var ClaimList = new List<Claim>();
-                    ClaimList.Add(new Claim("Id", User.Id.ToString()));
-                    ClaimList.Add(new Claim("Username", User.Username));
-                    ClaimList.Add(new Claim("Email", User.Email));
-                    ClaimList.Add(new Claim("FullName", User.FullName));
-                    if (User.PictureUrl != null)
-                        ClaimList.Add(new Claim("PictureUrl", User.PictureUrl.ToString()));
+                    AllowRefresh = true,
+                    IsPersistent = true
+                };
 
-                    var ClaimsIdentity = new ClaimsIdentity(ClaimList, CookieAuthenticationDefaults.AuthenticationScheme);
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(ClaimsIdentity),
+                    AuthProperties);
 
-                    var AuthProperties = new AuthenticationProperties
-                    {
-                        AllowRefresh = true,
-                        IsPersistent = true
-                    };
-
-                    await HttpContext.SignInAsync(
-                        CookieAuthenticationDefaults.AuthenticationScheme,
-                        new ClaimsPrincipal(ClaimsIdentity),
-                        AuthProperties);
-
-                    return ReturnUrl != null && !ReturnUrl.ToLower().Contains("account") ? Redirect(ReturnUrl) : Redirect("/beta");
-                }
-                TempData["LoginMessage"] = "Kullanıcı adınız veya parolanız geçersiz";
+                return ReturnUrl != null && !ReturnUrl.ToLower().Contains("account") ? Redirect(ReturnUrl) : Redirect("/beta");
             }
+            TempData["LoginMessage"] = "Kullanıcı adınız veya parolanız geçersiz";
             return View();
         }
         public async Task<User> AuthenticateAsync(LoginModel Model)

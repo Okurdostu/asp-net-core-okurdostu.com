@@ -24,56 +24,50 @@ namespace Okurdostu.Web.Controllers
         [Route("~/Kaydol")]
         public async Task<IActionResult> Index(ProfileModel Model)
         {
-            if (ModelState.IsValid)
+            var User = new User
             {
-                var User = new User
+                Username = Model.Username,
+                Email = Model.Email,
+                Password = Model.Password.SHA512(),
+                FullName = Model.FullName,
+            };
+            try
+            {
+                await Context.User.AddAsync(User);
+                var result = await Context.SaveChangesAsync();
+                if (result > 0)
                 {
-                    Username = Model.Username,
-                    Email = Model.Email,
-                    Password = Model.Password.SHA512(),
-                    FullName = Model.FullName,
-                };
-                try
-                {
-                    await Context.User.AddAsync(User);
-                    var result = await Context.SaveChangesAsync();
-                    if (result > 0)
+                    var ClaimList = new List<Claim>();
+                    ClaimList.Add(new Claim("Id", User.Id.ToString()));
+                    ClaimList.Add(new Claim("Username", User.Username));
+                    ClaimList.Add(new Claim("Email", User.Email));
+                    ClaimList.Add(new Claim("FullName", User.FullName));
+                    var ClaimsIdentity = new ClaimsIdentity(ClaimList, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var AuthProperties = new AuthenticationProperties
                     {
-                        var ClaimList = new List<Claim>();
-                        ClaimList.Add(new Claim("Id", User.Id.ToString()));
-                        ClaimList.Add(new Claim("Username", User.Username));
-                        ClaimList.Add(new Claim("Email", User.Email));
-                        ClaimList.Add(new Claim("FullName", User.FullName));
-                        var ClaimsIdentity = new ClaimsIdentity(ClaimList, CookieAuthenticationDefaults.AuthenticationScheme);
-                        var AuthProperties = new AuthenticationProperties
-                        {
-                            AllowRefresh = true,
-                            IsPersistent = true
+                        AllowRefresh = true,
+                        IsPersistent = true
 
-                        };
-                        await HttpContext.SignInAsync(
-                            CookieAuthenticationDefaults.AuthenticationScheme,
-                            new ClaimsPrincipal(ClaimsIdentity),
-                            AuthProperties);
+                    };
+                    await HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(ClaimsIdentity),
+                        AuthProperties);
 
-                        return Redirect("/beta");
-                    }
-                    else
-                        TempData["SignUpMessage"] = "Başaramadık ve ne olduğunu bilmiyoruz";
+                    return Redirect("/beta");
                 }
-                catch (Exception e)
-                {
-                    if (e.InnerException.Message.Contains("Unique_Key_Username"))
-                        TempData["SignUpMessage"] = "Bu kullanıcı adını kullanamazsınız";
-                    else if (e.InnerException.Message.Contains("Unique_Key_Email"))
-                        TempData["SignUpMessage"] = "Bu e-mail adresini kullanamazsınız";
-                    else
-                        TempData["SignUpMessage"] = "Başaramadık ve ne olduğunu bilmiyoruz"; //ex.innerex.message db log
-                }
+                else
+                    TempData["SignUpMessage"] = "Başaramadık ve ne olduğunu bilmiyoruz";
             }
-            else
-                TempData["SignUpMessage"] = "Verdiğiniz bilgilerin doğruluğunu kontrol edin";
-
+            catch (Exception e)
+            {
+                if (e.InnerException.Message.Contains("Unique_Key_Username"))
+                    TempData["SignUpMessage"] = "Bu kullanıcı adını kullanamazsınız";
+                else if (e.InnerException.Message.Contains("Unique_Key_Email"))
+                    TempData["SignUpMessage"] = "Bu e-mail adresini kullanamazsınız";
+                else
+                    TempData["SignUpMessage"] = "Başaramadık ve ne olduğunu bilmiyoruz"; //ex.innerex.message db log
+            }
             return View();
         }
     }
