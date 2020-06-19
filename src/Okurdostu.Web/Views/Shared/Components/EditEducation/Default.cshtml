@@ -8,7 +8,6 @@
 <hr />
 @using (Html.BeginForm("EditEducation", "Account", FormMethod.Post))
 {
-    @Html.AntiForgeryToken()
     @Html.HiddenFor(model => model.EducationId)
     <div class="form-horizontal">
         @if (Model.Universities != null)

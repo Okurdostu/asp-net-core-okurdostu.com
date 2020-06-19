@@ -23,7 +23,6 @@
     }
     @using (Html.BeginForm("Index", "Login", FormMethod.Post, new { id = "LoginForm" }))
     {
-        @Html.AntiForgeryToken()
         @Html.Hidden("ReturnUrl")
         <div class="form-group mb-2">
             @Html.EditorFor(model => model.Username, new { htmlAttributes = new { @class = "form-control rounded-pill font-weight-bold text-black-50", @placeholder = "Kullanıcı adı, telefon veya email", autocomplete = "username" } })

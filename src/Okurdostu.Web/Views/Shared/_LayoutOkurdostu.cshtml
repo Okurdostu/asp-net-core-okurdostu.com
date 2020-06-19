@@ -162,7 +162,6 @@
                         <div>
                             @using (Html.BeginForm("", "Logout", FormMethod.Post))
                             {
-                                @Html.AntiForgeryToken()
                                 <button type="submit" class="btn btn-secondary btn-block font-weight-bold rounded-custom">
                                     Evet, çıkış yap
                                 </button>
