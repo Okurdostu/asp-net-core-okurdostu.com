@@ -1,6 +1,7 @@
 # ignores about project
 universite-logo/
 profil-fotograf/
+documents/
 
 #vscode
 .vscode/*
@@ -33,4 +34,3 @@ msbuild.wrn
 *.user
 *.userosscache
 *.sln.docstates
-

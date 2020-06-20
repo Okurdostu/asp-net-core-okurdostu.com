@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data.Model;
@@ -54,7 +54,9 @@ namespace Okurdostu.Web.Controllers
                 {
                     AuthUser.Password = Model.Password.SHA512();
                     var result = await Context.SaveChangesAsync();
-                    if (result! > 0)
+                    if (result > 0)
+                        TempData["ProfileMessage"] = "Artık giriş yaparken yeni parolanızı kullanabilirsiniz";
+                    else
                         TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
                 }
                 else
@@ -66,7 +68,7 @@ namespace Okurdostu.Web.Controllers
             Response.Redirect("/" + AuthUser.Username);
         }
 
-        [HttpPost,ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken]
         [Route("~/username")]
         public async Task EditUsername(ProfileModel Model)
         {
@@ -74,6 +76,7 @@ namespace Okurdostu.Web.Controllers
             {
                 if (Model.Username.ToLower() != AuthUser.Username)
                 {
+
                     if (AuthUser.Username != Model.Username)
                     {
                         string NowUsername = AuthUser.Username;
@@ -81,17 +84,19 @@ namespace Okurdostu.Web.Controllers
                         try
                         {
                             await Context.SaveChangesAsync();
+                            TempData["ProfileMessage"] = "Yeni kullanıcı adınız: " + AuthUser.Username;
                         }
                         catch (Exception e)
                         {
                             TempData["ProfileMessage"] = e.InnerException.Message.Contains("Unique_Key_Username")
-                                ? "Bu kullanıcı adını kullanamazsınız"
+                                ? "Bu kullanıcı adını: " + AuthUser.Username + " kullanamazsınız"
                                 : "Başaramadık, neler olduğunu bilmiyoruz";
 
                             AuthUser.Username = NowUsername;
                             //log ex message
                         }
                     }
+
                 }
             }
             else
@@ -109,8 +114,8 @@ namespace Okurdostu.Web.Controllers
             AuthUser.Twitter = Model.Twitter;
             AuthUser.Github = Model.Github;
             var result = await Context.SaveChangesAsync();
-            if (result! > 0)
-                TempData["ProfileMessage"] = "Başaramadık neler olduğunu bilmiyoruz";
+            if (result == 0)
+                TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
 
             Response.Redirect("/" + AuthUser.Username);
         }
@@ -123,8 +128,9 @@ namespace Okurdostu.Web.Controllers
             AuthUser.Biography = Model.Biography;
             AuthUser.FullName = Model.FullName;
             var result = await Context.SaveChangesAsync();
-            if (result! > 0)
-                TempData["ProfileMessage"] = "Başaramadık neler olduğunu bilmiyoruz";
+            if (result == 0)
+                TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
+
             Response.Redirect("/" + AuthUser.Username);
         }
 
@@ -135,20 +141,33 @@ namespace Okurdostu.Web.Controllers
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             var File = Request.Form.Files.First();
 
-            if (File.Length < 1048576)
+            if (File != null && File.Length < 1048576 && File.Length > 0)
             {
                 if (File.ContentType == "image/png" || File.ContentType == "image/jpg" || File.ContentType == "image/jpeg")
                 {
-                    string NewName = Guid.NewGuid().ToString() + Path.GetExtension(File.FileName);
-                    string FilePathWithName = Environment.WebRootPath + "/image/profil-fotograf/" + NewName;
-                    using var image = Image.Load(File.OpenReadStream());
-                    if (image.Width > 200)
-                        image.Mutate(x => x.Resize(200, 200));
-                    image.Save(FilePathWithName);
-                    AuthUser.PictureUrl = "/image/profil-fotograf/" + NewName;
+                    string Name = Guid.NewGuid().ToString() + Path.GetExtension(File.FileName);
+                    string FilePathWithName = Environment.WebRootPath + "/image/profil-fotograf/" + Name;
+
+                    using var ImageSharp = Image.Load(File.OpenReadStream());
+                    if (ImageSharp.Width > 200)
+                        ImageSharp.Mutate(x => x.Resize(200, 200));
+
+                    ImageSharp.Save(FilePathWithName);
+
+                    string OldPhotoPath = AuthUser.PictureUrl;
+                    AuthUser.PictureUrl = "/image/profil-fotograf/" + Name;
+
+
                     var result = await Context.SaveChangesAsync();
-                    if (result! > 0)
+                    if (result > 0)
+                    {
+                        //yeni fotoğraf ile database kaydı gerçekleştiyse eski fotoğrafı kullanıcı güvenliği adına silmeliyiz.
+                        if (System.IO.File.Exists(Environment.WebRootPath + OldPhotoPath))
+                            System.IO.File.Delete(Environment.WebRootPath + OldPhotoPath);
+                    }
+                    else
                         TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
+
                 }
                 else
                     TempData["ProfileMessage"] = "PNG, JPG ve JPEG türünde fotoğraf yükleyiniz";
@@ -164,9 +183,21 @@ namespace Okurdostu.Web.Controllers
         public async Task RemovePhoto()
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+            string OldPhotoPath = AuthUser.PictureUrl;
             AuthUser.PictureUrl = null;
-            //file server'dan silenecek, kullanılmayan hiç bir kullanıcı verisi sunucuda tutulmayacak
-            await Context.SaveChangesAsync();
+            var result = await Context.SaveChangesAsync();
+            if (result > 0)
+            {
+                if (System.IO.File.Exists(Environment.WebRootPath + OldPhotoPath))
+                    System.IO.File.Delete(Environment.WebRootPath + OldPhotoPath);
+            }
+            else
+            {
+                TempData["ProfileMessage"] = "Başaramadık, ne olduğunu bilmiyoruz" +
+                    "<br />" +
+                    "Bildirdik, yakın zamanda çözeceğiz";
+                //log
+            }
             Response.Redirect("/" + AuthUser.Username);
         }
         #endregion
@@ -184,24 +215,22 @@ namespace Okurdostu.Web.Controllers
             {
                 if (Model.Startyear < Model.Finishyear)
                 {
-                    if (User != null)
+                    var Education = new UserEducation
                     {
-                        var Education = new UserEducation
-                        {
-                            UserId = AuthUser.Id,
-                            UniversityId = University.Id,
-                            Department = Model.Department,
-                            StartYear = Model.Startyear.ToString(),
-                            EndYear = Model.Finishyear.ToString(),
-                            ActivitiesSocieties = Model.ActivitiesSocieties
-                        };
-                        await Context.UserEducation.AddAsync(Education);
-                        var result = await Context.SaveChangesAsync();
+                        UserId = AuthUser.Id,
+                        UniversityId = University.Id,
+                        Department = Model.Department,
+                        StartYear = Model.Startyear.ToString(),
+                        EndYear = Model.Finishyear.ToString(),
+                        ActivitiesSocieties = Model.ActivitiesSocieties
+                    };
 
-                        TempData["ProfileMessage"] = result > 0
-                            ? "Eğitim bilginiz eklendi<br />Onaylanması için belge yollamayı unutmayın."
-                            : "Başaramadık, neler olduğunu bilmiyoruz";
-                    }
+                    await Context.UserEducation.AddAsync(Education);
+                    var result = await Context.SaveChangesAsync();
+
+                    TempData["ProfileMessage"] = result > 0
+                        ? "Eğitim bilginiz eklendi<br />Onaylanması için belge yollamayı unutmayın."
+                        : "Başaramadık, neler olduğunu bilmiyoruz";
                 }
                 else
                     TempData["ProfileMessage"] = "Başlangıç yılınız, bitiriş yılınızdan büyük olmamalı";
@@ -220,28 +249,30 @@ namespace Okurdostu.Web.Controllers
             {
                 if (Education.UserId == AuthUser.Id)
                 {
+                    TempData["ProfileMessage"] = "Eğitim bilgileriniz düzenlendi";
                     Education.ActivitiesSocieties = Model.ActivitiesSocieties;
                     if (Education.IsUniversityInformationsCanEditable())
                     {
                         Education.UniversityId = (short)Model.UniversityId;
                         Education.Department = Model.Department;
                     }
-                    if (Model.Startyear < Model.Finishyear)
+
+                    if (Model.Startyear <= Model.Finishyear)
                     {
                         Education.StartYear = Model.Startyear.ToString();
                         Education.EndYear = Model.Finishyear.ToString();
-                        TempData["ProfileMessage"] = "Eğitim bilgileriniz düzenlendi";
                     }
                     else
                         TempData["ProfileMessage"] = "Başlangıç yılınız, bitiriş yılınızdan büyük olmamalı" +
                             "<br />" + "Bunlar dışında ki eğitim bilgileriniz düzenlendi";
 
                     var result = await Context.SaveChangesAsync();
-                    if (result! > 0)
+                    if (result == 0)
                         TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
                 }
                 else
                     TempData["ProfileMessage"] = "MC Hammer: You can't touch this";
+
             }
             Response.Redirect("/" + AuthUser.Username);
         }
@@ -262,12 +293,36 @@ namespace Okurdostu.Web.Controllers
                         TempData["ProfileMessage"] = "İhtiyaç kampanyanız olduğu için" +
                             "<br />" +
                             "Aktif olan eğitim bilginizi silemezsiniz." +
-                            "Aktif olan eğitim bilgisi, hala burada okuduğunuzu iddia ettiğiniz bir eğitim bilgisidir.";
+                            "Aktif olan eğitim bilgisi, belge yollayarak hala burada okuduğunuzu iddia ettiğiniz bir eğitim bilgisidir.";
                     else
                     {
                         Education.IsRemoved = true;
                         var result = await Context.SaveChangesAsync();
-                        if (result! > 0)
+                        if (result > 0)
+                        {
+                            TempData["ProfileMessage"] = "Eğitiminiz kaldırıldı";
+
+                            try
+                            {
+                                if (Education.IsSentToConfirmation)
+                                {
+                                    var EducationDocuments = await Context.UserEducationDoc.Where(x => x.UserEducationId == Education.Id).ToListAsync();
+                                    foreach (var item in EducationDocuments)
+                                    {
+                                        if (System.IO.File.Exists(item.DocumentPath))
+                                            System.IO.File.Delete(item.DocumentPath);
+                                        Context.Remove(item);
+                                    }
+                                    await Context.SaveChangesAsync();
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                //log ex
+                            }
+
+                        }
+                        else
                             TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
                     }
                 }
@@ -277,6 +332,70 @@ namespace Okurdostu.Web.Controllers
 
             Response.Redirect("/" + AuthUser.Username);
         }
-        #endregion
+
+
+
+        [HttpPost, ValidateAntiForgeryToken]
+        [Route("~/education-document")]
+        public async Task SendEducationDocument(long Id, IFormFile File)
+        {
+            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsSentToConfirmation); //bir belge yollayabilir.
+            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+            if (Education != null && AuthUser.Id == Education.UserId)
+            {
+                if (File != null && File.Length < 1048576 && File.Length > 0)
+                {
+
+                    if (File.ContentType == "document/pdf" || File.ContentType == "image/png" || File.ContentType == "image/jpg" || File.ContentType == "image/jpeg")
+                    {
+
+                        string NewName = Guid.NewGuid().ToString() + Path.GetExtension(File.FileName);
+                        string FilePathWithName = Environment.WebRootPath + "/documents/" + NewName;
+
+                        using (var Stream = System.IO.File.Create(FilePathWithName))
+                        {
+                            await File.CopyToAsync(Stream);
+                        };
+
+                        if (System.IO.File.Exists(FilePathWithName))
+                        {
+
+                            var EducationDocument = new UserEducationDoc
+                            {
+                                CreatedOn = DateTime.Now,
+                                UserEducationId = Id,
+                                DocumentPath = FilePathWithName,
+                                DocumentUrl = "/documents/" + NewName,
+                            };
+                            Education.IsSentToConfirmation = true;
+
+                            await Context.AddAsync(EducationDocument);
+                            var result = await Context.SaveChangesAsync();
+
+                            if (result > 0)
+                                TempData["ProfileMessage"] = "Eğitim dökümanınız yollandı, en geç 6 saat içinde geri dönüş yapılacak";
+                            else
+                            {
+                                TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
+                                System.IO.File.Delete(FilePathWithName); //veritabanı kaydını oluşturamadıysa dosyayı kaldır.
+                            }
+
+                        }
+
+                    }
+                    else
+                        TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz"; //dosyayı sunucuya kaydetmedi
+
+                }
+                else
+                    TempData["ProfileMessage"] = "PDF, PNG, JPG veya JPEG türünde belge yükleyiniz";
+
+            }
+            else if (File.Length > 1048576)
+                TempData["ProfileMessage"] = "Seçtiğiniz dosya 1 megabyte'dan fazla olmamalı";
+
+            Response.Redirect("/" + AuthUser.Username);
+        }
     }
 }
+#endregion

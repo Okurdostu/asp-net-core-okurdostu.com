@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\image\profil-fotograf\" />
+    <Folder Include="wwwroot\documents\" />
     <Folder Include="wwwroot\svg\" />
   </ItemGroup>
 

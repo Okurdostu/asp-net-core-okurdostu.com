@@ -276,7 +276,31 @@ else
                     }
                     else
                     {
-                        <a class="text-warning small font-weight-bold" href="/education-confirm/@item.Id"><i class="fas fa-exclamation-circle"></i> Onaylatmak için tıklayın</a>
+                        <a class="text-warning small font-weight-bold" href="" data-toggle="modal" data-target="#education-confirm-@item.Id"><i class="fas fa-exclamation-circle"></i> Onaylatmak için tıklayın</a>
+
+                        <div class="modal fade" id="education-confirm-@item.Id" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                                <div class="modal-content" style="background: transparent;">
+                                    <div class="modal-body bg-light" style="border-radius: 25px;">
+                                        <p>
+                                            ...
+                                        </p>
+
+                                        @using (Html.BeginForm("SendEducationDocument", "Account", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                                        {
+                                            @Html.Hidden("Id", item.Id)
+
+                                            <input type="file" id="file" name="file" required class="form-control mb-1">
+
+                                            <div class="modal-footer">
+                                                <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
+                                                <input type="submit" value="Dökümanı yolla" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" />
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     }
                 }
                 else if (!item.IsConfirmed)
