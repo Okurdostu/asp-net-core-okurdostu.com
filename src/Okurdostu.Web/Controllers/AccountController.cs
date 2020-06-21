@@ -213,7 +213,7 @@ namespace Okurdostu.Web.Controllers
 
             if (University != null)
             {
-                if (Model.Startyear < Model.Finishyear)
+                if (Model.Startyear <= Model.Finishyear)
                 {
                     var Education = new UserEducation
                     {
@@ -293,7 +293,10 @@ namespace Okurdostu.Web.Controllers
                         TempData["ProfileMessage"] = "İhtiyaç kampanyanız olduğu için" +
                             "<br />" +
                             "Aktif olan eğitim bilginizi silemezsiniz." +
-                            "Aktif olan eğitim bilgisi, belge yollayarak hala burada okuduğunuzu iddia ettiğiniz bir eğitim bilgisidir.";
+                            "<br />" +
+                            "Aktif olan eğitim bilgisi, belge yollayarak hala burada okuduğunuzu iddia ettiğiniz bir eğitim bilgisidir." +
+                            "<br/>" +
+                            "Daha fazla ayrıntı ve işlem için: info@okurdostu.com";
                     else
                     {
                         Education.IsRemoved = true;
