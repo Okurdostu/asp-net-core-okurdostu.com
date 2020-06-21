@@ -13,13 +13,17 @@ namespace Okurdostu.Data.Model.ModelConfiguration
 
             entity.Property(e => e.Description).IsRequired();
 
-            entity.Property(e => e.FinishedOn).HasColumnType("smalldatetime");
 
             entity.Property(e => e.FriendlyTitle)
                 .IsRequired()
                 .HasMaxLength(200);
 
+
+            entity.Property(e => e.CreatedOn).HasColumnType("smalldatetime");
+
             entity.Property(e => e.StartedOn).HasColumnType("smalldatetime");
+
+            entity.Property(e => e.FinishedOn).HasColumnType("smalldatetime");
 
             entity.Property(e => e.Title)
                 .IsRequired()

@@ -7,6 +7,13 @@ namespace Okurdostu.Data.Model
     {
         public Need()
         {
+            CreatedOn = DateTime.Now;
+            IsSentForConfirmation = false;
+            IsCompleted = false;
+            IsConfirmed = false;
+            IsRemoved = false;
+            IsWrong = false;
+
             NeedItem = new HashSet<NeedItem>();
             NeedLike = new HashSet<NeedLike>();
         }
@@ -21,6 +28,7 @@ namespace Okurdostu.Data.Model
         public bool IsSentForConfirmation { get; set; }
         public bool IsConfirmed { get; set; }
         public bool IsCompleted { get; set; }
+        public DateTime? CreatedOn { get; private set; }
         public DateTime? StartedOn { get; set; }
         public DateTime? FinishedOn { get; set; }
         public bool IsWrong { get; set; }
