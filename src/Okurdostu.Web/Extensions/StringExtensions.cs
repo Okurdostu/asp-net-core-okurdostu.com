@@ -25,7 +25,39 @@ namespace Okurdostu.Web.Extensions
             char[] charArray = str.ToCharArray();
             if (char.IsLower(charArray[0])) charArray[0] = char.ToUpper(charArray[0]);
             for (int i = 1; i < charArray.Length; i++)
-                if (charArray[i - 1] == ' ' && char.IsLower(charArray[i])) charArray[i] = char.ToUpper(charArray[i]);
+                if (charArray[i - 1] == ' ' && char.IsLower(charArray[i]))
+                {
+
+                    if (charArray[i] == 'i')
+                    {
+                        charArray[i] = 'İ';
+                    }
+                    else if (charArray[i] == 'ş')
+                    {
+                        charArray[i] = 'Ş';
+                    }
+                    else if (charArray[i] == 'ç')
+                    {
+                        charArray[i] = 'Ç';
+                    }
+                    else if (charArray[i] == 'ğ')
+                    {
+                        charArray[i] = 'Ğ';
+                    }
+                    else if (charArray[i] == 'ü')
+                    {
+                        charArray[i] = 'Ü';
+                    }
+                    else if (charArray[i] == 'ö')
+                    {
+                        charArray[i] = 'Ö';
+                    }
+                    else
+                    {
+                        charArray[i] = char.ToUpper(charArray[i]);
+                    }
+
+                }
             return new string(charArray);
         }
 
