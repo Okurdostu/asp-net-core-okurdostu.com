@@ -1,0 +1,21 @@
+﻿@model Okurdostu.Data.Model.Need
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
+@{ bool IsAuthenticatedUserEqualModelUser = false; }
+@{
+    if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+    {
+        string AuthenticatedUserId = HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+        if (AuthenticatedUserId == Model.UserId.ToString())
+        {
+            IsAuthenticatedUserEqualModelUser = true;
+        }
+    }
+}
+@{
+    ViewData["Title"] = Model.Title + " @" + Model.User.Username + " | Okurdostu";
+    ViewData["OGDescription"] = "Bir öğrencinin ihtiyaç kampanyası: " + Model.Title;
+    ViewData["Description"] = "Bir öğrencinin ihtiyaç kampanyası: " + Model.Title;
+
+    Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
+}
+<h1>@ViewData["Title"]</h1>

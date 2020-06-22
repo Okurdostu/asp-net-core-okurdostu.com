@@ -25,29 +25,29 @@ namespace Okurdostu.Web.Controllers
             if (AuthUserAnyActiveEducation != null)
             {
                 Need ErrorNeed = null;
-                var UserUnRemovedNeeds = await Context.Need.Where(x => x.UserId == AuthUser.Id && !x.IsRemoved).ToListAsync();
-                if (UserUnRemovedNeeds.Count > 0) //User'in önceden oluşturduğu ve silmediği bir kampanya varsa
+                var UserNotRemovedCompletedNeeds = await Context.Need.Where(x => x.UserId == AuthUser.Id && !x.IsRemoved && !x.IsCompleted).ToListAsync();
+                if (UserNotRemovedCompletedNeeds.Count > 0) //User'in önceden oluşturduğu ve silmediği bir kampanya varsa
                 {
-                    if (UserUnRemovedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == false).FirstOrDefault() != null)
+                    if (UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == false).FirstOrDefault() != null)
                     {
                         //Onaylama için gönderilmemiş bir kampanya varsa
-                        ErrorNeed = UserUnRemovedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == false).FirstOrDefault();
+                        ErrorNeed = UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == false).FirstOrDefault();
                         TempData["CreateNeedError"] = "Oluşturduğunuz ama onay için gönderilmemiş bir kampanyanız var <br/> Onu tamamlayıp, onaylanması için gönderin";
                     }
-                    else if (UserUnRemovedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == true).FirstOrDefault() != null)
+                    else if (UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == true).FirstOrDefault() != null)
                     {
                         //Onaylanmamış fakat onaylanması için gönderilmiş bir kampanya varsa
-                        ErrorNeed = UserUnRemovedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == true).FirstOrDefault();
+                        ErrorNeed = UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == true).FirstOrDefault();
                         TempData["CreateNeedError"] = "Onaylanmamış bir kampanyanız var onun onaylanmasını bekleyin";
                     }
-                    else if (UserUnRemovedNeeds.Where(x => x.IsConfirmed == true && x.IsCompleted == false).FirstOrDefault() != null)
+                    else if (UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == true && x.IsCompleted == false).FirstOrDefault() != null)
                     {
                         //Onaylanmış fakat tamamlanmamış bir kampanya varsa
-                        ErrorNeed = UserUnRemovedNeeds.Where(x => x.IsConfirmed == true && x.IsCompleted == false).FirstOrDefault();
+                        ErrorNeed = UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == true && x.IsCompleted == false).FirstOrDefault();
                         TempData["CreateNeedError"] = "Hedefine ulaşmamış bir kampanyanız var <br/> Aynı anda iki kampanya sergiletemezsiniz";
                     }
 
-                    TempData["CausingErrorNeedLink"] = "/" + ErrorNeed.User.Username + "/ihtiyac/" + ErrorNeed.Title + "/" + ErrorNeed.Id;
+                    TempData["CausingErrorNeedLink"] = "/" + ErrorNeed.User.Username + "/ihtiyac/" + ErrorNeed.FriendlyTitle + "/" + ErrorNeed.Id;
                     return true;
                 }
             }
@@ -81,7 +81,6 @@ namespace Okurdostu.Web.Controllers
                 }
 
             }
-
             return View();
         }
 
@@ -92,6 +91,11 @@ namespace Okurdostu.Web.Controllers
         public async Task<IActionResult> Create(NeedModel Model)
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+            if (ModelState.ErrorCount > 1)
+            {
+                TempData["CreateNeedError"] = "Input error";
+                return View();
+            }
 
             if (!await IsThereAnyProblemtoCreateNeed())
             {
@@ -104,13 +108,21 @@ namespace Okurdostu.Web.Controllers
                     FriendlyTitle = Model.Title.FriendlyUrl(),
                     Description = Model.Description,
                     UserId = AuthUser.Id,
-                    
                 };
 
                 try
                 {
+
                     await Context.Need.AddAsync(Need);
-                    await Context.SaveChangesAsync();
+                    var result = await Context.SaveChangesAsync();
+                    if (result > 0)
+                    {
+
+                        string link = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id;
+                        return Redirect(link);
+
+                    }
+
                 }
                 catch (Exception e)
                 {
@@ -132,5 +144,33 @@ namespace Okurdostu.Web.Controllers
 
             return View();
         }
+
+        [Route("~/{username}/ihtiyac/{friendlytitle}/{id}")]
+        public async Task<IActionResult> ViewNeed(string username, string friendlytitle, long id)
+        {
+            var Need = await Context.Need
+                .Include(need => need.User)
+                        .ThenInclude(needuser => needuser.UserEducation)
+                            .ThenInclude(x => x.University)
+                .Include(need => need.NeedItem)
+                .FirstOrDefaultAsync(x => x.Id == id && !x.IsRemoved);
+
+            if (Need != null)
+            {
+
+                TempData["activeihtiyac"] = "active";
+                if (Need.User.Username.ToLower() != username.ToLower() || Need.FriendlyTitle.ToLower() != friendlytitle.ToLower())
+                {
+                    return Redirect("/" + Need.User.Username.ToLower() + "/ihtiyac/" + Need.FriendlyTitle.ToLower() + "/" + Need.Id);
+                }
+
+                return View(Need);
+
+            }
+
+            //404
+            return null;
+        }
+
     }
 }
