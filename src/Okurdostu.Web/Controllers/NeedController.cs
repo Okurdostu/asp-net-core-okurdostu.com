@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data.Model;
 using Okurdostu.Web.Base;
@@ -8,6 +9,7 @@ using Okurdostu.Web.Models;
 using Okurdostu.Web.Models.NeedItem;
 using System;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
@@ -17,7 +19,7 @@ namespace Okurdostu.Web.Controllers
 
         private User AuthUser;
 
-
+        #region --
         [NonAction]
         public async Task<bool> IsThereAnyProblemtoCreateNeed()
         {
@@ -145,6 +147,10 @@ namespace Okurdostu.Web.Controllers
 
             return View();
         }
+        #endregion
+
+
+
         #region needitem
         [Authorize]
         [HttpPost, ValidateAntiForgeryToken]
@@ -273,6 +279,8 @@ namespace Okurdostu.Web.Controllers
         }
         #endregion
 
+
+
         #region editneed
         [Authorize]
         [HttpPost, ValidateAntiForgeryToken]
@@ -345,7 +353,22 @@ namespace Okurdostu.Web.Controllers
         #endregion
 
 
+
         #region view
+        [Route("~/ihtiyac/{Id}")]
+        public async Task<IActionResult> ShortUrl(long Id) // -ihtiyac/id
+        {
+            var Need = await Context.Need.Include(needuser=> needuser.User).FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
+
+            if (Need != null)
+            {
+                TempData["MetaRouteLink"] = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id.ToString();
+                return View(Need);
+            }
+            else
+                return Redirect("/");
+        }
+
         [Route("~/{username}/ihtiyac/{friendlytitle}/{id}")]
         public async Task<IActionResult> ViewNeed(string username, string friendlytitle, long id)
         {
@@ -382,6 +405,12 @@ namespace Okurdostu.Web.Controllers
         {
             return PartialView(Model);
         }
+        public PartialViewResult ViewNeedBasic(Need Model)
+        {
+            return PartialView(Model);
+        }
         #endregion
+
+
     }
 }

@@ -32,6 +32,10 @@ namespace Okurdostu.Web.Extensions
                     {
                         charArray[i] = 'İ';
                     }
+                    else if (charArray[i] == 'ı')
+                    {
+                        charArray[i] = 'I';
+                    }
                     else if (charArray[i] == 'ş')
                     {
                         charArray[i] = 'Ş';
