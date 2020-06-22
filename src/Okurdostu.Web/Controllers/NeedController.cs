@@ -292,26 +292,60 @@ namespace Okurdostu.Web.Controllers
                 if (AuthUser.Id == Need.UserId)
                 {
 
-                    Model.Title = Model.Title.ClearSpaces();
-                    Model.Title = Model.Title.ToLower().UppercaseFirstCharacters();
-
-                    Need.Title = Model.Title;
-                    Need.FriendlyTitle = Need.Title.FriendlyUrl();
-
-                    var result = await Context.SaveChangesAsync();
-                    if (result > 0)
+                    if (Model.Title != Need.Title)
                     {
-                        string link = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id;
-                        return Redirect(link);
+                        Model.Title = Model.Title.ClearSpaces();
+                        Model.Title = Model.Title.ToLower().UppercaseFirstCharacters();
+
+                        Need.Title = Model.Title;
+                        Need.FriendlyTitle = Need.Title.FriendlyUrl();
+                        await Context.SaveChangesAsync();
                     }
+
+                    string link = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id;
+                    return Redirect(link);
                     //catch title unique key error
                 }
             }
             return null;
         }
 
+        [Authorize]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditDescription(NeedModel Model)
+        {
+            if (ModelState.ErrorCount > 1)
+            {
+                TempData["CreateNeedError"] = "Input error";
+                return Redirect("/");
+            }
+
+            var Need = await Context.Need.FirstOrDefaultAsync(x => x.Id == Model.Id);
+            if (Need != null)
+            {
+
+                AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+                if (AuthUser.Id == Need.UserId)
+                {
+
+                    if (Need.Description != Model.Description)
+                    {
+                        Need.Description = Model.Description;
+                        await Context.SaveChangesAsync();
+                    }
+
+                    string link = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id;
+                    return Redirect(link);
+
+                }
+
+            }
+            return null;
+        }
         #endregion
 
+
+        #region view
         [Route("~/{username}/ihtiyac/{friendlytitle}/{id}")]
         public async Task<IActionResult> ViewNeed(string username, string friendlytitle, long id)
         {
@@ -344,5 +378,10 @@ namespace Okurdostu.Web.Controllers
             return PartialView(Model);
         }
 
+        public PartialViewResult ViewNeedDescriptionSupporter(Need Model)
+        {
+            return PartialView(Model);
+        }
+        #endregion
     }
 }

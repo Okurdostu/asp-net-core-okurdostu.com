@@ -152,9 +152,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
         {
             <hr />
         }
-        @{
-            //description supporters
-        }
+        @Html.Partial("ViewNeedDescriptionSupporter", Model)
     </div>
 }
 else

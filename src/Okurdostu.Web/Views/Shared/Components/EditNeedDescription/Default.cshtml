@@ -1,0 +1,21 @@
+﻿@model NeedModel
+@using (Html.BeginForm("EditDescription", "Need", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.Id)
+    <div class="form-horizontal h-100">
+        <div class="form-group h-100">
+            <span class="control-label pl-2 pr-0 font-weight-bold text-black-50">
+                Açıklama
+            </span>
+            <div class="h-100">
+                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control", @autocomplete = "off", @style = "height: 65vh" } })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger font-weight-bold" })
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
+            <input type="submit" value="Düzenle" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" />
+        </div>
+    </div>
+}
