@@ -1,0 +1,47 @@
+﻿@model List<Okurdostu.Data.Model.User>
+@{
+    Layout = null;
+}
+@{
+    int i = 0;
+}
+@if (Model.Count > 0)
+{
+    foreach (var item in Model)
+    {
+        i++;
+        <div class="row no-gutters pt-1 text-left">
+            <div class="col-auto pr-1 pl-1">
+                @if (item.PictureUrl != null)
+                {
+                    <a href="/@item.Username">
+                        <img src="@item.PictureUrl"
+                             class="profil-image rounded-pill " style="width:50px; height:50px" />
+                    </a>
+
+                }
+                else
+                {
+                    <a href="/@item.Username">
+                        <img src="~/Content/image/user.svg"
+                             class="profil-image rounded-pill " style="width:50px; height:50px;" />
+                    </a>
+                }
+            </div>
+            <div class="col p-0">
+                <a class="od text-break" href="/@item.Username">
+                    <h6 style="font-size:15px !important">
+                        @item.FullName <br />
+                        <span class="text-black-50">(@Html.Raw("@" + item.Username))</span> <br />
+                    </h6>
+                </a>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="font-weight-bold text-black-50 text-center pt-4 pb-2">
+        <p>Bu ihtiyacı beğenen kimse yok</p>
+    </div>
+}

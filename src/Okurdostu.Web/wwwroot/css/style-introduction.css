@@ -82,6 +82,23 @@ a {
     a.white {
         color: #fff
     }
+    
+.btn-purple {
+    display: inline-block;
+    padding: 1.1875rem 2.125rem 1.1875rem 2.125rem;
+    border: .125rem solid #6c63ff;
+    border-radius: 2rem;
+    background-color: #6c63ff;
+    color: #fff;
+    font: 700 1rem/0 Montserrat,sans-serif;
+    text-decoration: none;
+    transition: all .2s
+}
+    .btn-purple:hover {
+        background-color: transparent;
+        color: #6c63ff;
+        text-decoration: none
+    }
 
 .btn-solid-reg {
     display: inline-block;

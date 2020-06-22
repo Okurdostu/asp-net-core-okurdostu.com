@@ -63,16 +63,12 @@
             else
             {
                 <a class="od" id="Like">
-                    @{
-                        //like button
-                    }
+                    @await Component.InvokeAsync("LikeButton", new { id = Model.Id })
                 </a>
             }
             <a href="#" id="ShowLikers" data-toggle="modal" data-target="#LikersModal" style="cursor:pointer;" class="od">
                 <span class="od font-weight-bold" id="LikeCount">
-                    @{
-                        //total like count
-                    }
+                    @await Component.InvokeAsync("LikeCount", new { id = Model.Id })
                 </span>
             </a>
         </div>
