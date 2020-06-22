@@ -95,5 +95,32 @@ namespace Okurdostu.Web.Extensions
                 url = url.Replace("--", "-");
             return url;
         }
+
+        public static string NormalizePrice(this String price)
+        {
+            //7'ye bir tanım bulamadım.
+
+            //7;    örnek olarak 1500,00 gibi bir price geldiği zaman
+            //      1.500,00 olarak döndürmek için kullanılıyor
+
+            string DeletedLast2Digit = price.Substring(0, price.Length - 2);
+            return DeletedLast2Digit.Length >= 7 ? AddDot(DeletedLast2Digit) : DeletedLast2Digit;
+        }
+        private static string AddDot(string price)
+        {
+            char[] _price = price.ToCharArray();
+            string DottedPrice = "";
+            for (int x = 0; x < _price.Length; x++)
+            {
+                if (_price.Length - 7 == x)
+                {
+                    DottedPrice += _price[x];
+                    DottedPrice += ".";
+                }
+                else DottedPrice += _price[x];
+            }
+            return DottedPrice;
+        }
+
     }
 }

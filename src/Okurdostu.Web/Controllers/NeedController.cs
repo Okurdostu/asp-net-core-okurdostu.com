@@ -172,5 +172,11 @@ namespace Okurdostu.Web.Controllers
             return null;
         }
 
+        public PartialViewResult ViewNeedItem(Need Model)
+        {
+            return PartialView(Model);
+        }
+
+
     }
 }

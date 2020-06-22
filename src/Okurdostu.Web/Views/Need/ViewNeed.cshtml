@@ -121,17 +121,13 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
             @if (Model.IsConfirmed == true)
             {
                 <div class="col-xl-6 col-lg-6 col-md-6">
-                    @{
-                        //items
-                    }
+                    @Html.Partial("ViewNeedItem", Model)
                 </div>
             }
             else
             {
                 <div class="col-12">
-                    @{
-                        //items
-                    }
+                    @Html.Partial("ViewNeedItem", Model)
                 </div>
             }
             <div class="col pl-xl-0 pl-lg-0 pl-md-0" @*style="pointer-events: none; opacity: 0.4;"*@>
