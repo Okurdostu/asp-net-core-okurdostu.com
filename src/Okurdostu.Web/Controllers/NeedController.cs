@@ -19,6 +19,14 @@ namespace Okurdostu.Web.Controllers
 
         private User AuthUser;
 
+
+
+        [Route("~/ihtiyaclar")]
+        public async Task<IActionResult> Index()
+        {
+            return View();
+        }
+
         #region --
         [NonAction]
         public async Task<bool> IsThereAnyProblemtoCreateNeed()
@@ -58,13 +66,6 @@ namespace Okurdostu.Web.Controllers
                 TempData["CreateNeedError"] = "Active education";
 
             return false;
-        }
-
-
-        [Route("~/ihtiyaclar")]
-        public async Task<IActionResult> Index()
-        {
-            return View();
         }
 
 
@@ -209,6 +210,7 @@ namespace Okurdostu.Web.Controllers
                             };
 
                             await Context.AddAsync(NeedItem);
+                            Need.TotalCharge += NeedItem.Price;
                             await Context.SaveChangesAsync();
                         }
                         else
@@ -234,8 +236,9 @@ namespace Okurdostu.Web.Controllers
                                     IsRemoved = false,
                                     IsWrong = false
                                 };
-
+                                
                                 await Context.AddAsync(NeedItem);
+                                Need.TotalCharge += NeedItem.Price;
                                 await Context.SaveChangesAsync();
                             }
                             else
@@ -263,6 +266,7 @@ namespace Okurdostu.Web.Controllers
                             };
 
                             await Context.AddAsync(NeedItem);
+                            Need.TotalCharge += NeedItem.Price;
                             await Context.SaveChangesAsync();
                         }
                         else
@@ -356,7 +360,7 @@ namespace Okurdostu.Web.Controllers
 
         #region view
         [Route("~/ihtiyac/{Id}")]
-        public async Task<IActionResult> ShortUrl(long Id) // -ihtiyac/id
+        public async Task<IActionResult> ShortUrl(long Id)
         {
             var Need = await Context.Need.Include(needuser=> needuser.User).FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
 
@@ -366,7 +370,7 @@ namespace Okurdostu.Web.Controllers
                 return View(Need);
             }
             else
-                return Redirect("/");
+                return Redirect("/ihtiyaclar");
         }
 
         [Route("~/{username}/ihtiyac/{friendlytitle}/{id}")]

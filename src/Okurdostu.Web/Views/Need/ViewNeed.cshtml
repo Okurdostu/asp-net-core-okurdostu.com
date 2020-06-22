@@ -130,9 +130,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                 </div>
             }
             <div class="col pl-xl-0 pl-lg-0 pl-md-0" @*style="pointer-events: none; opacity: 0.4;"*@>
-                @{
-                    //right panel
-                }
+                @Html.Partial("ViewNeedBasic", Model)
             </div>
         </div>
         @if (Model.IsConfirmed == true)
@@ -154,6 +152,94 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
         }
         @Html.Partial("ViewNeedDescriptionSupporter", Model)
     </div>
+
+    @if (!HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+    {
+        <div class="modal fade" id="signup" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content" style="background: transparent;">
+                    <div class="modal-body p-0" style="border-radius: 25px;">
+                        @{ 
+                            //signup
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="login" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content" style="background: transparent;">
+                    <div class="modal-body p-0" style="border-radius: 25px;">
+                        @{ 
+                            //login
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            function GetInf() {
+                    $("#LikeCount").load("/like/count/@Model.Id");
+            };
+            $("#modalLoginButton").click(function () {
+                $('#signup').modal('hide')
+                $('#login').modal('show')
+            });
+            $("#modalSignupButton").click(function () {
+                $('#login').modal('hide')
+                $('#signup').modal('show')
+            });
+
+            $('#LoginForm').on('submit', function () {
+                setTimeout(function () {
+                    if ($('#Password-error').length || $('#Username-error').length) {
+                    }
+                    else {
+                        $('#Login').prop('disabled', true);
+                        $('#spinner-form').show();
+                    }
+                }, 5)
+            });
+            $('#SignupForm').on('submit', function () {
+                setTimeout(function () {
+                    if ($('#FullName-error').length || $('#Username-error').length || $('#Email-error').length || $('#Password-error').length) {
+                    }
+                    else {
+                        $('#Signup').prop('disabled', true);
+                        $('#spinner-form').show();
+                    }
+                }, 5)
+            });
+            $("#ShowLikers").on("click", function () {
+                    $("#Likers").load("/like/Likers/@Model.Id/@Model.User.Username", function () {
+                    });
+            });
+            setInterval(function () { GetInf(); }, 5000);
+        </script>
+    }
+    else
+    {
+        <script type="text/javascript">
+            $(document).ready(function () {
+                function GetInf() {
+                    $("#Like").load("/like/button/@Model.Id");
+                    $("#LikeCount").load("/like/count/@Model.Id");
+                };
+                $("#Like").on("click", function () {
+                    $.ajax({
+                        type: "POST", url: "/like", data: { id: '@Model.Id',username: '@Model.User.Username'}, dataType: "json", success() {
+                            GetInf();
+                        },
+                    });
+                });
+                $("#ShowLikers").on("click", function () {
+                    $("#Likers").load("/like/likers/@Model.Id/@Model.User.Username", function () {
+                    });
+                });
+                setInterval(function () { GetInf(); }, 5000);
+            });
+        </script>
+    }
 }
 else
 {
