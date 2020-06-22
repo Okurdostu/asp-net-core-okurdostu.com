@@ -9,8 +9,8 @@ using Okurdostu.Web.Models;
 using Okurdostu.Web.Models.NeedItem;
 using System;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Okurdostu.Web.Controllers
 {
@@ -20,11 +20,42 @@ namespace Okurdostu.Web.Controllers
         private User AuthUser;
 
 
-
         [Route("~/ihtiyaclar")]
-        public async Task<IActionResult> Index()
+        [Route("~/ihtiyaclar/{filtreText}")]
+        public async Task<IActionResult> Index(string? filtreText, int? s)
         {
-            return View();
+            int _sayfa = s ?? 1;
+            TempData["activeihtiyac"] = "active";
+            List<Need> NeedDefaultList = await Context.Need.Include(x => x.User).ThenInclude(x => x.UserEducation).ThenInclude(x => x.University).Where(x => x.IsConfirmed == true && x.IsRemoved != true).OrderByDescending(x => x.NeedLike.Where(a => a.IsCurrentLiked == true).Count()).ToListAsync();
+            if (filtreText != null)
+            {
+                var University = await Context.University.Where(x => x.FriendlyName == filtreText).FirstOrDefaultAsync();
+                if (University != null) //gelen filtre bir okula uyuyorsa okula göre listele
+                {
+                    NeedDefaultList = NeedDefaultList.Where(x => x.User.UserEducation.Any(a => a.University.Name == University.Name && a.IsRemoved != true)).ToList();
+                    TempData["ListelePageTitle"] = University.Name + " öğrencilerinin ihtiyaçları | Okurdostu";
+                    ViewBag.tagUniversityName = University.Name;
+                    //ViewBag.Tag = University.name;
+                    ViewBag.University = University;
+                }
+                else // uymuyorsa, diğer containslere göre listele:
+                {
+
+                    NeedDefaultList = NeedDefaultList.Where(
+                        x =>
+                        x.NeedItem.Any(a => a.Name.ToLower().Contains(filtreText.ToLower())) || x.User.Username.ToLower().Contains(filtreText.ToLower()) || x.User.FullName.ToLower().Contains(filtreText.ToLower())
+                        ).ToList();
+
+                    TempData["ListelePageTitle"] = filtreText + " aramasıyla ilgili öğrenci ihtiyaçları | Okurdostu";
+                    ViewBag.Tag = filtreText;
+                }
+            }
+            else // filtre yoksa komple bütün hepsini listele
+            {
+                NeedDefaultList = NeedDefaultList.ToList();
+                TempData["ListelePageTitle"] = "Öğrencilerin ihtiyaçları | Okurdostu ";
+            }
+            return View(NeedDefaultList);
         }
 
         #region --
@@ -148,6 +179,38 @@ namespace Okurdostu.Web.Controllers
 
             return View();
         }
+        [Authorize]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendToConfirmation(long NeedId)
+        {
+            var Need = await Context.Need.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == NeedId);
+
+            if (Need != null)
+            {
+                AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+                if (Need.UserId == AuthUser.Id)
+                {
+                    var UnRemovedItems = await Context.NeedItem.Where(x => x.NeedId == Need.Id && !x.IsRemoved).ToListAsync();
+                    if (UnRemovedItems.Count() > 0 && UnRemovedItems.Count() <= 3)
+                    {
+                        decimal TotalCharge = 0;
+
+                        foreach (var item in UnRemovedItems)
+                            TotalCharge += item.Price;
+
+                        Need.TotalCharge = TotalCharge;
+                        Need.IsSentForConfirmation = true;
+
+                        await Context.SaveChangesAsync();
+                    }
+                    else
+                        TempData["Mesaj"] = "Kampanyanız için en az bir, en fazla üç hedef belirleyebilirsiniz";
+
+                    return Redirect("/" + Need.User.Username.ToLower() + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id);
+                }
+            }
+            return Redirect("/");
+        }
         #endregion
 
 
@@ -236,7 +299,7 @@ namespace Okurdostu.Web.Controllers
                                     IsRemoved = false,
                                     IsWrong = false
                                 };
-                                
+
                                 await Context.AddAsync(NeedItem);
                                 Need.TotalCharge += NeedItem.Price;
                                 await Context.SaveChangesAsync();
@@ -362,7 +425,7 @@ namespace Okurdostu.Web.Controllers
         [Route("~/ihtiyac/{Id}")]
         public async Task<IActionResult> ShortUrl(long Id)
         {
-            var Need = await Context.Need.Include(needuser=> needuser.User).FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
+            var Need = await Context.Need.Include(needuser => needuser.User).FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
 
             if (Need != null)
             {

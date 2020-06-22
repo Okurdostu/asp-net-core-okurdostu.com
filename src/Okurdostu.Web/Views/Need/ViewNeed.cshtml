@@ -62,7 +62,7 @@
                         <p class="text-black-50 font-weight-bold text-md-left text-center">
                             Seçtiğiniz başlığa ve hedeflerinize son bir kez göz atıp onay için yollayabilirsiniz.
                         </p>
-                        @using (Html.BeginForm("", "Need", FormMethod.Post))
+                        @using (Html.BeginForm("SendToConfirmation", "Need", FormMethod.Post))
                         {
                             @Html.Hidden("NeedId", Model.Id)
                             <button type="submit" class="btn btn-primary btn-block font-weight-bold rounded-custom">
@@ -111,7 +111,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                     </div>
                 </div>
             }
-            <h5 class="text-center text-black-50">
+            <h5 class="text-center text-black-50 text-break">
                 @Model.Title
             </h5>
         </div>
