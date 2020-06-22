@@ -20,6 +20,7 @@
 }
 @if (!Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUserEqualModelUser)
 {
+    <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
     @*
         Tamamlanmamış, onaylanma için gönderilmemiş.
         İşleme devam etmesi gerektiğini söyle
@@ -63,7 +64,7 @@
                         </p>
                         @using (Html.BeginForm("", "Need", FormMethod.Post))
                         {
-                            @Html.Hidden("ID", Model.Id)
+                            @Html.Hidden("NeedId", Model.Id)
                             <button type="submit" class="btn btn-primary btn-block font-weight-bold rounded-custom">
                                 Tamamdır, onay için yolla
                             </button>
@@ -103,9 +104,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                                     Başlığı düzenleme
                                 </h3>
                                 <hr />
-                                @{
-                                    //title edit form
-                                }
+                                @await Component.InvokeAsync("EditNeedTitle", new { Id = Model.Id })
                             </div>
 
                         </div>

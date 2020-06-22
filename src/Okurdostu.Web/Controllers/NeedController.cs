@@ -101,7 +101,7 @@ namespace Okurdostu.Web.Controllers
             if (!await IsThereAnyProblemtoCreateNeed())
             {
                 Model.Title = Model.Title.ClearSpaces();
-                Model.Title = Model.Title.UppercaseFirstCharacters();
+                Model.Title = Model.Title.ToLower().UppercaseFirstCharacters();
 
                 var Need = new Need
                 {
@@ -145,7 +145,7 @@ namespace Okurdostu.Web.Controllers
 
             return View();
         }
-
+        #region needitem
         [Authorize]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveItem(long NeedItemId)
@@ -271,7 +271,46 @@ namespace Okurdostu.Web.Controllers
             ControllerContext.HttpContext.Response.StatusCode = 404;
             return null;
         }
+        #endregion
 
+        #region editneed
+        [Authorize]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditTitle(NeedModel Model)
+        {
+            if (ModelState.ErrorCount > 1)
+            {
+                TempData["CreateNeedError"] = "Input error";
+                return Redirect("/");
+            }
+
+            var Need = await Context.Need.FirstOrDefaultAsync(x => x.Id == Model.Id);
+            if (Need != null)
+            {
+
+                AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+                if (AuthUser.Id == Need.UserId)
+                {
+
+                    Model.Title = Model.Title.ClearSpaces();
+                    Model.Title = Model.Title.ToLower().UppercaseFirstCharacters();
+
+                    Need.Title = Model.Title;
+                    Need.FriendlyTitle = Need.Title.FriendlyUrl();
+
+                    var result = await Context.SaveChangesAsync();
+                    if (result > 0)
+                    {
+                        string link = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id;
+                        return Redirect(link);
+                    }
+                    //catch title unique key error
+                }
+            }
+            return null;
+        }
+
+        #endregion
 
         [Route("~/{username}/ihtiyac/{friendlytitle}/{id}")]
         public async Task<IActionResult> ViewNeed(string username, string friendlytitle, long id)
@@ -304,7 +343,6 @@ namespace Okurdostu.Web.Controllers
         {
             return PartialView(Model);
         }
-
 
     }
 }
