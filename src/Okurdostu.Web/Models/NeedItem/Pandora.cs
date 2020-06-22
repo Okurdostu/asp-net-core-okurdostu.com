@@ -50,11 +50,11 @@ namespace Okurdostu.Web.Models.NeedItem
                 /// </summary>
                 if (htmlDocument.DocumentNode.SelectSingleNode(".//ul[@class='borderedPhone']/li/strong[@class='indirimliFiyat']") != null && htmlDocument.DocumentNode.SelectSingleNode(".//ul[@class='borderedPhone']/li/span[@class='eskiFiyat']") != null)
                 {
-                    Product.DiscountedPrice = WebUtility.HtmlDecode(htmlDocument.DocumentNode.SelectSingleNode(".//ul[@class='borderedPhone']/li/strong[@class='indirimliFiyat']").InnerText.Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace(".", ",").Replace("TL", ""));
-                    Product.NormalPrice = WebUtility.HtmlDecode(htmlDocument.DocumentNode.SelectSingleNode(".//ul[@class='borderedPhone']/li/span[@class='eskiFiyat']").InnerText.Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace(".", ",").Replace("TL", ""));
+                    Product.DiscountedPrice = WebUtility.HtmlDecode(htmlDocument.DocumentNode.SelectSingleNode(".//ul[@class='borderedPhone']/li/strong[@class='indirimliFiyat']").InnerText.Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace(",", ".").Replace("TL", ""));
+                    Product.NormalPrice = WebUtility.HtmlDecode(htmlDocument.DocumentNode.SelectSingleNode(".//ul[@class='borderedPhone']/li/span[@class='eskiFiyat']").InnerText.Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace(",", ".").Replace("TL", ""));
                 }
                 else if (htmlDocument.DocumentNode.SelectSingleNode(".//ul[@class='borderedPhone']/li/strong[@class='indirimliFiyat']") != null)
-                    Product.NormalPrice = WebUtility.HtmlDecode(htmlDocument.DocumentNode.SelectSingleNode(".//ul[@class='borderedPhone']/li/strong[@class='indirimliFiyat']").InnerText.Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace(".", ",").Replace("TL", ""));
+                    Product.NormalPrice = WebUtility.HtmlDecode(htmlDocument.DocumentNode.SelectSingleNode(".//ul[@class='borderedPhone']/li/strong[@class='indirimliFiyat']").InnerText.Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace(",", ".").Replace("TL", ""));
                 else
                 {
                     Product.Error = "Kitabın fiyatına ulaşılamadı";

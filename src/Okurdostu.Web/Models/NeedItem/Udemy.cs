@@ -29,9 +29,9 @@ namespace Okurdostu.Web.Models.NeedItem
                 }
 
                 if (htmlDocument.DocumentNode.SelectSingleNode("//span[contains(@class,'price-text__current')]") != null)
-                    Product.DiscountedPrice = WebUtility.HtmlDecode(htmlDocument.DocumentNode.SelectSingleNode("//span[contains(@class,'price-text__current')]").InnerText).Replace("Current price", "").Replace(":", "").Replace(" ", "").Replace("₺", "").Replace("\n", "").Replace("\r", "").Replace(".", ",");
+                    Product.DiscountedPrice = WebUtility.HtmlDecode(htmlDocument.DocumentNode.SelectSingleNode("//span[contains(@class,'price-text__current')]").InnerText).Replace("Current price", "").Replace(":", "").Replace(" ", "").Replace("₺", "").Replace("\n", "").Replace("\r", "").Replace(",", ".");
                 else if (htmlDocument.DocumentNode.SelectSingleNode("//meta[@property='udemy_com:price']").Attributes["content"].Value != null)
-                    Product.NormalPrice = htmlDocument.DocumentNode.SelectSingleNode("//meta[@property='udemy_com:price']").Attributes["content"].Value.Replace("₺", "").Replace(".", ",");
+                    Product.NormalPrice = htmlDocument.DocumentNode.SelectSingleNode("//meta[@property='udemy_com:price']").Attributes["content"].Value.Replace("₺", "").Replace(",", ".");
                 
                 if (Product.DiscountedPrice == null && Product.NormalPrice == null)
                 {

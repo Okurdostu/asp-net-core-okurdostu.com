@@ -5,6 +5,7 @@ using Okurdostu.Data.Model;
 using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
+using Okurdostu.Web.Models.NeedItem;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -144,6 +145,133 @@ namespace Okurdostu.Web.Controllers
 
             return View();
         }
+
+        [Authorize]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveItem(long NeedItemId)
+        {
+            var item = await Context.NeedItem.Include(needitem => needitem.Need).FirstOrDefaultAsync(x => x.Id == NeedItemId && !x.Need.IsRemoved && !x.Need.IsSentForConfirmation);
+            // Kampanya(need) onaylanma için yollandıysa bir item silemeyecek: onaylanma için gönderdiyse 
+            //(completed ve confirmed kontrol etmeye gerek yok çünkü onaylandıysa veya bittiyse de isSentForConfirmation hep true kalacak.)
+            if (item != null)
+            {
+                AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+                if (AuthUser.Id == item.Need.UserId)
+                {
+                    item.IsRemoved = true;
+                    await Context.SaveChangesAsync();
+                }
+                return Redirect("/" + item.Need.User.Username.ToLower() + "/ihtiyac/" + item.Need.FriendlyTitle + "/" + item.Need.Id);
+            }
+
+            ControllerContext.HttpContext.Response.StatusCode = 404;
+            return null;
+        }
+
+        [Authorize]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddItem(string ItemLink, long NeedId)
+        {
+            var Need = await Context.Need.Where(x => x.Id == NeedId
+            && !x.IsRemoved
+            && !x.IsSentForConfirmation
+            && x.NeedItem.Where(a => a.IsRemoved != true).Count() < 3)
+                .FirstOrDefaultAsync();
+            // Kampanya(need) onaylanma için yollandıysa bir item ekleyemecek: onaylanma için gönderdiyse 
+            //(completed ve confirmed kontrol etmeye gerek yok çünkü onaylandıysa veya bittiyse de isSentForConfirmation hep true kalacak.)
+            if (Need != null)
+            {
+                AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+                if (Need.UserId == AuthUser.Id)
+                {
+                    if (ItemLink.ToLower().Contains("udemy.com"))
+                    {
+
+                        Udemy Udemy = new Udemy();
+                        Udemy = Udemy.Product(ItemLink);
+                        if (Udemy.Error == null)
+                        {
+                            var NeedItem = new NeedItem
+                            {
+                                NeedId = Need.Id,
+                                Link = Udemy.Link,
+                                Picture = "udemy",
+                                Name = Udemy.Name,
+                                Price = Udemy.Price,
+                                PlatformName = "Udemy",
+                                IsRemoved = false,
+                            };
+
+                            await Context.AddAsync(NeedItem);
+                            await Context.SaveChangesAsync();
+                        }
+                        else
+                            TempData["Hata"] = Udemy.Error;
+                    }
+                    else if (ItemLink.ToLower().Contains("pandora.com.tr"))
+                    {
+                        if (ItemLink.ToLower().Contains("/kitap/"))
+                        {
+
+                            Pandora Pandora = new Pandora();
+                            Pandora = Pandora.Product(ItemLink);
+                            if (Pandora.Error == null)
+                            {
+                                var NeedItem = new NeedItem
+                                {
+                                    NeedId = Need.Id,
+                                    Link = Pandora.Link,
+                                    Picture = Pandora.Picture,
+                                    Name = Pandora.Name,
+                                    Price = Pandora.Price,
+                                    PlatformName = "Pandora",
+                                    IsRemoved = false,
+                                    IsWrong = false
+                                };
+
+                                await Context.AddAsync(NeedItem);
+                                await Context.SaveChangesAsync();
+                            }
+                            else
+                                TempData["Hata"] = Pandora.Error;
+                        }
+                        else
+                            TempData["MesajHata"] = "Pandora.com.tr'den sadece kitap seçebilirsiniz";
+                    }
+                    else if (ItemLink.ToLower().Contains("amazon.com.tr"))
+                    {
+                        Amazon Amazon = new Amazon();
+                        Amazon = Amazon.Product(ItemLink);
+                        if (Amazon.Error == null)
+                        {
+
+                            var NeedItem = new NeedItem
+                            {
+                                NeedId = Need.Id,
+                                Link = Amazon.Link,
+                                Picture = "Amazon",
+                                Name = Amazon.Name,
+                                Price = Amazon.Price,
+                                PlatformName = "Amazon",
+                                IsRemoved = false,
+                            };
+
+                            await Context.AddAsync(NeedItem);
+                            await Context.SaveChangesAsync();
+                        }
+                        else
+                            TempData["Hata"] = Amazon.Error;
+                    }
+                    else
+                        TempData["MesajHata"] = "İhtiyacınızın linkini verirken desteklenen platformları kullanın";
+
+                    return Redirect("/" + Need.User.Username.ToLower() + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id);
+                }
+            }
+            ControllerContext.HttpContext.Response.StatusCode = 404;
+            return null;
+        }
+
 
         [Route("~/{username}/ihtiyac/{friendlytitle}/{id}")]
         public async Task<IActionResult> ViewNeed(string username, string friendlytitle, long id)

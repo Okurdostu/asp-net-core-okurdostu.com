@@ -25,9 +25,9 @@ namespace Okurdostu.Web.Models.NeedItem
             }
 
             if (htmlDocument.DocumentNode.SelectSingleNode("//span[@class='priceBlockStrikePriceString a-text-strike']") != null)
-                Product.Price = decimal.Parse(htmlDocument.DocumentNode.SelectSingleNode("//span[@class='priceBlockStrikePriceString a-text-strike']").InnerText.Replace(".", "").Replace("₺", "").Replace(" ", ""));
+                Product.Price = decimal.Parse(htmlDocument.DocumentNode.SelectSingleNode("//span[@class='priceBlockStrikePriceString a-text-strike']").InnerText.Replace(",", ".").Replace("₺", "").Replace(" ", ""));
             else if (htmlDocument.DocumentNode.SelectSingleNode("//span[@id='priceblock_ourprice']") != null)
-                Product.Price = decimal.Parse(htmlDocument.DocumentNode.SelectSingleNode("//span[@id='priceblock_ourprice']").InnerText.Replace(".", "").Replace("₺", "").Replace(" ", ""));
+                Product.Price = decimal.Parse(htmlDocument.DocumentNode.SelectSingleNode("//span[@id='priceblock_ourprice']").InnerText.Replace(",", ".").Replace("₺", "").Replace(" ", ""));
             else
                 Product.Error = "Fiyatına ulaşılamadı";
 

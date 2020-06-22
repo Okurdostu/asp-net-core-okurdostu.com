@@ -1,0 +1,161 @@
+﻿@model Okurdostu.Data.Model.Need
+
+@{
+    string styleItem = "style='width:75px; height:75px;'";
+}
+@{
+    var UnRemovedItemList = Model.NeedItem.Where(x => x.IsRemoved == false).ToList();
+}
+<div class="text-center text-black-50">
+    <span>İhtiyaç kampanyasının hedefleri</span> <a class="od" href="#" data-target="#question" data-toggle="modal"><i class="fas fa-question-circle"></i></a>
+    <hr class="mt-0 mb-1" />
+    @if (Model.IsConfirmed == true)
+    {
+        <div class="modal fade" id="question" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal modal-dialog-centered" role="document">
+                <div class="modal-content" style="background: transparent;">
+                    <div class="modal-body bg-light" style="border-radius: 25px;">
+                        <p class="mb-1">
+                            Burada gördüğünüz hedefler öğrenci tarafından belirlenmiştir.
+                            <br />
+                            <span class="text-primary">Amazon</span>, <span class="text-primary">Udemy</span>, <span class="text-primary">Pandora</span> yazılarına tıklayarak, hedefler(ihtiyaçlar) hakkında bilgi edinebilirsiniz.
+                        </p>
+                        <button type="button" class="btn  btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Anladım</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<div class="pl-1 text-black-50 text-break">
+    @if (Model.NeedItem != null)
+    {
+        foreach (Okurdostu.Data.Model.NeedItem Item in UnRemovedItemList)
+        {
+            <div class="row pt-1">
+                @if (Item.Picture.ToLower() == "udemy")
+                {
+                    <div class="col-auto pr-1">
+                        <img class="img-thumbnail" src="~/Content/image/udemy.png" Html.Raw(styleItem) />
+                    </div>
+                }
+                else if (Item.Picture.ToLower() == "amazon")
+                {
+                    <div class="col-auto pr-1">
+                        <img class="img-thumbnail" src="~/Content/image/amazon.png" Html.Raw(styleItem) />
+                    </div>
+                }
+                else
+                {
+                    <div class="col-auto pr-1">
+                        <img class="img-thumbnail" src="@Html.Raw(Item.Picture)" @Html.Raw(styleItem) />
+                    </div>
+                }
+                <div class="col pl-0">
+                    <p class="mb-1">@Html.Raw(Item.Name)</p>
+                    <p class="mb-1">
+                        <a href="@Item.Link" target="_blank">@Html.Raw(Item.PlatformName)</a>
+                    </p>
+                    <p class="mb-1">
+                        @{
+                            string Price = Item.Price.ToString().NormalizePrice().Replace(".", ",");
+                        }
+                        @Price &#8378
+                    </p>
+                    @if (Model.IsSentForConfirmation != true)
+                    {
+                        <button class="btn btn-outline-danger rounded-custom font-weight-bold p-0 pr-2 pl-2" href="" data-toggle="modal" data-target="#removeitem_@Item.Id" style="cursor:pointer;">
+                            <i class="fas fa-trash"></i> Kaldır
+                        </button>
+                        <div class="modal fade" id="removeitem_@Item.Id" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal modal-dialog-centered" role="document">
+                                <div class="modal-content" style="background: transparent;">
+                                    <div class="modal-body bg-light" style="border-radius: 25px;">
+                                        <h3 class="font-weight-bold text-center text-black-50">
+                                            Hedef kaldırma
+                                        </h3>
+                                        <p>
+                                            Kampanyanıza ait kaldırılacak hedef: @Item.Name
+                                        </p>
+                                        @using (Html.BeginForm("RemoveItem", "Need", FormMethod.Post))
+                                        {
+
+                                            @Html.Hidden("NeedItemId", Item.Id)
+                                            <button type="submit" class="btn btn-danger btn-block font-weight-bold rounded-custom">
+                                                Kaldır
+                                            </button>
+                                        }
+                                        <hr />
+                                        <button type="button" class="btn  btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        if (UnRemovedItemList.Count != 3 && Model.IsConfirmed != true && Model.IsSentForConfirmation != true)
+        {
+            for (int i = 0; i < 3 - UnRemovedItemList.Count; i++)
+            {
+                @:
+                <a class="text-center od small font-weight-bold" href="" data-toggle="modal" data-target="#additem">
+                    <p>
+                        <i class="fas fa-plus od" style="font-size:40px;"></i>
+                        <br />
+                        İhtiyaç kampanyanıza hedef ekleyebilirsiniz
+                        <br />
+                        Hedef eklemek için tıklayınız
+                    </p>
+                </a>
+            }
+            <div class="modal fade" id="additem" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content" style="background: transparent;">
+                        <div class="modal-body bg-light" style="border-radius: 25px;">
+                            <h3 class="font-weight-bold text-center text-black-50">
+                                Hedef (İhtiyaç) ekleme
+                            </h3>
+                            <hr />
+                            @{
+                                @using (Html.BeginForm("AddItem", "Need", FormMethod.Post))
+                                {
+                                    @Html.Hidden("NeedId", Model.Id)
+                                    <div class="form-horizontal">
+                                        <div class="form-group">
+                                            <span class="control-label pl-2 pr-0 font-weight-bold text-black-50">İhtiyaç linki</span>
+                                            <div>
+                                                <input type="text" class="form-control" autocomplete="off" name="ItemLink" required />
+                                            </div>
+                                        </div>
+                                        <p class="small font-weight-bold">
+                                            İhtiyacınız olan hedefleri aşağıda belirtilen platformlardan seçip sayfa linkini buraya yazarak ekleyebilirsiniz.
+                                        </p>
+                                        <p class="small font-weight-bold text-danger">
+                                            *Teknolojik ürün veya diğerleri: Amazon.com.tr<br />
+                                            *Kitap: Pandora.com.tr<br />
+                                            *Kurs: Udemy.com
+                                        </p>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
+                                            <input type="submit" value="Ekle" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" />
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+@*@if (Model.isConfirmed == true)
+    {
+        @:
+        <div class="text-center">
+            <span class="small text-black-50 font-weight-bold">Kampanya sahibine nakit para değil, burada görünen hedefleri(ihtiyaçları) verilecek</span>
+        </div>
+    }*@
+
