@@ -25,7 +25,7 @@ namespace Okurdostu.Web.Controllers
         public async Task<IActionResult> Index(string? filtreText, int? s)
         {
             int _sayfa = s ?? 1;
-            TempData["activeihtiyac"] = "active";
+            ViewData["NeedsActiveClass"] = "active";
             List<Need> NeedDefaultList = await Context.Need.Include(x => x.User).ThenInclude(x => x.UserEducation).ThenInclude(x => x.University).Where(x => x.IsConfirmed == true && x.IsRemoved != true).OrderByDescending(x => x.NeedLike.Where(a => a.IsCurrentLiked == true).Count()).ToListAsync();
             if (filtreText != null)
             {
@@ -439,6 +439,7 @@ namespace Okurdostu.Web.Controllers
         [Route("~/{username}/ihtiyac/{friendlytitle}/{id}")]
         public async Task<IActionResult> ViewNeed(string username, string friendlytitle, long id)
         {
+            ViewData["NeedsActiveClass"] = "active";
             var Need = await Context.Need
                 .Include(need => need.User)
                         .ThenInclude(needuser => needuser.UserEducation)

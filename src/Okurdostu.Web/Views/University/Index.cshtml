@@ -1,0 +1,36 @@
+﻿@model List<Okurdostu.Data.Model.University>
+@{
+    ViewData["Title"] = "Üniversiteler | Okurdostu";
+    Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
+}
+
+<h3 class="text-xl-left text-md-left text-center pl-xl-3 pl-md-3 text-black-50"><i>Üniversiteler</i></h3>
+<br />
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 pb-2 text-center">
+            @{
+                string link = "/universite/" + item.FriendlyName;
+            }
+            @if (item.LogoUrl == null)
+            {
+                <a href="@link">
+                    <img src="~/Content/image/building.svg"
+                         class="profil-image rounded-pill" style="width:100px;" />
+                </a>
+            }
+            else
+            {
+                <a href="@link">
+                    <img class="card-img-top" src="@item.LogoUrl" alt="@Html.Raw(item.Name + " image")" style="height:100px; width:100px;">
+                </a>
+            }
+            <div class="card-body od" style="hover">
+                <a class="od" href="@link">
+                    <h6 class="card-title font-weight-bold">@Html.Raw(item.Name)</h6>
+                </a>
+            </div>
+        </div>
+    }
+</div>

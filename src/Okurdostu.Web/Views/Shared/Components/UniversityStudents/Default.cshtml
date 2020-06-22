@@ -1,0 +1,36 @@
+﻿@model List<UniversityStudentsModel>
+
+@if (Model.Count == 0)
+{
+    <div class="justify-content-center text-center pt-2">
+        <p class="text-black-50 font-weight-bold mb-0">Hiç öğrenci bulunamadı.</p>
+    </div>
+}
+else
+{
+    <div class="row pt-2">
+        @foreach (var item in Model)
+        {
+            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 pb-2">
+                <div class="card rounded-custom pt-2">
+                    <a class="text-center rounded-custom" href="/@item.Username">
+                        @if (item.ProfilePicture != null)
+                        {
+                            <img class="profil-image rounded-pill" src="@item.ProfilePicture" alt="@item.FullName image" style="height:100px; width:100px;">
+                        }
+                        else
+                        {
+                            <img class="profil-image rounded-pill" src="~/Content/image/user.svg" alt="@item.FullName image" style="height:100px; width:100px;">
+                        }
+                    </a>
+                    <div class="card-body pt-1 p-0">
+                        <a href="/@item.Username">
+                            <p class="card-title font-weight-bold text-center">@item.FullName</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
