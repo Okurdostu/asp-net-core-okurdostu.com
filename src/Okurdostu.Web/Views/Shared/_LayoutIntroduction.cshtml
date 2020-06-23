@@ -69,16 +69,18 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700,700i" rel="stylesheet">
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <link href="~/css/bs-edited.css" rel="stylesheet" />
     <link href="~/css/style-introduction.css" rel="stylesheet" />
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     @if (!IsAuthenticated)
     {
+        <link href="~/css/preloader.css" rel="stylesheet" />
         @if (Context.Request.Path.Value.ToLower() != "/girisyap" && Context.Request.Path.Value.ToLower() != "/kaydol")
         {
             <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
         }
     }
+
 </head>
 <body data-spy="scroll" data-target=".fixed-top">
     <div class="spinner-form" id="spinner-form" style="display:none;">

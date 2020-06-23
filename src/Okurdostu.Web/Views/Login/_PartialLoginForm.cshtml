@@ -54,3 +54,14 @@
         </div>
     }
 </div>
+
+<script>
+    $('#LoginForm').on('submit', function () {
+        setTimeout(function () {
+            if (!($('#Password-error').length || $('#Username-error').length)) {
+                $('#Login').prop('disabled', true);
+                $('#spinner-form').show();
+            }
+        }, 5)
+    });
+</script>
