@@ -80,35 +80,14 @@
             <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
         }
     }
-
 </head>
 <body data-spy="scroll" data-target=".fixed-top">
-    <div class="spinner-form" id="spinner-form" style="display:none;">
-        <div class="spinner">
-            <div class="bounce1"></div>
-            <div class="bounce2"></div>
-            <div class="bounce3"></div>
-        </div>
-    </div>
+    <div class="spinner-form" id="spinner-form" style="display:none;"> <div class="spinner"> <div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div></div>
     <nav class="navbar navbar-expand-md navbar-dark navbar-custom fixed-top">
         <a href="/"><span class="navbar-brand" style="cursor:pointer">Okurdostu</span></a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-awesome fas fa-bars"></span>
-            <span class="navbar-toggler-awesome fas fa-times"></span>
-        </button>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-awesome fas fa-bars"></span> <span class="navbar-toggler-awesome fas fa-times"></span> </button>
         <div class="collapse navbar-collapse" id="navbar">
-            <ul class="navbar-nav pt-1">
-                <li class="nav-item">
-                    <a class="nav-link" href="/#header">ANASAYFA <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/#nasil">NASIL ÇALIŞIR?</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/sss">SSS</a>
-                </li>
-
-            </ul>
+            <ul class="navbar-nav pt-1"> <li class="nav-item"> <a class="nav-link" href="/#header">ANASAYFA <span class="sr-only">(current)</span></a> </li><li class="nav-item"> <a class="nav-link" href="/#nasil">NASIL ÇALIŞIR?</a> </li><li class="nav-item"> <a class="nav-link" href="/sss">SSS</a> </li></ul>
             <ul class="navbar-nav ml-auto">
                 @{
                     @if (!IsAuthenticated)
@@ -160,103 +139,10 @@
         </div>
     </nav>
     @RenderBody()
-    <div class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="footer-col">
-                        <h4>Okurdostu</h4>
-                        <p>
-                            Öğrenci ve öğrenci dostunu bir araya getiren platform
-                        </p>
-                        <p>
-                            <a class="text-center font-weight-bold od" href="mailto:info@okurdostu.com">
-                                info@okurdostu.com
-                            </a>
-                        </p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="footer-col middle">
-                        <h4>Bağlantılar</h4>
-                        <span class="font-weight-bold p-large">
-                            <a href="/beta#Feedback" class="od">Geri bildirim</a>
-                        </span>
-                        <br />
-                        <span class="font-weight-bold p-large">
-                            <a href="/kullanici-sozlesmesi" class="od">Kullanıcı sözleşmesi</a>
-                        </span>
-                        <br />
-                        <span class="font-weight-bold p-large">
-                            <a href="/gizlilik-politikasi" class="od">Gizlilik politikası</a>
-                        </span>
-                        <br />
-                        <span class="font-weight-bold p-large">
-                            <a href="/KVKK" class="od">KVKK</a>
-                        </span>
-
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="footer-col last">
-                        <h4>SOSYAL MEDYA</h4>
-                        <span class="fa-stack">
-                            <a href="https://twitter.com/okurdostucom" target="_blank">
-                                <i class="fas fa-circle fa-stack-2x"></i>
-                                <i class="fab fa-twitter fa-stack-1x"></i>
-                            </a>
-                        </span>
-                        <span class="fa-stack">
-                            <a href="https://instagram.com/okurdostucom" target="_blank">
-                                <i class="fas fa-circle fa-stack-2x"></i>
-                                <i class="fab fa-instagram fa-stack-1x"></i>
-                            </a>
-                        </span>
-                        <span class="fa-stack">
-                            <a href="https://www.linkedin.com/company/okurdostu/" target="_blank">
-                                <i class="fas fa-circle fa-stack-2x"></i>
-                                <i class="fab fa-linkedin-in fa-stack-1x"></i>
-                            </a>
-                        </span>
-                        <span class="fa-stack">
-                            <a href="https://github.com/Okurdostu" target="_blank">
-                                <i class="fas fa-circle fa-stack-2x"></i>
-                                <i class="fab fa-github fa-stack-1x"></i>
-                            </a>
-                        </span>
-                        <p class="od text-center font-weight-bold">
-                            Bir yazılım geliştirici iseniz,<br />
-                            Github'dan takip etmeyi unutmayın.<br />
-                            Size ihtiyacımız olacak.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <center>
-                <span class="font-weight-bold small">&copy; @DateTime.Now.Year Okurdostu</span>
-            </center>
-        </div>
-    </div>
+    <div class="footer"> <div class="container"> <div class="row"> <div class="col-md-4"> <div class="footer-col"> <h4>Okurdostu</h4> <p> Öğrenci ve öğrenci dostunu bir araya getiren platform </p><p> <a class="text-center font-weight-bold od" href="mailto:info@okurdostu.com"> info@okurdostu.com </a> </p></div></div><div class="col-md-4"> <div class="footer-col middle"> <h4>Bağlantılar</h4> <span class="font-weight-bold p-large"> <a href="/beta#Feedback" class="od">Geri bildirim</a> </span> <br /> <span class="font-weight-bold p-large"> <a href="/kullanici-sozlesmesi" class="od">Kullanıcı sözleşmesi</a> </span> <br /> <span class="font-weight-bold p-large"> <a href="/gizlilik-politikasi" class="od">Gizlilik politikası</a> </span> <br /> <span class="font-weight-bold p-large"> <a href="/KVKK" class="od">KVKK</a> </span> </div></div><div class="col-md-4"> <div class="footer-col last"> <h4>SOSYAL MEDYA</h4> <span class="fa-stack"> <a href="https://twitter.com/okurdostucom" target="_blank"> <i class="fas fa-circle fa-stack-2x"></i> <i class="fab fa-twitter fa-stack-1x"></i> </a> </span> <span class="fa-stack"> <a href="https://instagram.com/okurdostucom" target="_blank"> <i class="fas fa-circle fa-stack-2x"></i> <i class="fab fa-instagram fa-stack-1x"></i> </a> </span> <span class="fa-stack"> <a href="https://www.linkedin.com/company/okurdostu/" target="_blank"> <i class="fas fa-circle fa-stack-2x"></i> <i class="fab fa-linkedin-in fa-stack-1x"></i> </a> </span> <span class="fa-stack"> <a href="https://github.com/Okurdostu" target="_blank"> <i class="fas fa-circle fa-stack-2x"></i> <i class="fab fa-github fa-stack-1x"></i> </a> </span> <p class="od text-center font-weight-bold"> Bir yazılım geliştirici iseniz,<br /> Github'dan takip etmeyi unutmayın.<br /> Size ihtiyacımız olacak. </p></div></div></div><center> <span class="font-weight-bold small">&copy; @DateTime.Now.Year Okurdostu</span> </center> </div></div>
     @if (Context.Request.Path.Value.ToLower() != "/girisyap" && Context.Request.Path.Value.ToLower() != "/kaydol" && !IsAuthenticated)
     {
-        <div class="modal fade" id="signup" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                <div class="modal-content" style="background: transparent;">
-                    <div class="modal-body p-0" style="border-radius: 25px;">
-                        <partial name="~/Views/SignUp/_PartialSignUpForm.cshtml">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="login" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content" style="background: transparent;">
-                    <div class="modal-body p-0" style="border-radius: 25px;">
-                        <partial name="~/Views/Login/_PartialLoginForm.cshtml">
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="modal fade" id="signup" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-lg modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body p-0" style="border-radius: 25px;"> <partial name="~/Views/SignUp/_PartialSignUpForm.cshtml"> </div></div></div></div><div class="modal fade" id="login" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body p-0" style="border-radius: 25px;"> <partial name="~/Views/Login/_PartialLoginForm.cshtml"> </div></div></div></div>
     }
     <script src="~/js/bootstrap.min.js"></script>
     <script src="~/js/script-introduction.js"></script>

@@ -5,172 +5,17 @@
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
 <header id="header" class="header">
     <div class="header-content">
-        <div class="container">
-            <div class="form-row">
-            </div>
-        </div>
-        <div class="container">
+        <div class="container"> <div class="form-row"> </div></div><div class="container">
             <div class="row">
                 <div class="col-lg-6">
                     <div class="text-container mt-5">
-                        <h1>Bir öğrenci için dost ol </h1>
-                        <p class="p-large">Bir öğrencinin ihtiyaçlarını maddi olarak gidermesi için destekle. Bu çok kolay olacak göreceksin. İstersen bu iyiliğini gizli tut istersen bütün dünyaya duyur.</p>
-                        <a class="btn-solid-reg text-center" href="/ihtiyaclar" style="width:200px;">İhtiyaçlar</a>
+                        <h1>Bir öğrenci için dost ol </h1> <p class="p-large">Bir öğrencinin ihtiyaçlarını maddi olarak gidermesi için destekle. Bu çok kolay olacak göreceksin. İstersen bu iyiliğini gizli tut istersen bütün dünyaya duyur.</p><a class="btn-solid-reg text-center" href="/ihtiyaclar" style="width:200px;">İhtiyaçlar</a> 
                         @if (!HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
-                        {
-                            <a class="btn-solid-reg mt-1 text-center" data-toggle="modal" data-target="#signup" style="width:200px;" href="">Kaydol</a>
-                        }
+                        {<a class="btn-solid-reg mt-1 text-center" data-toggle="modal" data-target="#signup" style="width:200px;" href="">Kaydol</a>}
                     </div>
-                </div>
-                <div class="col-lg-6 d-none d-lg-block">
-                    <div class="image-container">
-                        <img class="img-fluid" src="~/svg/book.svg">
-                    </div>
-                </div>
+                </div><div class="col-lg-6 d-none d-lg-block"> <div class="image-container"> <img class="img-fluid" src="~/svg/book.svg"> </div></div>
             </div>
         </div>
     </div>
 </header>
-<div id="nasil" class="tabs pt-5">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12 ">
-                <h2 class="mb-3">NASIL ÇALIŞIR?</h2>
-            </div>
-        </div>
-        <div class="row">
-            <ul class="nav nav-tabs mb-1" id="tabs" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active" id="nav-tab-1" data-toggle="tab" href="#tab-1" role="tab" aria-controls="tab-1" aria-selected="true"><i class="fas fa-user-graduate"></i> Öğrenci için</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="nav-tab-2" data-toggle="tab" href="#tab-2" role="tab" aria-controls="tab-2" aria-selected="false"><i class="fas fa-user"></i> Okurdostu için</a>
-                </li>
-                <li class="nav-item">
-                </li>
-            </ul>
-            <div class="tab-content" id="tabsContent">
-                <div class="tab-pane fade show active" id="tab-1" role="tabpanel" aria-labelledby="tab-1">
-                    <div class="container">
-                        <div class="text-center">
-                            <h3>
-                                Destekçilerini sen arama, onlar seni keşfetsin
-                                <br />
-                                <a class="btn-solid-reg text-center" data-toggle="modal" data-target="#signup" style="width:200px;" href="">Kaydol</a>
-                            </h3>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-4 pl-1">
-                                <div class="card left-pane first">
-                                    <div class="card-body">
-                                        <div class="text-wrapper">
-                                            <h4 class="card-title">Kendine ait bir profil oluştur</h4>
-                                            <p>Ad soyad ve eğitim bilgilerinin var olduğu bir profil oluştur</p>
-                                        </div>
-                                        <div class="card-icon">
-                                            <i class="fas fa-id-card"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card left-pane">
-                                    <div class="card-body">
-                                        <div class="text-wrapper">
-                                            <h4 class="card-title">Öğrenciliğini doğrula</h4>
-                                            <p>Eğitim bilgilerini öğrenci belgen ile doğrula</p>
-                                        </div>
-                                        <div class="card-icon">
-                                            <i class="fas fa-graduation-cap"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <img class="img-fluid mt-5 d-none d-lg-block" src="~/svg/math.svg" alt="alternative">
-                            </div>
-                            <div class="col-lg-4 pr-0">
-                                <div class="card right-pane first">
-                                    <div class="card-body">
-                                        <div class="text-wrapper">
-                                            <h4 class="card-title">Onay bekle</h4>
-                                            <p>Sistem tarafından onaylanmasını bekle</p>
-                                        </div>
-                                        <div class="card-icon">
-                                            <i class="fas fa-check"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card right-pane">
-                                    <div class="card-body">
-                                        <div class="text-wrapper">
-                                            <h4 class="card-title">İlk ihtiyacını ilanla</h4>
-                                            <p>İhtiyaç oluşturmak için: ihtiyaç kampanyası başlat ardından istediğin ihtiyaçlarını ilan et ve Okurdostlarının senin için o ilana bağış yapmasını bekle</p>
-                                        </div>
-                                        <div class="card-icon">
-                                            <i class="fas fa-book"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="tab-2" role="tabpanel" aria-labelledby="tab-2">
-                    <div class="container">
-                        <div class="text-center">
-                            <h3>
-                                İstediğin an istediğin meblağda destek ol
-                                <br />
-                                <a class="btn-solid-reg text-center" href="/ihtiyaclar" style="width:200px;">İhtiyaçlar</a>
-                            </h3>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <img class="img-fluid d-none d-lg-block" src="~/svg/team.svg" alt="alternative">
-                            </div>
-                            <div class="col-md-8">
-                                <div class="icon-cards-area">
-                                    <div class="card">
-                                        <div class="card-icon">
-                                            <i class="fas fa-user-plus"></i>
-                                        </div>
-                                        <div class="card-body">
-                                            <h4 class="card-title">Kayıt olmana gerek kalmadan</h4>
-                                            <p>Öğrenci ihtiyaçlarını görüntüleyebilir ve sitede gezebilirsin</p>
-                                        </div>
-                                    </div>
-                                    <div class="card">
-                                        <div class="card-icon">
-                                            <i class="fas fa-search"></i>
-                                        </div>
-                                        <div class="card-body">
-                                            <h4 class="card-title">Listelenmiş ihtiyaçlardan birini seç</h4>
-                                            <p>Öğrencilerin ilan ettiği ihtiyaçlara göz at ve birini seç</p>
-                                        </div>
-                                    </div>
-                                    <div class="card">
-                                        <div class="card-icon">
-                                            <i class="fas fa-credit-card"></i>
-                                        </div>
-                                        <div class="card-body">
-                                            <h4 class="card-title">Bağış yap</h4>
-                                            <p>Seçtiğin öğrenci ihtiyacının satış platformunda ki fiyatını görerek bağış yap, istersen tamamını istersen bir kısmını karşılayabilirsin</p>
-                                        </div>
-                                    </div>
-                                    <div class="card">
-                                        <div class="card-icon">
-                                            <i class="far fa-smile-beam"></i>
-                                        </div>
-                                        <div class="card-body">
-                                            <h4 class="card-title">ve Mutlu son</h4>
-                                            <p>Artık bir öğrencinin ihtiyacının bir kısmını veya tamamını karşıladın</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<div id="nasil" class="tabs pt-5"> <div class="container"> <div class="row"> <div class="col-lg-12 "> <h2 class="mb-3">NASIL ÇALIŞIR?</h2> </div></div><div class="row"> <ul class="nav nav-tabs mb-1" id="tabs" role="tablist"> <li class="nav-item"> <a class="nav-link active" id="nav-tab-1" data-toggle="tab" href="#tab-1" role="tab" aria-controls="tab-1" aria-selected="true"><i class="fas fa-user-graduate"></i> Öğrenci için</a> </li><li class="nav-item"> <a class="nav-link" id="nav-tab-2" data-toggle="tab" href="#tab-2" role="tab" aria-controls="tab-2" aria-selected="false"><i class="fas fa-user"></i> Okurdostu için</a> </li><li class="nav-item"> </li></ul> <div class="tab-content" id="tabsContent"> <div class="tab-pane fade show active" id="tab-1" role="tabpanel" aria-labelledby="tab-1"> <div class="container"> <div class="text-center"> <h3> Destekçilerini sen arama, onlar seni keşfetsin <br /> <a class="btn-solid-reg text-center" data-toggle="modal" data-target="#signup" style="width:200px;" href="">Kaydol</a> </h3> </div><div class="row"> <div class="col-lg-4 pl-1"> <div class="card left-pane first"> <div class="card-body"> <div class="text-wrapper"> <h4 class="card-title">Kendine ait bir profil oluştur</h4> <p>Ad soyad ve eğitim bilgilerinin var olduğu bir profil oluştur</p></div><div class="card-icon"> <i class="fas fa-id-card"></i> </div></div></div><div class="card left-pane"> <div class="card-body"> <div class="text-wrapper"> <h4 class="card-title">Öğrenciliğini doğrula</h4> <p>Eğitim bilgilerini öğrenci belgen ile doğrula</p></div><div class="card-icon"> <i class="fas fa-graduation-cap"></i> </div></div></div></div><div class="col-lg-4"> <img class="img-fluid mt-5 d-none d-lg-block" src="~/svg/math.svg" alt="alternative"> </div><div class="col-lg-4 pr-0"> <div class="card right-pane first"> <div class="card-body"> <div class="text-wrapper"> <h4 class="card-title">Onay bekle</h4> <p>Sistem tarafından onaylanmasını bekle</p></div><div class="card-icon"> <i class="fas fa-check"></i> </div></div></div><div class="card right-pane"> <div class="card-body"> <div class="text-wrapper"> <h4 class="card-title">İlk ihtiyacını ilanla</h4> <p>İhtiyaç oluşturmak için: ihtiyaç kampanyası başlat ardından istediğin ihtiyaçlarını ilan et ve Okurdostlarının senin için o ilana bağış yapmasını bekle</p></div><div class="card-icon"> <i class="fas fa-book"></i> </div></div></div></div></div></div></div><div class="tab-pane fade" id="tab-2" role="tabpanel" aria-labelledby="tab-2"> <div class="container"> <div class="text-center"> <h3> İstediğin an istediğin meblağda destek ol <br /> <a class="btn-solid-reg text-center" href="/ihtiyaclar" style="width:200px;">İhtiyaçlar</a> </h3> </div><div class="row"> <div class="col-md-4"> <img class="img-fluid d-none d-lg-block" src="~/svg/team.svg" alt="alternative"> </div><div class="col-md-8"> <div class="icon-cards-area"> <div class="card"> <div class="card-icon"> <i class="fas fa-user-plus"></i> </div><div class="card-body"> <h4 class="card-title">Kayıt olmana gerek kalmadan</h4> <p>Öğrenci ihtiyaçlarını görüntüleyebilir ve sitede gezebilirsin</p></div></div><div class="card"> <div class="card-icon"> <i class="fas fa-search"></i> </div><div class="card-body"> <h4 class="card-title">Listelenmiş ihtiyaçlardan birini seç</h4> <p>Öğrencilerin ilan ettiği ihtiyaçlara göz at ve birini seç</p></div></div><div class="card"> <div class="card-icon"> <i class="fas fa-credit-card"></i> </div><div class="card-body"> <h4 class="card-title">Bağış yap</h4> <p>Seçtiğin öğrenci ihtiyacının satış platformunda ki fiyatını görerek bağış yap, istersen tamamını istersen bir kısmını karşılayabilirsin</p></div></div><div class="card"> <div class="card-icon"> <i class="far fa-smile-beam"></i> </div><div class="card-body"> <h4 class="card-title">ve Mutlu son</h4> <p>Artık bir öğrencinin ihtiyacının bir kısmını veya tamamını karşıladın</p></div></div></div></div></div></div></div></div></div></div></div>
