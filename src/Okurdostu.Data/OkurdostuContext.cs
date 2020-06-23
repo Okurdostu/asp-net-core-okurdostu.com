@@ -40,6 +40,7 @@ namespace Okurdostu.Data
             modelBuilder.ApplyConfiguration(new UserConfiguration());
             modelBuilder.ApplyConfiguration(new UserEducationConfiguration());
             modelBuilder.ApplyConfiguration(new UserEducationDocConfiguration());
+            modelBuilder.ApplyConfiguration(new FeedbackConfiguration());
 
             OnModelCreatingPartial(modelBuilder);
         }

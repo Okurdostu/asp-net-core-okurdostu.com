@@ -1,0 +1,42 @@
+﻿@model FeedbackModel
+
+
+<partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
+
+@using (Html.BeginForm("Feedback", "Beta", FormMethod.Post, new { @id = "FeedbackForm" }))
+{
+    <div class="form-horizontal">
+        <div class="form-group">
+            @Html.LabelFor(model => model.Message, htmlAttributes: new { @class = "control-label font-weight-bold" })
+            @Html.EditorFor(model => model.Message, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Message, "", new { @class = "text-danger font-weight-bold" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label font-weight-bold" })
+            @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger font-weight-bold" })
+        </div>
+        <div class="form-group">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
+        <input type="submit" value="Gönder" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" />
+    </div>
+    <hr />
+    <div class="text-black-50 text-center small font-weight-bold">
+        This site is protected by reCAPTCHA and the Google
+        <a target="_blank" href="https://policies.google.com/privacy" class="od">Privacy Policy</a> and
+        <a target="_blank" href="https://policies.google.com/terms" class="od">Terms of Service</a> apply.
+    </div>
+}
+
+<script>
+    $('#FeedbackForm').on('submit', function () {
+        setTimeout(function () {
+            if (!($('#Message-error').length || $('#Email-error').length)) {
+                $('#spinner-form').show();
+            }
+        }, 5)
+    });
+</script>
