@@ -1,0 +1,41 @@
+﻿@model List<Okurdostu.Data.Model.University>
+@if (Model.Count > 0)
+{
+    foreach (var item in Model)
+    {
+        <div class="row no-gutters pt-1">
+            <div class="col-auto pr-1 pl-1">
+                @if (item.LogoUrl != null)
+                {
+                    <a href="/universite/@item.FriendlyName">
+                        <img src="@item.LogoUrl"
+                             class="profil-image rounded-pill " style="width:75px; height:75px" />
+                    </a>
+
+                }
+                else
+                {
+                    <a href="/universite/@item.FriendlyName">
+                        <img src="~/svg/building.svg"
+                             class="profil-image rounded-pill " style="width:75px; height:75px;" />
+                    </a>
+                }
+            </div>
+            <div class="col p-0">
+                <h6 style="font-size:15px !important">
+                    <a class="od text-break" href="/universite/@item.FriendlyName">
+                        @item.Name <br /> <span class="text-black-50">(@Html.Raw("@" + item.Name))</span>
+                    </a>
+                </h6>
+            </div>
+        </div>
+        <hr class="mb-1 mt-1" />
+    }
+}
+else if (TempData["q"] != null)
+{
+    <div class="font-weight-bold text-black-50 text-center pt-4 pb-2">
+        <p>Sonuç yok.</p>
+        <p class="small">Bu arama için eşlesen üniversite bulunamadı...</p>
+    </div>
+}

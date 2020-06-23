@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = TempData["SearchPageTitle"];
+    Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
+}
+
+<div class="inner-addon left-addon pb-1">
+    <i class="icon fas fa-search od"></i>
+    <input class="form-control rounded-pill" value="@TempData["q"]" id="searchbox" type="search" placeholder="Bir şeyler arıyorum" required />
+    <div id="divsearch" class="pt-1 text-center" style="display:none;">
+        <hr class="mb-1 mt-1" />
+        <a class="btn btn-block od text-break font-weight-bold" href="" id="searchlink"></a>
+        <hr class="mt-1 mb-0" />
+    </div>
+</div>
+@if (TempData["q"] != null)
+{
+    <ul class="nav nav-tabs font-weight-bold justify-content-center sekme" id="tab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link sekme active" id="universities-tab" data-toggle="tab" href="#universities" role="tab" aria-controls="universities" aria-selected="true">Üniversite</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="profiles-tab" data-toggle="tab" href="#profiles" role="tab" aria-controls="profiles" aria-selected="false">Kişi</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="ihtiyacs-tab" data-toggle="tab" href="#needs" role="tab" aria-controls="ihtiyacs" aria-selected="false">İhtiyaçlar</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="universities" role="tabpanel" aria-labelledby="universite-tab">
+            <div>
+                @await Component.InvokeAsync("SearchUniversity", new { q = TempData["q"] })
+            </div>
+        </div>
+        <div class="tab-pane fade" id="profiles" role="tabpanel" aria-labelledby="kisi-tab">
+            <div>
+                @await Component.InvokeAsync("SearchProfile", new { q = TempData["q"] })
+            </div>
+        </div>
+        <div class="tab-pane fade" id="needs" role="tabpanel" aria-labelledby="ihtiyac-tab">
+            <div>
+                @await Component.InvokeAsync("SearchNeed", new { q = TempData["q"] })
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="image-container text-center mt-1">
+        <img class="img-fluid" src="~/svg/search.svg" style="max-height:300px">
+    </div>
+}
+
+<script>
+    $(document).ready(function () {
+        $("#searchbox").on('input', function (e) {
+            if ($("#searchbox").val().length == 0) {
+                $("#searchlink").hide();
+                $("#divsearch").hide();
+            }
+            else {
+                $("#searchlink").show();
+                $("#divsearch").show();
+            }
+            var str = $("#searchbox").val()
+            $("#searchlink").attr("href", "/arama/" + str)
+            $("#searchlink").html("Ara: " + str);
+        });
+    });
+</script>
