@@ -1,9 +1,12 @@
 ﻿@model List<Okurdostu.Data.Model.Need>
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
 @{
-    Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
+    bool isRequestComingFromUniversityPage;
 }
-
+@if (HttpContextAccessor.HttpContext.Request.Path.Value.ToLower().Contains("need"))
+{
+    HttpContextAccessor.HttpContext.Response.Redirect("/ihtiyaclar");
+}
 <!--
    bonsai.css
 -->
@@ -22,42 +25,52 @@
             transform: translateY(calc(var(--levitate-hvr) * -1.2px))
         }
 </style>
+@{
+    //bu sayfa aşağıda ki türde linklerle gelir:
+
+    // -/ihtiyaclar :                                               bütün ihtiyaçlar
+    // -/ihtiyaclar/universite-namefriendly :                       üniversitenin öğrencilerinin bütün ihtiyaçları
+    // -/ihtiyaclar/{herhangi bir arama} :                          filtrelenmiş texte göre ihtiyaçlar
 
 
-@if (HttpContextAccessor.HttpContext.Request.Path.Value.ToLower().Contains("need"))
+    // -/ihtiyaclar/universite-namefriendly/jquery
+    //jquery ile bu sayfayı üniversite sayfasında ki ihtiyaçlar sekmesine çağırıyorum ve
+    //parametreye jquery yolladığım zaman - TempData["Jquery"]'nın içine 'Yes' diye bir değer atıyorum,
+    //ve sayfanın designi buna ve bununla bağlantılı isRequestComingFromUniversityPage'e göre değişiyor.
+
+    //aspnetmvc'de renderaction kullanırken sayfanın hangi url tarafından çağrıldığını kontrol ediyordum designi ona göre ayarlıyordum
+    //buda bir nevi aynı bug olacağını sanmıyorum ama yine de kontrol et.
+}
+
+@if (TempData["Jquery"] == "Yes")
 {
-    HttpContextAccessor.HttpContext.Response.Redirect("/ihtiyaclar");
+    isRequestComingFromUniversityPage = true;
+}
+else
+{
+    isRequestComingFromUniversityPage = false;
 }
 @{
-    bool isRequestComingFromUniversityPage = true;
-    if (HttpContextAccessor.HttpContext.Request.Path.Value.ToLower().Replace("ı", "i").Contains("/ihtiyaclar"))
-    {
-        isRequestComingFromUniversityPage = false;
-    }
-    // -/ihtiyaclar/universite-namefriendly
-    // -/ihtiyaclar
-    // -/ihtiyaclar/filtreText
-    // -/universite/universite-namefriendly (üniversite sayfasında ki: ihtiyaçlar sekmesi)
+    int i = 0; //üniversite sayfasında geliyorsa istek en fazla 6 tane kaydı görüntülemek için aşağıda ki bir foreach'da kullanılıyor
 
-    //şeklinde gelen isteklerde bu .cshtml görüntüleniyor ve gelen istek pathine göre hepsinde farklı bir sayfa gösteriyor
-
-    int i = 0;
     var viewbagUniversity = new Okurdostu.Data.Model.University();
-
     if (ViewBag.University != null)
     {
         viewbagUniversity = (ViewBag.University as Okurdostu.Data.Model.University);
     }
 }
-@if (isRequestComingFromUniversityPage == false)
+
+@if (!isRequestComingFromUniversityPage)
 {
-    <link href="~/Content/PagedList.css" rel="stylesheet" />
     Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
     ViewData["Title"] = TempData["ListelePageTitle"];
-    //ViewBag.Keywords = "";
+}
+else
+{
+    Layout = null;
 }
 
-@if (isRequestComingFromUniversityPage == false)
+@if (!isRequestComingFromUniversityPage)
 {
     <button class="btn btn-outline-purple font-weight-bold float-right filter-button rounded-custom" data-toggle="modal" data-target="#filtre" style="cursor:pointer;">
         İhtiyaçları filtrele
@@ -78,16 +91,11 @@
 }
 @if (Model.Count > 0)
 {
-    //Sayfanın üstünde ki pagedlist butonları
-    @*if (isRequestComingFromUniversityPage != true && Model.Count > 12)
-        {
-            @Html.PagedListPager(Model, s => Url.Action("Index", "Ihtiyaclar", new { s = s }));
-        }*@
     <div class="row pt-2">
         @foreach (Okurdostu.Data.Model.Need item in Model)
         {
             i++;
-            if (i > 6 && isRequestComingFromUniversityPage == true)
+            if (i > 6 && isRequestComingFromUniversityPage)
             {
                 //universite sayfasından geliyorsa istek en fazla 6 tane ilan ihtiyacını görüntüle
                 break;
@@ -99,7 +107,7 @@
                         <div class="text-center pt-2 pr-3 pl-3">
                             <img src="@item.User.PictureUrl" class="rounded-custom" style=" height:200px; width:100%;" />
                             <p class="font-weight-bold mb-0 ">@item.User.FullName</p>
-                            <span class="small font-weight-bold text-black-50">@item.User.UserEducation.Where(x => x.IsConfirmed == true && x.IsRemoved != true).FirstOrDefault().University.Name</span>
+                            <span class="small font-weight-bold text-black-50">@item.User.UserEducation.OrderByDescending(x => x.StartYear).Where(x => x.IsConfirmed == true && x.IsRemoved != true).FirstOrDefault().University.Name</span>
                         </div>
                         <p class="card-title font-weight-bold pr-1 pl-1 text-center" style="max-height:65px;">
                             @if (item.Title.Length >= 30)
@@ -112,11 +120,10 @@
                             }
                         </p>
                         <div class="progress rounded-custom mt-2 mr-2 ml-2">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-od"
-                                 role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-od" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
                         </div>
                         @{
-                            string Price = item.TotalCharge.ToString().NormalizePrice();
+                            string Price = item.TotalCharge.ToString().NormalizePrice().Replace(".", ",");
                         }
                         <h6 class="text-center mt-0">
                             <span class="font-weight-bold">
@@ -135,7 +142,8 @@
                     </div>
                 </div>
             </div>
-            if (i == 6 && isRequestComingFromUniversityPage != true)
+            //6 tane kayıtı girdikten sonra buton oluşturması için
+            if (i == 6 && !isRequestComingFromUniversityPage)
             {
                 <div class="col-12">
                     <hr class="mb-2" />
@@ -156,11 +164,6 @@
             }
         </center>
     }
-    @*else if (Model.Count > 12)
-        {
-            //Sayfanın altında ki  pagedlist butonları
-            @Html.PagedListPager(Model, s => Url.Action("Index", "Ihtiyaclar", new { s = s }));
-        }*@
 }
 else
 {
@@ -178,8 +181,7 @@ else
         </div>
     }
 }
-
-@if (isRequestComingFromUniversityPage != true)
+@if (!isRequestComingFromUniversityPage)
 {
     <div class="modal fade" id="filtre" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">

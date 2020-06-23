@@ -22,9 +22,12 @@ namespace Okurdostu.Web.Controllers
 
         [Route("~/ihtiyaclar")]
         [Route("~/ihtiyaclar/{filtreText}")]
-        public async Task<IActionResult> Index(string? filtreText, int? s)
+        [Route("~/ihtiyaclar/{filtreText}/jquery")]
+        public async Task<IActionResult> Index(string filtreText, string _)
         {
-            int _sayfa = s ?? 1;
+            if (_ == "jquery")
+                TempData["Jquery"] = "Yes";
+
             ViewData["NeedsActiveClass"] = "active";
             List<Need> NeedDefaultList = await Context.Need.Include(x => x.User).ThenInclude(x => x.UserEducation).ThenInclude(x => x.University).Where(x => x.IsConfirmed == true && x.IsRemoved != true).OrderByDescending(x => x.NeedLike.Where(a => a.IsCurrentLiked == true).Count()).ToListAsync();
             if (filtreText != null)
