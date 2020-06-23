@@ -22,7 +22,7 @@ namespace Okurdostu.Web.Controllers
 
         [Route("~/ihtiyaclar")]
         [Route("~/ihtiyaclar/{filtreText}")]
-        [Route("~/ihtiyaclar/{filtreText}/jquery")]
+        [Route("~/ihtiyaclar/{filtreText}/{_}")]
         public async Task<IActionResult> Index(string filtreText, string _)
         {
             if (_ == "jquery")
