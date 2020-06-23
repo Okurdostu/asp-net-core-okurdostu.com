@@ -25,7 +25,7 @@ namespace Okurdostu.Web.Controllers
             {
                 AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
 
-                var PreviouslyLike = await Context.NeedLike.FirstOrDefaultAsync(x => x.UserId == AuthUser.Id);
+                var PreviouslyLike = await Context.NeedLike.FirstOrDefaultAsync(x => x.UserId == AuthUser.Id && x.NeedId == Need.Id);
 
                 if (PreviouslyLike != null)
                 {

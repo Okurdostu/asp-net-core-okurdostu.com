@@ -17,7 +17,7 @@ namespace Okurdostu.Web.Models
         public async Task<List<UniversityStudentsModel>> Students(string schoolfriendlyname)
         {
             var Context = new OkurdostuContext();
-            List<UniversityStudentsModel> List = new List<UniversityStudentsModel>();
+            List<UniversityStudentsModel> Students = new List<UniversityStudentsModel>();
 
             List<UserEducation> EducationList = await Context.UserEducation.Include(x => x.User).Where(x =>
              x.University.FriendlyName == schoolfriendlyname &&
@@ -25,7 +25,7 @@ namespace Okurdostu.Web.Models
             foreach (var Education in EducationList)
             {
 
-                if (List.Where(x => x.ID == Education.UserId).FirstOrDefault() != null)
+                if (Students.Where(x => x.ID == Education.UserId).FirstOrDefault() != null)
                     continue;
                 /*
                     Bir öğrencinin aynı üniversite'de birden fazla eğitimi olabilir (Kısaca ikinci eğitimden aynı user yaklanrsa ekleme)
@@ -42,9 +42,9 @@ namespace Okurdostu.Web.Models
                 Student.Username = Education.User.Username;
                 Student.ProfilePicture = Education.User.PictureUrl;
 
-                List.Add(Student);
+                Students.Add(Student);
             }
-            return List;
+            return Students;
         }
     }
 }
