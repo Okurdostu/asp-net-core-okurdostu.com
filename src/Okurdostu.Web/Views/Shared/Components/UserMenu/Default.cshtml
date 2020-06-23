@@ -1,0 +1,15 @@
+﻿@model Okurdostu.Data.Model.User
+<div>
+    @if (@Model.PictureUrl != null)
+    {
+        <a href="/@Model.Username" id="profil"><i><img src="@Model.PictureUrl" class="rounded-pill" style="width:35px; height:35px;" /></i> <span>Profil</span></a>
+    }
+    else
+    {
+        <a href="/@Model.Username" id="profil"><img src="~/Content/image/user.svg" class="rounded-pill" style="width:35px; height:35px;" /> <span>Profil</span></a>
+    }
+
+</div>
+<div>
+    <a data-toggle="modal" data-target="#LogoutModal" style="cursor:pointer;"><i class="fas fa-sign-out-alt"></i> <span>Çıkış yap</span></a>
+</div>

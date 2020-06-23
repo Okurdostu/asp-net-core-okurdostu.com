@@ -88,7 +88,7 @@
             </div>
             @if (IsAuthenticated)
             {
-                //partialmenu for user
+                @await Component.InvokeAsync("UserMenu")
             }
             else
             {
@@ -160,7 +160,7 @@
                         </p>
                         <hr />
                         <div>
-                            @using (Html.BeginForm("", "Logout", FormMethod.Post))
+                            @using (Html.BeginForm("Index", "Logout", FormMethod.Post))
                             {
                                 <button type="submit" class="btn btn-secondary btn-block font-weight-bold rounded-custom">
                                     Evet, çıkış yap
