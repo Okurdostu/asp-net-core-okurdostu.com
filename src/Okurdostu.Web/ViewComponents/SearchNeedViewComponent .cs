@@ -15,7 +15,7 @@ namespace Okurdostu.Web.ViewComponents
         public async Task<IViewComponentResult> InvokeAsync(string q)
         {
             var result = await Context.Need.Include(x=> x.User).Where(x =>
-            x.IsConfirmed && !x.IsRemoved || x.Title.ToLower().Contains(q.ToLower())
+            x.IsConfirmed && !x.IsRemoved && x.Title.ToLower().Contains(q.ToLower())
             ).ToListAsync();
 
             return View(result);

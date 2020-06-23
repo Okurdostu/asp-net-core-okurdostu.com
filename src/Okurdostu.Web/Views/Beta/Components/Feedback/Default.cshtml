@@ -24,11 +24,7 @@
         <input type="submit" value="Gönder" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" />
     </div>
     <hr />
-    <div class="text-black-50 text-center small font-weight-bold">
-        This site is protected by reCAPTCHA and the Google
-        <a target="_blank" href="https://policies.google.com/privacy" class="od">Privacy Policy</a> and
-        <a target="_blank" href="https://policies.google.com/terms" class="od">Terms of Service</a> apply.
-    </div>
+    <partial name="~/Views/Shared/_GoogleRecaptchaWarningPartial.cshtml" />
 }
 
 <script>
