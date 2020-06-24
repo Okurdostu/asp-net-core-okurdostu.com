@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
 }
 <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
-@if (TempData["CreateNeedError"] != null && TempData["CreateNeedError"] != "Active education")
+@if (TempData["CreateNeedError"] != null && TempData["CreateNeedError"].ToString() != "Active education")
 {
     <div class="alert alert-secondary text-center font-weight-bold" role="alert">
         <span class="text-danger">
@@ -16,7 +16,7 @@
             <br />
             <span class="text-black-50">
                 Hataya sebep veren kampanyanızı görmek için:
-                <a class="od" href="@Html.Raw(TempData["CausingErrorNeedLink"])"> Tıklayınız</a>
+                <a class="od" href="@Html.Raw(TempData["CausingErrorNeedLink"].ToString())"> Tıklayınız</a>
             </span>
         }
     </div>

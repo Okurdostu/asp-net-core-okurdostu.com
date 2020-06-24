@@ -60,7 +60,6 @@ namespace Okurdostu.Web.Controllers
             }
             else // filtre yoksa komple bütün hepsini listele
             {
-                NeedDefaultList = NeedDefaultList.ToList();
                 TempData["ListelePageTitle"] = "Öğrencilerin ihtiyaçları | Okurdostu ";
             }
             return View(NeedDefaultList);
@@ -154,7 +153,7 @@ namespace Okurdostu.Web.Controllers
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
 
-            if (await IsThereAnyProblemtoCreateNeed() && TempData["CreateNeedError"] == "Active education")
+            if (await IsThereAnyProblemtoCreateNeed() && TempData["CreateNeedError"] != null && TempData["CreateNeedError"].ToString() == "Active education")
             {
                 TempData["ProfileMessage"] = "İhtiyaç kampanyası oluşturmak için onaylanmış bir eğitim bilgisine ihtiyacınız vardır.";
                 return Redirect("/" + AuthUser.Username);
@@ -212,7 +211,7 @@ namespace Okurdostu.Web.Controllers
 
                 }
             }
-            else if (TempData["CreateNeedError"] == "Active education")
+            else if (TempData["CreateNeedError"] != null && TempData["CreateNeedError"].ToString() == "Active education")
             {
 
                 TempData["ProfileMessage"] = "İhtiyaç kampanyası oluşturmak için onaylanmış bir eğitim bilgisine ihtiyacınız vardır.";

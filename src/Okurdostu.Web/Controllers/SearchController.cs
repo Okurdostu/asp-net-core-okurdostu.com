@@ -8,7 +8,7 @@ namespace Okurdostu.Web.Controllers
     {
         [Route("~/arama")]
         [Route("~/arama/{q}")]
-        public async Task<IActionResult> Index(string q)
+        public IActionResult Index(string q)
         {
             
             if (!string.IsNullOrEmpty(q) && !string.IsNullOrWhiteSpace(q))

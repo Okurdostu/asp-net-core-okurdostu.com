@@ -42,7 +42,7 @@
     //buda bir nevi aynı bug olacağını sanmıyorum ama yine de kontrol et.
 }
 
-@if (TempData["Jquery"] == "Yes")
+@if (TempData["Jquery"] != null && TempData["Jquery"].ToString() == "Yes")
 {
     isRequestComingFromUniversityPage = true;
 }
@@ -63,7 +63,7 @@ else
 @if (!isRequestComingFromUniversityPage)
 {
     Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
-    ViewData["Title"] = TempData["ListelePageTitle"];
+    ViewData["Title"] = TempData["ListelePageTitle"].ToString();
 }
 else
 {
