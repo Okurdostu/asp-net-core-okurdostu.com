@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class UniversityController : OkurdostuContextController
+    public class UniversityController : OkurdostuContextController<UniversityController>
     {
         [Route("~/universiteler")]
         public IActionResult Index()

@@ -7,7 +7,7 @@ using Okurdostu.Web.Base;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class ProfileController : OkurdostuContextController
+    public class ProfileController : OkurdostuContextController<ProfileController>
     {
         public async Task<IActionResult> Index(string username)
         {

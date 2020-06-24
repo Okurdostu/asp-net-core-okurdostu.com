@@ -12,7 +12,7 @@ using Okurdostu.Web.Models;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class SignUpController : OkurdostuContextController
+    public class SignUpController : OkurdostuContextController<SignUpController>
     {
         [Route("~/Kaydol")]
         public IActionResult Index()

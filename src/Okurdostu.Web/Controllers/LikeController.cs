@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class Like : OkurdostuContextController
+    public class LikeController : OkurdostuContextController<LikeController>
     {
         private User AuthUser = null;
 

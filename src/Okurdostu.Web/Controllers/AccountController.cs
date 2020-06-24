@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Okurdostu.Data.Model;
 using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
@@ -17,7 +18,7 @@ using SixLabors.ImageSharp.Processing;
 namespace Okurdostu.Web.Controllers
 {
     [Authorize]
-    public class AccountController : OkurdostuContextController
+    public class AccountController : OkurdostuContextController<AccountController>
     {
         private User AuthUser;
 
@@ -134,6 +135,7 @@ namespace Okurdostu.Web.Controllers
         [Route("~/photo")]
         public async Task AddPhoto()
         {
+            Logger.LogInformation("test");
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             var File = Request.Form.Files.First();
 
@@ -157,7 +159,6 @@ namespace Okurdostu.Web.Controllers
                     var result = await Context.SaveChangesAsync();
                     if (result > 0)
                     {
-                        //yeni fotoğraf ile database kaydı gerçekleştiyse eski fotoğrafı kullanıcı güvenliği adına silmeliyiz.
                         if (System.IO.File.Exists(Environment.WebRootPath + OldPhotoPath))
                             System.IO.File.Delete(Environment.WebRootPath + OldPhotoPath);
                     }
@@ -386,12 +387,12 @@ namespace Okurdostu.Web.Controllers
                         TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz"; //dosyayı sunucuya kaydetmedi
 
                 }
+                else if (File.Length > 1048576)
+                    TempData["ProfileMessage"] = "Seçtiğiniz dosya 1 megabyte'dan fazla olmamalı";
                 else
                     TempData["ProfileMessage"] = "PDF, PNG, JPG veya JPEG türünde belge yükleyiniz";
-
+                
             }
-            else if (File.Length > 1048576)
-                TempData["ProfileMessage"] = "Seçtiğiniz dosya 1 megabyte'dan fazla olmamalı";
 
             Response.Redirect("/" + AuthUser.Username);
         }

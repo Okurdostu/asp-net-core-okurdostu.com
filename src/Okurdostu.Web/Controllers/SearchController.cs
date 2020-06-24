@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class SearchController : OkurdostuContextController
+    public class SearchController : OkurdostuContextController<SearchController>
     {
         [Route("~/arama")]
         [Route("~/arama/{q}")]

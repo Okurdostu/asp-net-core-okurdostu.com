@@ -7,7 +7,7 @@ using Okurdostu.Web.Models;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class BetaController : OkurdostuContextController
+    public class BetaController : OkurdostuContextController<BetaController>
     {
         public IActionResult Index()
         {

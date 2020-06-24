@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class NeedController : OkurdostuContextController
+    public class NeedController : OkurdostuContextController<NeedController>
     {
 
         private User AuthUser;

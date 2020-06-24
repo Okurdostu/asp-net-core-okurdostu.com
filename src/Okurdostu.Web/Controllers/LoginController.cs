@@ -14,7 +14,7 @@ using Okurdostu.Web.Models;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class LoginController : OkurdostuContextController
+    public class LoginController : OkurdostuContextController<LoginController>
     {
         [Route("~/Girisyap")]
         public IActionResult Index(string ReturnUrl)
