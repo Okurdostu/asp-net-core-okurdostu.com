@@ -21,8 +21,7 @@ namespace Okurdostu.Web.Controllers
                 if (_User != null) return View(_User);
             }
 
-            //404
-            return null;
+            return NotFound();
         }
 
     }

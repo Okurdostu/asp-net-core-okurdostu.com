@@ -114,8 +114,6 @@ namespace Okurdostu.Web.Controllers
             AuthUser.Twitter = Model.Twitter;
             AuthUser.Github = Model.Github;
             var result = await Context.SaveChangesAsync();
-            if (result == 0)
-                TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
 
             Response.Redirect("/" + AuthUser.Username);
         }
@@ -128,8 +126,6 @@ namespace Okurdostu.Web.Controllers
             AuthUser.Biography = Model.Biography;
             AuthUser.FullName = Model.FullName;
             var result = await Context.SaveChangesAsync();
-            if (result == 0)
-                TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
 
             Response.Redirect("/" + AuthUser.Username);
         }

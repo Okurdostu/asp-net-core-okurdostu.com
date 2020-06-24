@@ -20,11 +20,15 @@
 }
 @if (!Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUserEqualModelUser)
 {
+    @if (TempData["NeedMessage"] != null)
+    {
+        <div class="alert alert-secondary text-center font-weight-bold" role="alert">
+            <span>
+                @Html.Raw(TempData["NeedMessage"])
+            </span>
+        </div>
+    }
     <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
-    @*
-        Tamamlanmamış, onaylanma için gönderilmemiş.
-        İşleme devam etmesi gerektiğini söyle
-    *@
     <p class="font-weight-bold text-black-50 text-center">İkinci aşama</p>
     <div class="small">
         <p class="font-weight-bold text-black-50">

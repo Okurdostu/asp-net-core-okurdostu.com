@@ -73,6 +73,7 @@ namespace Okurdostu.Web.Controllers
                 var UserNotRemovedCompletedNeeds = await Context.Need.Where(x => x.UserId == AuthUser.Id && !x.IsRemoved && !x.IsCompleted).ToListAsync();
                 if (UserNotRemovedCompletedNeeds.Count > 0) //User'in önceden oluşturduğu ve silmediği bir kampanya varsa
                 {
+
                     if (UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == false).FirstOrDefault() != null)
                     {
                         //Onaylama için gönderilmemiş bir kampanya varsa
@@ -97,7 +98,10 @@ namespace Okurdostu.Web.Controllers
                 }
             }
             else
+            {
                 TempData["CreateNeedError"] = "Active education";
+                return true;
+            }
 
             return false;
         }
@@ -109,15 +113,10 @@ namespace Okurdostu.Web.Controllers
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
 
-            if (await IsThereAnyProblemtoCreateNeed())
+            if (await IsThereAnyProblemtoCreateNeed() && TempData["CreateNeedError"] == "Active education")
             {
-
-                if (TempData["CreateNeedError"].ToString() == "Active education")
-                {
-                    TempData["ProfileMessage"] = "İhtiyaç kampanyası oluşturmak için onaylanmış bir eğitim bilgisine ihtiyacınız vardır.";
-                    return Redirect("/" + AuthUser.Username);
-                }
-
+                TempData["ProfileMessage"] = "İhtiyaç kampanyası oluşturmak için onaylanmış bir eğitim bilgisine ihtiyacınız vardır.";
+                return Redirect("/" + AuthUser.Username);
             }
             return View();
         }
@@ -129,11 +128,6 @@ namespace Okurdostu.Web.Controllers
         public async Task<IActionResult> Create(NeedModel Model)
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-            if (ModelState.ErrorCount > 1)
-            {
-                TempData["CreateNeedError"] = "Input error";
-                return View();
-            }
 
             if (!await IsThereAnyProblemtoCreateNeed())
             {
@@ -172,7 +166,7 @@ namespace Okurdostu.Web.Controllers
 
                 }
             }
-            else if (TempData["CreateNeedError"].ToString() == "Active education")
+            else if (TempData["CreateNeedError"] == "Active education")
             {
 
                 TempData["ProfileMessage"] = "İhtiyaç kampanyası oluşturmak için onaylanmış bir eğitim bilgisine ihtiyacınız vardır.";
@@ -207,7 +201,7 @@ namespace Okurdostu.Web.Controllers
                         await Context.SaveChangesAsync();
                     }
                     else
-                        TempData["Mesaj"] = "Kampanyanız için en az bir, en fazla üç hedef belirleyebilirsiniz";
+                        TempData["NeedMessage"] = "Kampanyanızı onaya yollamak için en az bir, en fazla üç hedef belirlemelisiniz";
 
                     return Redirect("/" + Need.User.Username.ToLower() + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id);
                 }
@@ -237,8 +231,7 @@ namespace Okurdostu.Web.Controllers
                 return Redirect("/" + item.Need.User.Username.ToLower() + "/ihtiyac/" + item.Need.FriendlyTitle + "/" + item.Need.Id);
             }
 
-            ControllerContext.HttpContext.Response.StatusCode = 404;
-            return null;
+            return NotFound();
         }
 
         [Authorize]
@@ -344,8 +337,7 @@ namespace Okurdostu.Web.Controllers
                     return Redirect("/" + Need.User.Username.ToLower() + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id);
                 }
             }
-            ControllerContext.HttpContext.Response.StatusCode = 404;
-            return null;
+            return NotFound();
         }
         #endregion
 
@@ -356,12 +348,6 @@ namespace Okurdostu.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> EditTitle(NeedModel Model)
         {
-            if (ModelState.ErrorCount > 1)
-            {
-                TempData["CreateNeedError"] = "Input error";
-                return Redirect("/");
-            }
-
             var Need = await Context.Need.FirstOrDefaultAsync(x => x.Id == Model.Id);
             if (Need != null)
             {
@@ -377,26 +363,32 @@ namespace Okurdostu.Web.Controllers
 
                         Need.Title = Model.Title;
                         Need.FriendlyTitle = Need.Title.FriendlyUrl();
-                        await Context.SaveChangesAsync();
+                        try
+                        {
+                            await Context.SaveChangesAsync();
+                            TempData["NeedMessage"] = "Başlık düzenlendi";
+                        }
+                        catch (Exception e)
+                        {
+                            if (e.InnerException.Message.Contains("Unique_Key_Title"))
+                                TempData["NeedMessage"] = "Bu başlığı seçemezsiniz";
+                            else
+                                TempData["NeedMessage"] = "Başaramadık, ne olduğunu bilmiyoruz";
+                        }
                     }
-
                     string link = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id;
                     return Redirect(link);
-                    //catch title unique key error
+
                 }
             }
-            return null;
+
+            return NotFound();
         }
 
         [Authorize]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> EditDescription(NeedModel Model)
         {
-            if (ModelState.ErrorCount > 1)
-            {
-                TempData["CreateNeedError"] = "Input error";
-                return Redirect("/");
-            }
 
             var Need = await Context.Need.FirstOrDefaultAsync(x => x.Id == Model.Id);
             if (Need != null)
@@ -410,6 +402,7 @@ namespace Okurdostu.Web.Controllers
                     {
                         Need.Description = Model.Description;
                         await Context.SaveChangesAsync();
+                        TempData["NeedMessage"] = "Açıklama düzenlendi";
                     }
 
                     string link = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id;
@@ -418,7 +411,7 @@ namespace Okurdostu.Web.Controllers
                 }
 
             }
-            return null;
+            return NotFound();
         }
         #endregion
 
@@ -463,8 +456,7 @@ namespace Okurdostu.Web.Controllers
 
             }
 
-            //404
-            return null;
+            return NotFound();
         }
 
         public PartialViewResult ViewNeedItem(Need Model)
@@ -476,6 +468,7 @@ namespace Okurdostu.Web.Controllers
         {
             return PartialView(Model);
         }
+
         public PartialViewResult ViewNeedBasic(Need Model)
         {
             return PartialView(Model);

@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
 }
 <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
-@if (TempData["CreateNeedError"] != null)
+@if (TempData["CreateNeedError"] != null && TempData["CreateNeedError"] != "Active education")
 {
     <div class="alert alert-secondary text-center font-weight-bold" role="alert">
         <span class="text-danger">
