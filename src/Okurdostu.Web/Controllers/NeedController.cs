@@ -2,15 +2,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Okurdostu.Data.Model;
 using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 using Okurdostu.Web.Models.NeedItem;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace Okurdostu.Web.Controllers
 {
@@ -30,8 +31,12 @@ namespace Okurdostu.Web.Controllers
 
             ViewData["NeedsActiveClass"] = "active";
             List<Need> NeedDefaultList = await Context.Need.Include(x => x.User).ThenInclude(x => x.UserEducation).ThenInclude(x => x.University).Where(x => x.IsConfirmed == true && x.IsRemoved != true).OrderByDescending(x => x.NeedLike.Where(a => a.IsCurrentLiked == true).Count()).ToListAsync();
-            if (filtreText != null)
+            if (!string.IsNullOrEmpty(filtreText) && !string.IsNullOrWhiteSpace(filtreText))
             {
+                if (_ != "jquery")
+                    Logger.LogInformation("Searching needs with tag:{tag}, {now}", filtreText, DateTime.Now.ToString());
+
+
                 var University = await Context.University.Where(x => x.FriendlyName == filtreText).FirstOrDefaultAsync();
                 if (University != null) //gelen filtre bir okula uyuyorsa okula göre listele
                 {
@@ -61,7 +66,43 @@ namespace Okurdostu.Web.Controllers
             return View(NeedDefaultList);
         }
 
+
         #region --
+        [Authorize]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task SendToConfirmation(long NeedId)
+        {
+            var Need = await Context.Need.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == NeedId);
+
+            if (Need != null)
+            {
+
+                AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+                if (Need.UserId == AuthUser.Id)
+                {
+                    var UnRemovedItems = await Context.NeedItem.Where(x => x.NeedId == Need.Id && !x.IsRemoved).ToListAsync();
+                    if (UnRemovedItems.Count() > 0 && UnRemovedItems.Count() <= 3)
+                    {
+                        decimal TotalCharge = 0;
+
+                        foreach (var item in UnRemovedItems)
+                            TotalCharge += item.Price;
+
+                        Need.TotalCharge = TotalCharge;
+                        Need.IsSentForConfirmation = true;
+
+                        await Context.SaveChangesAsync();
+
+                    }
+                    else
+                        TempData["NeedMessage"] = "Kampanyanızı onaya yollamak için en az bir, en fazla üç hedef belirlemelisiniz";
+
+                    Response.Redirect("/" + Need.User.Username.ToLower() + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id);
+                }
+            }
+        }
+
+
         [NonAction]
         public async Task<bool> IsThereAnyProblemtoCreateNeed()
         {
@@ -160,9 +201,14 @@ namespace Okurdostu.Web.Controllers
                 {
 
                     if (e.InnerException.Message.Contains("Unique_Key_Title"))
+                    {
                         TempData["CreateNeedError"] = "Bu başlığı seçemezsiniz";
+                    }
                     else
+                    {
+                        Logger.LogError("Error create need. Ex.message : {ex.message}, Ex.innermessage: {ex.inner}", e.Message, e.InnerException.Message);
                         TempData["CreateNeedError"] = "Başaramadık, ne olduğunu bilmiyoruz";
+                    }
 
                 }
             }
@@ -176,46 +222,13 @@ namespace Okurdostu.Web.Controllers
 
             return View();
         }
-        [Authorize]
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> SendToConfirmation(long NeedId)
-        {
-            var Need = await Context.Need.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == NeedId);
-
-            if (Need != null)
-            {
-                AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-                if (Need.UserId == AuthUser.Id)
-                {
-                    var UnRemovedItems = await Context.NeedItem.Where(x => x.NeedId == Need.Id && !x.IsRemoved).ToListAsync();
-                    if (UnRemovedItems.Count() > 0 && UnRemovedItems.Count() <= 3)
-                    {
-                        decimal TotalCharge = 0;
-
-                        foreach (var item in UnRemovedItems)
-                            TotalCharge += item.Price;
-
-                        Need.TotalCharge = TotalCharge;
-                        Need.IsSentForConfirmation = true;
-
-                        await Context.SaveChangesAsync();
-                    }
-                    else
-                        TempData["NeedMessage"] = "Kampanyanızı onaya yollamak için en az bir, en fazla üç hedef belirlemelisiniz";
-
-                    return Redirect("/" + Need.User.Username.ToLower() + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id);
-                }
-            }
-            return Redirect("/");
-        }
         #endregion
 
 
-
-        #region needitem
+        #region needitemremoveadd
         [Authorize]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> RemoveItem(long NeedItemId)
+        public async Task RemoveItem(long NeedItemId)
         {
             var item = await Context.NeedItem.Include(needitem => needitem.Need).FirstOrDefaultAsync(x => x.Id == NeedItemId && !x.Need.IsRemoved && !x.Need.IsSentForConfirmation);
             // Kampanya(need) onaylanma için yollandıysa bir item silemeyecek: onaylanma için gönderdiyse 
@@ -227,16 +240,15 @@ namespace Okurdostu.Web.Controllers
                 {
                     item.IsRemoved = true;
                     await Context.SaveChangesAsync();
+                    Response.Redirect("/" + item.Need.User.Username.ToLower() + "/ihtiyac/" + item.Need.FriendlyTitle + "/" + item.Need.Id);
                 }
-                return Redirect("/" + item.Need.User.Username.ToLower() + "/ihtiyac/" + item.Need.FriendlyTitle + "/" + item.Need.Id);
             }
-
-            return NotFound();
         }
+
 
         [Authorize]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddItem(string ItemLink, long NeedId)
+        public async Task AddItem(string ItemLink, long NeedId)
         {
             var Need = await Context.Need.Where(x => x.Id == NeedId
             && !x.IsRemoved
@@ -273,7 +285,10 @@ namespace Okurdostu.Web.Controllers
                             await Context.SaveChangesAsync();
                         }
                         else
-                            TempData["Hata"] = Udemy.Error;
+                        {
+                            Logger.LogError("Udemy Error:{error}, Link:{link}", Udemy.Error, ItemLink);
+                            TempData["NeedMessage"] = Udemy.Error;
+                        }
                     }
                     else if (ItemLink.ToLower().Contains("pandora.com.tr"))
                     {
@@ -301,7 +316,10 @@ namespace Okurdostu.Web.Controllers
                                 await Context.SaveChangesAsync();
                             }
                             else
-                                TempData["Hata"] = Pandora.Error;
+                            {
+                                Logger.LogError("Pandora Error:{error}, Link:{link}", Pandora.Error, ItemLink);
+                                TempData["NeedMessage"] = Pandora.Error;
+                            }
                         }
                         else
                             TempData["MesajHata"] = "Pandora.com.tr'den sadece kitap seçebilirsiniz";
@@ -329,24 +347,25 @@ namespace Okurdostu.Web.Controllers
                             await Context.SaveChangesAsync();
                         }
                         else
-                            TempData["Hata"] = Amazon.Error;
+                        {
+                            Logger.LogError("Amazon Error:{error}, Link:{link}", Amazon.Error, ItemLink);
+                            TempData["NeedMessage"] = Amazon.Error;
+                        }
                     }
                     else
                         TempData["MesajHata"] = "İhtiyacınızın linkini verirken desteklenen platformları kullanın";
 
-                    return Redirect("/" + Need.User.Username.ToLower() + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id);
+                    Response.Redirect("/" + Need.User.Username.ToLower() + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id);
                 }
             }
-            return NotFound();
         }
         #endregion
 
 
-
-        #region editneed
+        #region editneedtitledescription
         [Authorize]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditTitle(NeedModel Model)
+        public async Task EditTitle(NeedModel Model)
         {
             var Need = await Context.Need.FirstOrDefaultAsync(x => x.Id == Model.Id);
             if (Need != null)
@@ -372,22 +391,19 @@ namespace Okurdostu.Web.Controllers
                         {
                             if (e.InnerException.Message.Contains("Unique_Key_Title"))
                                 TempData["NeedMessage"] = "Bu başlığı seçemezsiniz";
-                            else
-                                TempData["NeedMessage"] = "Başaramadık, ne olduğunu bilmiyoruz";
                         }
                     }
                     string link = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id;
-                    return Redirect(link);
+                    Response.Redirect(link);
 
                 }
             }
-
-            return NotFound();
         }
+
 
         [Authorize]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditDescription(NeedModel Model)
+        public async Task EditDescription(NeedModel Model)
         {
 
             var Need = await Context.Need.FirstOrDefaultAsync(x => x.Id == Model.Id);
@@ -406,15 +422,12 @@ namespace Okurdostu.Web.Controllers
                     }
 
                     string link = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id;
-                    return Redirect(link);
-
+                    Response.Redirect(link);
                 }
 
             }
-            return NotFound();
         }
         #endregion
-
 
 
         #region view
@@ -431,6 +444,7 @@ namespace Okurdostu.Web.Controllers
             else
                 return Redirect("/ihtiyaclar");
         }
+
 
         [Route("~/{username}/ihtiyac/{friendlytitle}/{id}")]
         public async Task<IActionResult> ViewNeed(string username, string friendlytitle, long id)
@@ -459,15 +473,18 @@ namespace Okurdostu.Web.Controllers
             return NotFound();
         }
 
+
         public PartialViewResult ViewNeedItem(Need Model)
         {
             return PartialView(Model);
         }
 
+
         public PartialViewResult ViewNeedDescriptionSupporter(Need Model)
         {
             return PartialView(Model);
         }
+
 
         public PartialViewResult ViewNeedBasic(Need Model)
         {

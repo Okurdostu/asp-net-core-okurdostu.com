@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Okurdostu.Data.Model;
 using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
+using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
 {
@@ -54,6 +55,8 @@ namespace Okurdostu.Web.Controllers
                         new ClaimsPrincipal(ClaimsIdentity),
                         AuthProperties);
 
+                    Logger.LogInformation(User.Username + " signed up at " + DateTime.Now);
+
                     return Redirect("/beta");
                 }
                 else
@@ -66,7 +69,10 @@ namespace Okurdostu.Web.Controllers
                 else if (e.InnerException.Message.Contains("Unique_Key_Email"))
                     TempData["SignUpMessage"] = "Bu e-mail adresini kullanamazsınız";
                 else
-                    TempData["SignUpMessage"] = "Başaramadık ve ne olduğunu bilmiyoruz"; //ex.innerex.message db log
+                {
+                    Logger.LogError("Guest taking a error when trying sign up Ex message: {ex.message}, InnerEx Message: {iex.message}", e.Message, e.InnerException.Message);
+                    TempData["SignUpMessage"] = "Başaramadık ve ne olduğunu bilmiyoruz";
+                }
             }
             return View();
         }

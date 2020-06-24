@@ -1,16 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Okurdostu.Data.Model;
 using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
 {
@@ -53,6 +55,8 @@ namespace Okurdostu.Web.Controllers
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(ClaimsIdentity),
                     AuthProperties);
+
+                Logger.LogInformation(User.Username + " logged in at " + DateTime.Now);
 
                 return ReturnUrl != null && !ReturnUrl.ToLower().Contains("account") ? Redirect(ReturnUrl) : Redirect("/beta");
             }

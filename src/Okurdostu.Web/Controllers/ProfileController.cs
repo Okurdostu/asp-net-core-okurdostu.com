@@ -1,8 +1,7 @@
-﻿
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Web.Base;
+using System.Threading.Tasks;
 
 
 namespace Okurdostu.Web.Controllers
