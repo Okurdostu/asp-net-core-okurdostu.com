@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Okurdostu.Data.Model;
-using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 using SixLabors.ImageSharp;
@@ -18,7 +17,7 @@ using System.Threading.Tasks;
 namespace Okurdostu.Web.Controllers
 {
     [Authorize]
-    public class AccountController : OkurdostuContextController<AccountController>
+    public class AccountController : BaseController<AccountController>
     {
         private User AuthUser;
 

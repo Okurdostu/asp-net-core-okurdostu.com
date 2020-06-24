@@ -1,16 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Okurdostu.Web.Base;
-using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class SearchController : OkurdostuContextController<SearchController>
+    public class SearchController : BaseController<SearchController>
     {
         [Route("~/arama")]
         [Route("~/arama/{q}")]
         public IActionResult Index(string q)
         {
-            
+
             if (!string.IsNullOrEmpty(q) && !string.IsNullOrWhiteSpace(q))
             {
                 TempData["SearchPageTitle"] = q + " arama sonuçları | Okurdostu";

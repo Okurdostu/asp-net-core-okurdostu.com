@@ -6,9 +6,9 @@ using Okurdostu.Data.Model;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Okurdostu.Web.Base
+namespace Okurdostu.Web
 {
-    public class OkurdostuContextController<T> : Controller where T : OkurdostuContextController<T>
+    public class BaseController<T> : Controller where T : BaseController<T>
     {
         private ILogger<T> _logger;
 
@@ -18,9 +18,7 @@ namespace Okurdostu.Web.Base
         private OkurdostuContext _con;
         public OkurdostuContext Context => _con ?? (OkurdostuContext)HttpContext?.RequestServices.GetService(typeof(OkurdostuContext));
 
-       
 
-        //başka bir controllera alınacak
         public async Task<User> GetAuthenticatedUserFromDatabaseAsync()
         {
             var Id = User.Identity.GetUserId();

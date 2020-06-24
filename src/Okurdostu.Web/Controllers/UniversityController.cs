@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Okurdostu.Web.Base;
-using Okurdostu.Web.Models;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class UniversityController : OkurdostuContextController<UniversityController>
+    public class UniversityController : BaseController<UniversityController>
     {
         [Route("~/universiteler")]
         public IActionResult Index()
@@ -23,6 +21,6 @@ namespace Okurdostu.Web.Controllers
             return View(University);
         }
 
-        
+
     }
 }

@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Okurdostu.Data.Model;
-using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 using System;
@@ -16,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class LoginController : OkurdostuContextController<LoginController>
+    public class LoginController : BaseController<LoginController>
     {
         [Route("~/Girisyap")]
         public IActionResult Index(string ReturnUrl)

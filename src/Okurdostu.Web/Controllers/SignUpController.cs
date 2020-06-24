@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Okurdostu.Data.Model;
-using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 using System;
@@ -13,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class SignUpController : OkurdostuContextController<SignUpController>
+    public class SignUpController : BaseController<SignUpController>
     {
         [Route("~/Kaydol")]
         public IActionResult Index()

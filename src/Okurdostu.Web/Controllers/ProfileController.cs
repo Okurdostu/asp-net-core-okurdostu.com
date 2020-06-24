@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Okurdostu.Web.Base;
 using System.Threading.Tasks;
 
 
 namespace Okurdostu.Web.Controllers
 {
-    public class ProfileController : OkurdostuContextController<ProfileController>
+    public class ProfileController : BaseController<ProfileController>
     {
         public async Task<IActionResult> Index(string username)
         {

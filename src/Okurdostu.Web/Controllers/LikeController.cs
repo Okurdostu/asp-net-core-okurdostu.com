@@ -2,14 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data.Model;
-using Okurdostu.Web.Base;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class LikeController : OkurdostuContextController<LikeController>
+    public class LikeController : BaseController<LikeController>
     {
         private User AuthUser = null;
 

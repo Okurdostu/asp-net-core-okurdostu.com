@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Okurdostu.Data;
-using Okurdostu.Web.Base;
 using Okurdostu.Web.Models;
 using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class BetaController : OkurdostuContextController<BetaController>
+    public class BetaController : BaseController<BetaController>
     {
         public IActionResult Index()
         {
