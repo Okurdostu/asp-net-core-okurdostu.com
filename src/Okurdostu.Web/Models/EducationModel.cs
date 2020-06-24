@@ -10,7 +10,7 @@ using Okurdostu.Data;
 public class EducationModel
 {
     [Required(ErrorMessage = "Üniversitenizi seçmelisiniz")]
-    public int UniversityId { get; set; }
+    public short UniversityId { get; set; }
     [Required]
     public long EducationId { get; set; } //it's for edit UserEducation[Table] : Id
     [Required(ErrorMessage = "Başlangıç yılı seçmelisiniz")]
