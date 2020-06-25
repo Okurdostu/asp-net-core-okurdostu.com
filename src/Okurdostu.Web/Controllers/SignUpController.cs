@@ -39,15 +39,11 @@ namespace Okurdostu.Web.Controllers
                 {
                     var ClaimList = new List<Claim>();
                     ClaimList.Add(new Claim("Id", User.Id.ToString()));
-                    ClaimList.Add(new Claim("Username", User.Username));
-                    ClaimList.Add(new Claim("Email", User.Email));
-                    ClaimList.Add(new Claim("FullName", User.FullName));
                     var ClaimsIdentity = new ClaimsIdentity(ClaimList, CookieAuthenticationDefaults.AuthenticationScheme);
                     var AuthProperties = new AuthenticationProperties
                     {
                         AllowRefresh = true,
                         IsPersistent = true
-
                     };
                     await HttpContext.SignInAsync(
                         CookieAuthenticationDefaults.AuthenticationScheme,
@@ -59,7 +55,7 @@ namespace Okurdostu.Web.Controllers
                     return Redirect("/beta");
                 }
                 else
-                    TempData["SignUpMessage"] = "Başaramadık ve ne olduğunu bilmiyoruz";
+                    TempData["SignUpMessage"] = "Sorun yaşadık, kaydolmayı tekrar deneyiniz";
             }
             catch (Exception e)
             {

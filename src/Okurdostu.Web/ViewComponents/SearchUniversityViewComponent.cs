@@ -14,8 +14,8 @@ namespace Okurdostu.Web.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync(string q)
         {
-            var result = await Context.University.Where(x => x.Name.ToLower().Contains(q.ToLower())).OrderByDescending(x => x.Name).ToListAsync();
-            return View(result);
+            var searchResult = await Context.University.Where(x => x.Name.ToLower().Contains(q.ToLower())).OrderByDescending(x => x.Name).ToListAsync();
+            return View(searchResult);
         }
     }
 }

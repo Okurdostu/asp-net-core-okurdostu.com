@@ -14,12 +14,12 @@ namespace Okurdostu.Web.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync(string q)
         {
-            var result = await Context.User.Where(x =>
+            var searchResult = await Context.User.Where(x =>
             x.Username.ToLower().Contains(q.ToLower()) ||
             x.FullName.ToLower().Contains(q.ToLower()) ||
             x.Biography.ToLower().Contains(q.ToLower()
             )).ToListAsync();
-            return View(result);
+            return View(searchResult);
         }
     }
 }

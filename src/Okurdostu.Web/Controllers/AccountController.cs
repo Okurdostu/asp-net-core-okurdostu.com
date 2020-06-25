@@ -52,17 +52,21 @@ namespace Okurdostu.Web.Controllers
             {
                 if (Model.RePassword == Model.Password)
                 {
-                    AuthUser.Password = Model.Password.SHA512();
-                    var result = await Context.SaveChangesAsync();
-                    if (result > 0)
+                    Model.Password = Model.Password.SHA512();
+                    if (AuthUser.Password != Model.Password)
                     {
-                        TempData["ProfileMessage"] = "Artık giriş yaparken yeni parolanızı kullanabilirsiniz";
-                        Logger.LogInformation("User({Id}) changed their password: ", AuthUser.Id);
-                    }
-                    else
-                    {
-                        TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
-                        Logger.LogError("Changes aren't save, User({Id}) take error when trying change their password: ", AuthUser.Id);
+                        AuthUser.Password = Model.Password;
+                        var result = await Context.SaveChangesAsync();
+                        if (result > 0)
+                        {
+                            TempData["ProfileMessage"] = "Artık giriş yaparken yeni parolanızı kullanabilirsiniz";
+                            Logger.LogInformation("User({Id}) changed their password: ", AuthUser.Id);
+                        }
+                        else
+                        {
+                            TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
+                            Logger.LogError("Changes aren't save, User({Id}) take error when trying change their password: ", AuthUser.Id);
+                        }
                     }
                 }
                 else
@@ -122,19 +126,23 @@ namespace Okurdostu.Web.Controllers
         {
 
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-            AuthUser.ContactEmail = Model.ContactEmail;
-            AuthUser.Twitter = Model.Twitter;
-            AuthUser.Github = Model.Github;
-            var result = await Context.SaveChangesAsync();
-            if (result > 0)
+            if (AuthUser.ContactEmail != Model.ContactEmail || AuthUser.Twitter != Model.Twitter || AuthUser.Github != Model.Github)
             {
-                Logger.LogInformation("User({Id}) added or changed contact informations", AuthUser.Id);
+                AuthUser.ContactEmail = Model.ContactEmail;
+                AuthUser.Twitter = Model.Twitter;
+                AuthUser.Github = Model.Github;
+                var result = await Context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    Logger.LogInformation("User({Id}) added or changed contact informations", AuthUser.Id);
+                }
+                else
+                {
+                    TempData["ProfileMessage"] = "Başaramadık, ne olduğunu bilmiyoruz";
+                    Logger.LogError("Changes aren't save, User({Id}) take error when trying add or change contact informations", AuthUser.Id);
+                }
             }
-            else
-            {
-                TempData["ProfileMessage"] = "Başaramadık, ne olduğunu bilmiyoruz";
-                Logger.LogError("Changes aren't save, User({Id}) take error when trying add or change contact informations", AuthUser.Id);
-            }
+
             Response.Redirect("/" + AuthUser.Username);
 
         }
@@ -145,18 +153,22 @@ namespace Okurdostu.Web.Controllers
         {
 
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-            AuthUser.Biography = Model.Biography;
-            AuthUser.FullName = Model.FullName;
-            var result = await Context.SaveChangesAsync();
-            if (result > 0)
+            if (AuthUser.Biography != Model.Biography || AuthUser.FullName != Model.FullName)
             {
-                Logger.LogInformation("User({Id}) changed bio or fullname", AuthUser.Id);
+                AuthUser.Biography = Model.Biography;
+                AuthUser.FullName = Model.FullName;
+                var result = await Context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    Logger.LogInformation("User({Id}) changed bio or fullname", AuthUser.Id);
+                }
+                else
+                {
+                    TempData["ProfileMessage"] = "Başaramadık, ne olduğunu bilmiyoruz";
+                    Logger.LogError("Changes aren't save,User({Id}) take error when trying change bio or fullname", AuthUser.Id);
+                }
             }
-            else
-            {
-                TempData["ProfileMessage"] = "Başaramadık, ne olduğunu bilmiyoruz";
-                Logger.LogError("Changes aren't save,User({Id}) take error when trying change bio or fullname", AuthUser.Id);
-            }
+
             Response.Redirect("/" + AuthUser.Username);
 
         }
@@ -168,7 +180,7 @@ namespace Okurdostu.Web.Controllers
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             var File = Request.Form.Files.First();
 
-            if (File != null && File.Length < 1048576 && File.Length > 0)
+            if (File != null && File.Length <= 1048576 && File.Length > 0)
             {
                 if (File.ContentType == "image/png" || File.ContentType == "image/jpg" || File.ContentType == "image/jpeg")
                 {
@@ -210,7 +222,7 @@ namespace Okurdostu.Web.Controllers
                 else
                     TempData["ProfileMessage"] = "PNG, JPG ve JPEG türünde fotoğraf yükleyiniz";
             }
-            else
+            else if (File.Length > 1048576)
                 TempData["ProfileMessage"] = "Seçtiğiniz dosya 1 megabyte'dan fazla";
 
             Response.Redirect("/" + AuthUser.Username);
@@ -220,23 +232,27 @@ namespace Okurdostu.Web.Controllers
         [Route("~/remove-photo")]
         public async Task RemovePhoto()
         {
+
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-            string OldPhotoPath = AuthUser.PictureUrl;
-            AuthUser.PictureUrl = null;
-            var result = await Context.SaveChangesAsync();
-            if (result > 0)
+            if (AuthUser.PictureUrl != null)
             {
-                Logger.LogInformation("User({Id}) removed their photo", AuthUser.Id);
-                if (System.IO.File.Exists(Environment.WebRootPath + OldPhotoPath))
+                string OldPhotoPath = AuthUser.PictureUrl;
+                AuthUser.PictureUrl = null;
+                var result = await Context.SaveChangesAsync();
+                if (result > 0)
                 {
-                    System.IO.File.Delete(Environment.WebRootPath + OldPhotoPath);
-                    Logger.LogInformation("Deleted old photo: " + Environment.WebRootPath + OldPhotoPath);
+                    Logger.LogInformation("User({Id}) removed their photo", AuthUser.Id);
+                    if (System.IO.File.Exists(Environment.WebRootPath + OldPhotoPath))
+                    {
+                        System.IO.File.Delete(Environment.WebRootPath + OldPhotoPath);
+                        Logger.LogInformation("Deleted old photo: " + Environment.WebRootPath + OldPhotoPath);
+                    }
                 }
-            }
-            else
-            {
-                Logger.LogError("Changes aren't save, User({Id}) take error when trying remove their photo", AuthUser.Id);
-                TempData["ProfileMessage"] = "Başaramadık, ne olduğunu bilmiyoruz";
+                else
+                {
+                    Logger.LogError("Changes aren't save, User({Id}) take error when trying remove their photo", AuthUser.Id);
+                    TempData["ProfileMessage"] = "Başaramadık, ne olduğunu bilmiyoruz";
+                }
             }
 
             Response.Redirect("/" + AuthUser.Username);
@@ -294,7 +310,7 @@ namespace Okurdostu.Web.Controllers
         [Route("~/edit-education")]
         public async Task EditEducation(EducationModel Model)
         {
-            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Model.EducationId);
+            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Model.EducationId && !x.IsRemoved);
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
 
             if (Education != null)
@@ -321,6 +337,10 @@ namespace Okurdostu.Web.Controllers
                         Education.StartYear = Model.Startyear.ToString();
                         Education.EndYear = Model.Finishyear.ToString();
                     }
+                    else
+                    {
+                        TempData["ProfileMessage"] = "Başlangıç yılınız, bitiriş yılınızdan büyük olmamalı";
+                    }
 
                     Education.ActivitiesSocieties = Model.ActivitiesSocieties;
                     var result = await Context.SaveChangesAsync();
@@ -337,11 +357,6 @@ namespace Okurdostu.Web.Controllers
                         {
                             TempData["ProfileMessage"] = "Eğitim bilgileriniz düzenlendi";
                         }
-                    }
-                    else
-                    {
-                        Logger.LogError("User({Id}) take error when trying edit Education:{EducationId}", AuthUser.Id, Education.Id);
-                        TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
                     }
                 }
                 else
@@ -405,7 +420,6 @@ namespace Okurdostu.Web.Controllers
                             catch (Exception e)
                             {
                                 Logger.LogError("Deleting education documents failed, UserId: {Id}, EducationId {EduId} Ex message: {ExMessage}", AuthUser.Id, Education.Id, e.Message);
-                                TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
                             }
 
                         }
@@ -432,24 +446,24 @@ namespace Okurdostu.Web.Controllers
         [Route("~/education-document")]
         public async Task SendEducationDocument(long Id, IFormFile File)
         {
-            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsSentToConfirmation); //bir belge yollayabilir.
+            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && !x.IsSentToConfirmation); //bir belge yollayabilir.
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             if (Education != null && AuthUser.Id == Education.UserId)
             {
-                if (File != null && File.Length < 1048576 && File.Length > 0)
+                if (File != null && File.Length <= 1048576 && File.Length > 0)
                 {
 
                     if (File.ContentType == "document/pdf" || File.ContentType == "image/png" || File.ContentType == "image/jpg" || File.ContentType == "image/jpeg")
                     {
 
-                        string NewName = Guid.NewGuid().ToString() + Path.GetExtension(File.FileName);
-                        string FilePathWithName = Environment.WebRootPath + "/documents/" + NewName;
+                        string Name = Guid.NewGuid().ToString() + Path.GetExtension(File.FileName);
+                        string FilePathWithName = Environment.WebRootPath + "/documents/" + Name;
 
                         using (var Stream = System.IO.File.Create(FilePathWithName))
                         {
                             await File.CopyToAsync(Stream);
                         };
-                        Logger.LogInformation("User({Id}) uploaded a education document({File}) on server", AuthUser.Id, NewName);
+                        Logger.LogInformation("User({Id}) uploaded a education document({File}) on server", AuthUser.Id, Name);
 
                         if (System.IO.File.Exists(FilePathWithName))
                         {
@@ -459,7 +473,7 @@ namespace Okurdostu.Web.Controllers
                                 CreatedOn = DateTime.Now,
                                 UserEducationId = Id,
                                 DocumentPath = FilePathWithName,
-                                DocumentUrl = "/documents/" + NewName,
+                                DocumentUrl = "/documents/" + Name,
                             };
                             Education.IsSentToConfirmation = true;
 
@@ -468,7 +482,7 @@ namespace Okurdostu.Web.Controllers
 
                             if (result > 0)
                             {
-                                Logger.LogInformation("Database seeded for a education document({File}).", NewName);
+                                Logger.LogInformation("Database seeded for a education document({File}).", Name);
                                 TempData["ProfileMessage"] = "Eğitim dökümanınız yollandı, en geç 6 saat içinde geri dönüş yapılacak";
                             }
                             else
