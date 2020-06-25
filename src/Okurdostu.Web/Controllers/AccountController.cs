@@ -30,7 +30,7 @@ namespace Okurdostu.Web.Controllers
         public AccountController(IHostingEnvironment env) => Environment = env;
 #pragma warning restore CS0618 // Type or member is obsolete
 
-        #region account
+        #region nonaction
         [NonAction]
         public async Task<bool> ConfirmIdentityWithPassword(string ConfirmPassword)
         {
@@ -39,7 +39,7 @@ namespace Okurdostu.Web.Controllers
             return ConfirmPassword == AuthUser.Password ? true : false;
         }
 
-
+        [NonAction]
         public bool DeleteFileFromServer(string filePathAfterRootPath)
         {
             if (System.IO.File.Exists(Environment.WebRootPath + filePathAfterRootPath))
@@ -54,7 +54,10 @@ namespace Okurdostu.Web.Controllers
                 return false;
             }
         }
+        #endregion
 
+
+        #region account
 
         //  email editleme:
 

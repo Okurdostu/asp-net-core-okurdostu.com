@@ -18,8 +18,10 @@
 
     Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
 }
-@if (!Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUserEqualModelUser)
+
+@if (IsAuthenticatedUserEqualModelUser && !Model.IsCompleted)
 {
+    <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
     @if (TempData["NeedMessage"] != null)
     {
         <div class="alert alert-secondary text-center font-weight-bold" role="alert">
@@ -28,7 +30,10 @@
             </span>
         </div>
     }
-    <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
+}
+
+@if (!Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUserEqualModelUser)
+{
     <p class="font-weight-bold text-black-50 text-center">İkinci aşama</p>
     <div class="small">
         <p class="font-weight-bold text-black-50">
@@ -124,17 +129,17 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
             @if (Model.IsConfirmed == true)
             {
                 <div class="col-xl-6 col-lg-6 col-md-6">
-                    @Html.Partial("ViewNeedItem", Model)
+                    @await Component.InvokeAsync("NeedItem", new { need = Model })
                 </div>
             }
             else
             {
                 <div class="col-12">
-                    @Html.Partial("ViewNeedItem", Model)
+                    @await Component.InvokeAsync("NeedItem", new { need = Model })
                 </div>
             }
             <div class="col pl-xl-0 pl-lg-0 pl-md-0" @*style="pointer-events: none; opacity: 0.4;"*@>
-                @Html.Partial("ViewNeedBasic", Model)
+                @await Component.InvokeAsync("NeedBasic", new { need = Model })
             </div>
         </div>
         @if (Model.IsConfirmed == true)
@@ -154,7 +159,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
         {
             <hr />
         }
-        @Html.Partial("ViewNeedDescriptionSupporter", Model)
+        @await Component.InvokeAsync("NeedDescriptionSupporter", new { need = Model })
     </div>
 
     @if (!HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)

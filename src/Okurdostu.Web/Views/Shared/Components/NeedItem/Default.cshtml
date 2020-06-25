@@ -33,19 +33,19 @@
                 @if (Item.Picture.ToLower() == "udemy")
                 {
                     <div class="col-auto pr-1">
-                        <img class="img-thumbnail" src="~/image/udemy.png" style ="width:75px; height:75px;" />
+                        <img class="img-thumbnail" src="~/image/udemy.png" style="width:75px; height:75px;" />
                     </div>
                 }
                 else if (Item.Picture.ToLower() == "amazon")
                 {
                     <div class="col-auto pr-1">
-                        <img class="img-thumbnail" src="~/image/amazon.png" style ="width:75px; height:75px;" />
+                        <img class="img-thumbnail" src="~/image/amazon.png" style="width:75px; height:75px;" />
                     </div>
                 }
                 else
                 {
                     <div class="col-auto pr-1">
-                        <img class="img-thumbnail" src="@Html.Raw(Item.Picture)" style ="width:75px; height:75px;" />
+                        <img class="img-thumbnail" src="@Html.Raw(Item.Picture)" style="width:75px; height:75px;" />
                     </div>
                 }
                 <div class="col pl-0">

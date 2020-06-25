@@ -27,6 +27,7 @@ namespace Okurdostu.Web.Controllers
             else
                 return Redirect("/");
         }
+
         [HttpPost, ValidateAntiForgeryToken]
         [Route("~/Girisyap")]
         public async Task<IActionResult> Index(LoginModel Model, string ReturnUrl)
@@ -55,6 +56,8 @@ namespace Okurdostu.Web.Controllers
             TempData["LoginMessage"] = "Kullanıcı adınız veya parolanız geçersiz";
             return View();
         }
+
+        [NonAction]
         public async Task<User> AuthenticateAsync(LoginModel Model)
         {
             var User = await Context.User.Where(x => x.Username == Model.Username || x.Telephone == Model.Username || x.Email == Model.Username).FirstOrDefaultAsync();
