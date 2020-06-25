@@ -7,7 +7,7 @@ namespace Okurdostu.Web.ViewComponents
     [ViewComponent(Name = "EditUsername")]
     public class EditUsernameViewComponent : ViewComponent
     {
-        public async Task<IViewComponentResult> InvokeAsync()
+        public IViewComponentResult Invoke()
         {
             ProfileModel Model = new ProfileModel();
             return View(Model);
