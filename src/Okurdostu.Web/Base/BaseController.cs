@@ -5,6 +5,7 @@ using Okurdostu.Data;
 using Okurdostu.Data.Model;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Okurdostu.Web
 {
@@ -18,7 +19,7 @@ namespace Okurdostu.Web
         private OkurdostuContext _con;
         public OkurdostuContext Context => _con ?? (OkurdostuContext)HttpContext?.RequestServices.GetService(typeof(OkurdostuContext));
 
-
+        [Authorize]
         public async Task<User> GetAuthenticatedUserFromDatabaseAsync()
         {
             var Id = User.Identity.GetUserId();

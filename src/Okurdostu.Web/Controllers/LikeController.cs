@@ -65,6 +65,7 @@ namespace Okurdostu.Web.Controllers
             return View(Count);
         }
 
+        [Authorize]
         [Route("Like/Button/{id}")]
         public async Task<IActionResult> Button(int id)
         {

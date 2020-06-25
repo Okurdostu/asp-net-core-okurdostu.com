@@ -6,13 +6,6 @@ namespace Okurdostu.Web
 {
     public static class IdentityExtensions
     {
-        public static string GetUsername(this IIdentity identity)
-        {
-            ClaimsIdentity CI = identity as ClaimsIdentity;
-            Claim claim = CI?.FindFirst("Username");
-            return claim != null ? claim.Value : null;
-        }
-
         public static string GetUserId(this IIdentity identity)
         {
             ClaimsIdentity CI = identity as ClaimsIdentity;

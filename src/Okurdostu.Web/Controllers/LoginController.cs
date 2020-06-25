@@ -36,14 +36,7 @@ namespace Okurdostu.Web.Controllers
             {
                 var ClaimList = new List<Claim>();
                 ClaimList.Add(new Claim("Id", User.Id.ToString()));
-                ClaimList.Add(new Claim("Username", User.Username));
-                ClaimList.Add(new Claim("Email", User.Email));
-                ClaimList.Add(new Claim("FullName", User.FullName));
-                if (User.PictureUrl != null)
-                    ClaimList.Add(new Claim("PictureUrl", User.PictureUrl.ToString()));
-
                 var ClaimsIdentity = new ClaimsIdentity(ClaimList, CookieAuthenticationDefaults.AuthenticationScheme);
-
                 var AuthProperties = new AuthenticationProperties
                 {
                     AllowRefresh = true,
@@ -65,6 +58,8 @@ namespace Okurdostu.Web.Controllers
         public async Task<User> AuthenticateAsync(LoginModel Model)
         {
             var User = await Context.User.Where(x => x.Username == Model.Username || x.Telephone == Model.Username || x.Email == Model.Username).FirstOrDefaultAsync();
+            //modelden username olarak aldığımız input, aslında Username,Telephone veya Email ile eş olabilir bunlardan her hangi birine uyuyorsa User'i seçip
+            //ardından passwordunu kontrol ediyor
             return User != null && User.Password == Model.Password.SHA512() ? User : null;
         }
     }
