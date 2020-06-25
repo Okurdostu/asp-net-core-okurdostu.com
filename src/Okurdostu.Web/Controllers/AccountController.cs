@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Okurdostu.Data.Model;
@@ -34,8 +35,26 @@ namespace Okurdostu.Web.Controllers
         public async Task<bool> ConfirmIdentityWithPassword(string ConfirmPassword)
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+            ConfirmPassword = ConfirmPassword.SHA512();
             return ConfirmPassword == AuthUser.Password ? true : false;
         }
+
+
+        public bool DeleteFileFromServer(string filePathAfterRootPath)
+        {
+            if (System.IO.File.Exists(Environment.WebRootPath + filePathAfterRootPath))
+            {
+                System.IO.File.Delete(Environment.WebRootPath + filePathAfterRootPath);
+                Logger.LogInformation("User({Id}) | A file deleted on server: {file}", AuthUser?.Id, filePathAfterRootPath);
+                return true;
+            }
+            else
+            {
+                Logger.LogWarning("File deleting failed, there isn't a file: " + filePathAfterRootPath);
+                return false;
+            }
+        }
+
 
         //  email editleme:
 
@@ -48,7 +67,7 @@ namespace Okurdostu.Web.Controllers
         [Route("~/password")]
         public async Task EditPassword(ProfileModel Model)
         {
-            if (await ConfirmIdentityWithPassword(Model.ConfirmPassword.SHA512()))
+            if (await ConfirmIdentityWithPassword(Model.ConfirmPassword))
             {
                 if (Model.RePassword == Model.Password)
                 {
@@ -86,7 +105,7 @@ namespace Okurdostu.Web.Controllers
         [Route("~/username")]
         public async Task EditUsername(ProfileModel Model)
         {
-            if (await ConfirmIdentityWithPassword(Model.ConfirmPassword.SHA512()))
+            if (await ConfirmIdentityWithPassword(Model.ConfirmPassword))
             {
                 Model.Username = Model.Username.ToLower();
                 if (AuthUser.Username != Model.Username)
@@ -115,7 +134,9 @@ namespace Okurdostu.Web.Controllers
                 }
             }
             else
+            {
                 TempData["ProfileMessage"] = "Kimliğinizi doğrulayamadık";
+            }
 
             Response.Redirect("/" + AuthUser.Username);
         }
@@ -193,7 +214,7 @@ namespace Okurdostu.Web.Controllers
 
                     ImageSharp.Save(FilePathWithName);
                     Logger.LogInformation("User({Id}) added a photo({file}) on server", AuthUser.Id, "/image/profil-fotograf/" + Name);
-                    string OldPhotoPath = AuthUser.PictureUrl;
+                    string OldPhoto = AuthUser.PictureUrl;
                     AuthUser.PictureUrl = "/image/profil-fotograf/" + Name;
 
                     var result = await Context.SaveChangesAsync();
@@ -201,20 +222,15 @@ namespace Okurdostu.Web.Controllers
                     if (result > 0)
                     {
                         Logger.LogInformation("User({Id}) changed profile photo", AuthUser.Id);
-                        if (System.IO.File.Exists(Environment.WebRootPath + OldPhotoPath))
+                        if (OldPhoto != null)
                         {
-                            System.IO.File.Delete(Environment.WebRootPath + OldPhotoPath);
-                            Logger.LogInformation("Old photo deleted: " + Environment.WebRootPath + OldPhotoPath);
+                            DeleteFileFromServer(OldPhoto);
                         }
                     }
                     else
                     {
                         Logger.LogError("Changes aren't save, User({Id}) take error when trying change profile photo", AuthUser.Id);
-                        if (System.IO.File.Exists(FilePathWithName))
-                        {
-                            System.IO.File.Delete(FilePathWithName);
-                            Logger.LogWarning("Deleted new uploaded photo : " + FilePathWithName);
-                        }
+                        DeleteFileFromServer("/image/profil-fotograf/" + Name);
                         TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
                     }
 
@@ -236,17 +252,13 @@ namespace Okurdostu.Web.Controllers
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             if (AuthUser.PictureUrl != null)
             {
-                string OldPhotoPath = AuthUser.PictureUrl;
+                string OldPhoto = AuthUser.PictureUrl;
                 AuthUser.PictureUrl = null;
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
                 {
                     Logger.LogInformation("User({Id}) removed their photo", AuthUser.Id);
-                    if (System.IO.File.Exists(Environment.WebRootPath + OldPhotoPath))
-                    {
-                        System.IO.File.Delete(Environment.WebRootPath + OldPhotoPath);
-                        Logger.LogInformation("Deleted old photo: " + Environment.WebRootPath + OldPhotoPath);
-                    }
+                    DeleteFileFromServer(OldPhoto);
                 }
                 else
                 {
@@ -410,9 +422,10 @@ namespace Okurdostu.Web.Controllers
                                     var EducationDocuments = await Context.UserEducationDoc.Where(x => x.UserEducationId == Education.Id).ToListAsync();
                                     foreach (var item in EducationDocuments)
                                     {
-                                        if (System.IO.File.Exists(item.DocumentPath))
-                                            System.IO.File.Delete(item.DocumentPath);
-                                        Context.Remove(item);
+                                        if (DeleteFileFromServer(item.PathAfterRoot))
+                                        {
+                                            Context.Remove(item);
+                                        }
                                     }
                                     await Context.SaveChangesAsync();
                                 }
@@ -472,8 +485,8 @@ namespace Okurdostu.Web.Controllers
                             {
                                 CreatedOn = DateTime.Now,
                                 UserEducationId = Id,
-                                DocumentPath = FilePathWithName,
-                                DocumentUrl = "/documents/" + Name,
+                                FullPath = FilePathWithName,
+                                PathAfterRoot = "/documents/" + Name,
                             };
                             Education.IsSentToConfirmation = true;
 
@@ -489,8 +502,8 @@ namespace Okurdostu.Web.Controllers
                             {
                                 TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
                                 Logger.LogError("Changes aren't save, User({Id}) take error when trying add a document Education:{EducationId}", AuthUser.Id, Education.Id);
-                                System.IO.File.Delete(FilePathWithName); //veritabanı kaydını oluşturamadıysa dosyayı kaldır.
-                                Logger.LogInformation("Deleted document: {doc}", FilePathWithName);
+
+                                DeleteFileFromServer(EducationDocument.PathAfterRoot);
                             }
 
                         }

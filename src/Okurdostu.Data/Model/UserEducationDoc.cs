@@ -7,8 +7,8 @@ namespace Okurdostu.Data.Model
     {
         public long Id { get; set; }
         public long UserEducationId { get; set; }
-        public string DocumentUrl { get; set; }
-        public string DocumentPath { get; set; }
+        public string PathAfterRoot { get; set; }
+        public string FullPath { get; set; }
         public DateTime CreatedOn { get; set; }
 
         public virtual UserEducation UserEducation { get; set; }

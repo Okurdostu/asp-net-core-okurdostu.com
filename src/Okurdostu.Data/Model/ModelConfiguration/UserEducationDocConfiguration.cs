@@ -10,9 +10,9 @@ namespace Okurdostu.Data.Model.ModelConfiguration
 
             entity.Property(e => e.CreatedOn).HasColumnType("smalldatetime");
 
-            entity.Property(e => e.DocumentPath).IsRequired();
+            entity.Property(e => e.FullPath).IsRequired();
 
-            entity.Property(e => e.DocumentUrl).IsRequired();
+            entity.Property(e => e.PathAfterRoot).IsRequired();
 
             entity.HasOne(d => d.UserEducation)
                 .WithMany(p => p.UserEducationDoc)
