@@ -12,6 +12,8 @@ namespace Okurdostu.Web.Models
         public string Title { get; set; }
 
         [Required(ErrorMessage = "Bir açıklama yazmalısınız")]
+        [MinLength(100, ErrorMessage = "Açıklama en az 100 karakter olmalı")]
+        [MaxLength(10000, ErrorMessage = "Açıklama en fazla 10 bin karakter olmalı")]
         [DataType(DataType.MultilineText)]
         public string Description { get; set; }
     }

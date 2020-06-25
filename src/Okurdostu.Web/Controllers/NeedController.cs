@@ -166,56 +166,63 @@ namespace Okurdostu.Web.Controllers
         [Route("~/ihtiyac-olustur")]
         public async Task<IActionResult> Create(NeedModel Model)
         {
-            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-
-            if (!await IsThereAnyProblemtoCreateNeed())
+            if (ModelState.IsValid)
             {
-                Model.Title = Model.Title.ClearSpaces();
-                Model.Title = Model.Title.ToLower().UppercaseFirstCharacters();
+                AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
 
-                var Need = new Need
+                if (!await IsThereAnyProblemtoCreateNeed())
                 {
-                    Title = Model.Title,
-                    FriendlyTitle = Model.Title.FriendlyUrl(),
-                    Description = Model.Description,
-                    UserId = AuthUser.Id,
-                };
+                    Model.Title = Model.Title.ClearSpaces();
+                    Model.Title = Model.Title.ToLower().UppercaseFirstCharacters();
 
-                try
-                {
+                    var Need = new Need
+                    {
+                        Title = Model.Title,
+                        FriendlyTitle = Model.Title.FriendlyUrl(),
+                        Description = Model.Description,
+                        UserId = AuthUser.Id,
+                    };
 
-                    await Context.Need.AddAsync(Need);
-                    var result = await Context.SaveChangesAsync();
-                    if (result > 0)
+                    try
                     {
 
-                        string link = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id;
-                        return Redirect(link);
+                        await Context.Need.AddAsync(Need);
+                        var result = await Context.SaveChangesAsync();
+                        if (result > 0)
+                        {
+
+                            string link = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id;
+                            return Redirect(link);
+
+                        }
 
                     }
+                    catch (Exception e)
+                    {
 
+                        if (e.InnerException.Message.Contains("Unique_Key_Title"))
+                        {
+                            TempData["CreateNeedError"] = "Bu başlığı seçemezsiniz";
+                        }
+                        else
+                        {
+                            Logger.LogError("Error create need. Ex.message : {ex.message}, Ex.innermessage: {ex.inner}", e.Message, e.InnerException.Message);
+                            TempData["CreateNeedError"] = "Başaramadık, ne olduğunu bilmiyoruz";
+                        }
+
+                    }
                 }
-                catch (Exception e)
+                else if (TempData["CreateNeedError"] != null && TempData["CreateNeedError"].ToString() == "Active education")
                 {
 
-                    if (e.InnerException.Message.Contains("Unique_Key_Title"))
-                    {
-                        TempData["CreateNeedError"] = "Bu başlığı seçemezsiniz";
-                    }
-                    else
-                    {
-                        Logger.LogError("Error create need. Ex.message : {ex.message}, Ex.innermessage: {ex.inner}", e.Message, e.InnerException.Message);
-                        TempData["CreateNeedError"] = "Başaramadık, ne olduğunu bilmiyoruz";
-                    }
+                    TempData["ProfileMessage"] = "İhtiyaç kampanyası oluşturmak için onaylanmış bir eğitim bilgisine ihtiyacınız vardır.";
+                    return Redirect("/" + AuthUser.Username);
 
                 }
             }
-            else if (TempData["CreateNeedError"] != null && TempData["CreateNeedError"].ToString() == "Active education")
+            else
             {
-
-                TempData["ProfileMessage"] = "İhtiyaç kampanyası oluşturmak için onaylanmış bir eğitim bilgisine ihtiyacınız vardır.";
-                return Redirect("/" + AuthUser.Username);
-
+                TempData["CreateNeedError"] = "Lütfen istenen bilgileri doldurun";
             }
 
             return View();
@@ -365,6 +372,7 @@ namespace Okurdostu.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task EditTitle(NeedModel Model)
         {
+
             var Need = await Context.Need.FirstOrDefaultAsync(x => x.Id == Model.Id);
             if (Need != null)
             {
@@ -372,28 +380,34 @@ namespace Okurdostu.Web.Controllers
                 AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
                 if (AuthUser.Id == Need.UserId)
                 {
-
-                    if (Model.Title != Need.Title)
+                    if (ModelState.ErrorCount < 2)
                     {
-                        Model.Title = Model.Title.ClearSpaces();
-                        Model.Title = Model.Title.ToLower().UppercaseFirstCharacters();
+                        if (Model.Title != Need.Title)
+                        {
+                            Model.Title = Model.Title.ClearSpaces();
+                            Model.Title = Model.Title.ToLower().UppercaseFirstCharacters();
 
-                        Need.Title = Model.Title;
-                        Need.FriendlyTitle = Need.Title.FriendlyUrl();
-                        try
-                        {
-                            await Context.SaveChangesAsync();
-                            TempData["NeedMessage"] = "Başlık düzenlendi";
+                            Need.Title = Model.Title;
+                            Need.FriendlyTitle = Need.Title.FriendlyUrl();
+                            try
+                            {
+                                await Context.SaveChangesAsync();
+                                TempData["NeedMessage"] = "Başlık düzenlendi";
+                            }
+                            catch (Exception e)
+                            {
+                                if (e.InnerException.Message.Contains("Unique_Key_Title"))
+                                    TempData["NeedMessage"] = "Bu başlığı seçemezsiniz";
+                            }
                         }
-                        catch (Exception e)
-                        {
-                            if (e.InnerException.Message.Contains("Unique_Key_Title"))
-                                TempData["NeedMessage"] = "Bu başlığı seçemezsiniz";
-                        }
+                    }
+                    else
+                    {
+                        TempData["NeedMessage"] = "Başlık boş olamaz.<br />" +
+                            "En fazla 75 karakter ";
                     }
                     string link = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id;
                     Response.Redirect(link);
-
                 }
             }
         }
@@ -411,12 +425,19 @@ namespace Okurdostu.Web.Controllers
                 AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
                 if (AuthUser.Id == Need.UserId)
                 {
-
-                    if (Need.Description != Model.Description)
+                    if (ModelState.ErrorCount < 2)
                     {
-                        Need.Description = Model.Description;
-                        await Context.SaveChangesAsync();
-                        TempData["NeedMessage"] = "Açıklama düzenlendi";
+                        if (Need.Description != Model.Description)
+                        {
+                            Need.Description = Model.Description;
+                            await Context.SaveChangesAsync();
+                            TempData["NeedMessage"] = "Açıklama düzenlendi";
+                        }
+                    }
+                    else
+                    {
+                        TempData["NeedMessage"] = "Açıklama boş olamaz.<br />" +
+                            "En az: 100, en fazla 10 bin karakter";
                     }
 
                     string link = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id;
@@ -426,6 +447,7 @@ namespace Okurdostu.Web.Controllers
             }
         }
         #endregion
+
 
 
         #region view
@@ -470,26 +492,6 @@ namespace Okurdostu.Web.Controllers
 
             return NotFound();
         }
-
-
-        public PartialViewResult ViewNeedItem(Need Model)
-        {
-            return PartialView(Model);
-        }
-
-
-        public PartialViewResult ViewNeedDescriptionSupporter(Need Model)
-        {
-            return PartialView(Model);
-        }
-
-
-        public PartialViewResult ViewNeedBasic(Need Model)
-        {
-            return PartialView(Model);
-        }
         #endregion
-
-
     }
 }
