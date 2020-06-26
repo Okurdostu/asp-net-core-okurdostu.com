@@ -20,18 +20,18 @@ namespace Okurdostu.Web.Controllers
         [Route("~/Girisyap")]
         public IActionResult Index(string ReturnUrl)
         {
-            if (!HttpContext.User.Identity.IsAuthenticated)
-                return View();
-            else if (ReturnUrl != null)
-                return Redirect(ReturnUrl);
-            else
-                return Redirect("/");
+            return HttpContext.User.Identity.IsAuthenticated ? (IActionResult)Redirect("/") : View();
         }
 
         [HttpPost, ValidateAntiForgeryToken]
         [Route("~/Girisyap")]
         public async Task<IActionResult> Index(LoginModel Model, string ReturnUrl)
         {
+            if (HttpContext.User.Identity.IsAuthenticated)
+            {
+                return Redirect("/");
+            }
+
             var User = await AuthenticateAsync(Model);
             if (User != null)
             {
@@ -51,7 +51,7 @@ namespace Okurdostu.Web.Controllers
 
                 Logger.LogInformation(User.Username + " logged in at " + DateTime.Now);
 
-                return ReturnUrl != null && !ReturnUrl.ToLower().Contains("account") ? Redirect(ReturnUrl) : Redirect("/beta");
+                return string.IsNullOrEmpty(ReturnUrl) ? Redirect("/beta") : Redirect(ReturnUrl);
             }
             TempData["LoginMessage"] = "Kullanıcı adınız veya parolanız geçersiz";
             return View();

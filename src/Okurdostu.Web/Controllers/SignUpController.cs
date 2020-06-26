@@ -15,15 +15,20 @@ namespace Okurdostu.Web.Controllers
     public class SignUpController : BaseController<SignUpController>
     {
         [Route("~/Kaydol")]
-        public IActionResult Index()
+        public IActionResult Index(string ReturnUrl)
         {
-            return View();
+            return HttpContext.User.Identity.IsAuthenticated ? (IActionResult)Redirect("/") : View();
         }
 
         [HttpPost, ValidateAntiForgeryToken]
         [Route("~/Kaydol")]
-        public async Task<IActionResult> Index(ProfileModel Model)
+        public async Task<IActionResult> Index(ProfileModel Model, string ReturnUrl)
         {
+            if (HttpContext.User.Identity.IsAuthenticated)
+            {
+                return Redirect("/");
+            }
+
             var User = new User
             {
                 Username = Model.Username,
@@ -52,10 +57,12 @@ namespace Okurdostu.Web.Controllers
 
                     Logger.LogInformation(User.Username + " signed up at " + DateTime.Now);
 
-                    return Redirect("/beta");
+                    return string.IsNullOrEmpty(ReturnUrl) ? Redirect("/beta") : Redirect(ReturnUrl);
                 }
                 else
+                {
                     TempData["SignUpMessage"] = "Sorun yaşadık, kaydolmayı tekrar deneyiniz";
+                }
             }
             catch (Exception e)
             {
