@@ -55,7 +55,15 @@ namespace Okurdostu.Web.Controllers
                         new ClaimsPrincipal(ClaimsIdentity),
                         AuthProperties);
 
-                    Logger.LogInformation(User.Username + " signed up at " + DateTime.Now);
+                    Logger.LogInformation("{username}({userid}) signed up on {datetime}", User.Username, User.Id, DateTime.Now);
+                    var _UserEmailConfirmation = new UserEmailConfirmation()
+                    {
+                        UserId = User.Id
+                    };
+                    await Context.AddAsync(_UserEmailConfirmation);
+                    await Context.SaveChangesAsync();
+
+                    //Hoş geldiniz e-maili yollanacak ve email adresini onaylaması için: _UserEmailConfirmation.GUID'ı /confirmemail/{guid} ile yollanacak
 
                     return string.IsNullOrEmpty(ReturnUrl) ? Redirect("/beta") : Redirect(ReturnUrl);
                 }

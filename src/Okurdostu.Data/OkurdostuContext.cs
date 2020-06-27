@@ -22,6 +22,8 @@ namespace Okurdostu.Data
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<UserEducation> UserEducation { get; set; }
         public virtual DbSet<UserEducationDoc> UserEducationDoc { get; set; }
+        public virtual DbSet<UserEmailConfirmation> UserEmailConfirmation { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

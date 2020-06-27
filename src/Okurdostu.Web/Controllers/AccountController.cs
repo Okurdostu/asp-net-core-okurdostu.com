@@ -56,7 +56,6 @@ namespace Okurdostu.Web.Controllers
         }
         #endregion
 
-
         #region account
 
         //  email editleme:
@@ -65,6 +64,42 @@ namespace Okurdostu.Web.Controllers
         //  2.  Keye ulaşabileceği bir link o an kullandığı e-mail adresine yollanacak
         //  3.  O keyli link kullanılarak yeni bir e-mail adresi girişi yapabilecek
         //  4.  Yeni girişin yapıldığı e-mail ilk başta veritabanında eşleştirdiğimiz(key ve kullanıcı) kullanıcıya atanıp: yeni e-mail için onay istenecek
+
+        [Route("~/confirmemail/{guid}")]
+        public async Task ConfirmEmail(Guid guid)
+        {
+            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+            if (!AuthUser.IsEmailConfirmed)
+            {
+                var Key = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => !x.IsUsed && x.UserId == AuthUser.Id && x.GUID == guid);
+                if (Key != null)
+                {
+                    AuthUser.IsEmailConfirmed = true;
+                    var result = await Context.SaveChangesAsync();
+                    if (result > 0)
+                    {
+                        Key.IsUsed = true;
+                        Key.UsedOn = DateTime.Now;
+                        TempData["ProfileMessage"] = "E-mail adresiniz onaylandı, teşekkürler";
+                        await Context.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        TempData["ProfileMessage"] = "E-mail adresiniz onaylayamadık, bu bağlantıyı başka zaman bir daha kullanabilirsiniz";
+                    }
+                }
+                else
+                {
+                    TempData["ProfileMessage"] = "Sanırım bir hata yapıyorsunuz, size gönderdiğimiz bağlantıyı kullanın";
+                }
+            }
+            else
+            {
+                TempData["ProfileMessage"] = "Bunu yapmaya ihtiyacınız yok, e-mail adresiniz zaten onaylanmış";
+            }
+
+            Response.Redirect("/" + AuthUser.Username);
+        }
 
         [HttpPost, ValidateAntiForgeryToken]
         [Route("~/password")]
