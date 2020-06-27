@@ -23,6 +23,7 @@ namespace Okurdostu.Data.Model
         public string Title { get; set; }
         public string FriendlyTitle { get; set; }
         public string Description { get; set; }
+        public decimal? TotalCollectedMoney { get; set; }
         public decimal? TotalCharge { get; set; }
         public bool IsRemoved { get; set; }
         public bool IsSentForConfirmation { get; set; }

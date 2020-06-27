@@ -19,18 +19,27 @@ namespace Okurdostu.Web.Controllers
 
         private User AuthUser;
 
-
         [Route("~/ihtiyaclar")]
         [Route("~/ihtiyaclar/{filtreText}")]
         [Route("~/ihtiyaclar/{filtreText}/{_}")]
         public async Task<IActionResult> Index(string filtreText, string _)
         {
+
+
             if (_ == "jquery")
                 TempData["Jquery"] = "Yes";
 
-            ViewData["NeedsActiveClass"] = "active";
-            List<Need> NeedDefaultList = await Context.Need.Include(x => x.User).ThenInclude(x => x.UserEducation).ThenInclude(x => x.University).Where(x => x.IsConfirmed == true && x.IsRemoved != true).OrderByDescending(x => x.NeedLike.Where(a => a.IsCurrentLiked == true).Count()).ToListAsync();
-            if (!string.IsNullOrEmpty(filtreText) && !string.IsNullOrWhiteSpace(filtreText))
+            List<Need> NeedDefaultList =
+                await Context.Need
+                .Include(x => x.User)
+                .ThenInclude(x => x.UserEducation)
+                .ThenInclude(x => x.University).Where(x => x.IsConfirmed == true && x.IsRemoved != true)
+                .OrderByDescending(x => x.CreatedOn)
+                .ToListAsync();
+            NeedDefaultList = NeedDefaultList.OrderBy(x => (x.TotalCharge - x.TotalCollectedMoney) * 100 / x.TotalCharge).ToList();
+            NeedDefaultList = NeedDefaultList.OrderByDescending(x => !x.IsCompleted).ToList();
+
+            if (!string.IsNullOrEmpty(filtreText))
             {
                 if (_ != "jquery")
                     Logger.LogInformation("Searching needs with tag:{tag}, {now}", filtreText, DateTime.Now.ToString());
@@ -48,9 +57,12 @@ namespace Okurdostu.Web.Controllers
                 else // uymuyorsa, diğer containslere göre listele:
                 {
 
+
                     NeedDefaultList = NeedDefaultList.Where(
-                        x =>
-                        x.NeedItem.Any(a => a.Name.ToLower().Contains(filtreText.ToLower())) || x.User.Username.ToLower().Contains(filtreText.ToLower()) || x.User.FullName.ToLower().Contains(filtreText.ToLower())
+                            x => x.Title.ToLower().Contains(filtreText.ToLower())
+                        || x.Description.ToLower().Contains(filtreText.ToLower())
+                        || x.User.Username.ToLower().Contains(filtreText.ToLower())
+                        || x.User.FullName.ToLower().Contains(filtreText.ToLower())
                         ).ToList();
 
                     TempData["ListelePageTitle"] = filtreText + " aramasıyla ilgili öğrenci ihtiyaçları | Okurdostu";
@@ -447,7 +459,6 @@ namespace Okurdostu.Web.Controllers
             }
         }
         #endregion
-
 
 
         #region view

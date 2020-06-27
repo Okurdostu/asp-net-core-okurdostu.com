@@ -119,21 +119,21 @@ else
                                 @item.Title;
                             }
                         </p>
-                        <div class="progress rounded-custom mt-2 mr-2 ml-2">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-od" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
-                        </div>
                         @{
-                            string Price = item.TotalCharge.ToString().NormalizePrice().Replace(".", ",");
+                            decimal? x = (100 - (item.TotalCharge - item.TotalCollectedMoney) * 100 / item.TotalCharge);
                         }
+                        <div class="progress rounded-custom mt-2 mr-2 ml-2">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-od" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:@Html.Raw(x.ToString() + "%")"></div>
+                        </div>
                         <h6 class="text-center mt-0">
                             <span class="font-weight-bold">
-                                0 &#8378
+                                @item.TotalCollectedMoney.ToString().NormalizePrice().Replace(".", ",") &#8378
                             </span>
                             <span class="small text-black-50 font-weight-bold">
                                 toplandı, hedef
                             </span>
                             <span class="font-weight-bold">
-                                @Price &#8378
+                                @item.TotalCharge.ToString().NormalizePrice().Replace(".", ",") &#8378
                             </span>
                         </h6>
                         <div class="mb-2 mt-2 mr-3 ml-3">
@@ -143,7 +143,7 @@ else
                 </div>
             </div>
             //6 tane kayıtı girdikten sonra buton oluşturması için
-            if (i == 6 && !isRequestComingFromUniversityPage)
+            if (i == 6 && !isRequestComingFromUniversityPage && !HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
             {
                 <div class="col-12">
                     <hr class="mb-2" />
