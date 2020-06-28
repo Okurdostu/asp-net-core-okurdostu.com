@@ -10,14 +10,14 @@ namespace Okurdostu.Web.Extensions
     {
         public static string SHA512(this String str)
         {
-            using (var hash = System.Security.Cryptography.SHA512.Create())
+            using var hash = System.Security.Cryptography.SHA512.Create();
+            var StringBytes = hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(str));
+            var StringBuilder = new System.Text.StringBuilder(128);
+            foreach (var charbyte in StringBytes)
             {
-                var StringBytes = hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(str));
-                var StringBuilder = new System.Text.StringBuilder(128);
-                foreach (var charbyte in StringBytes)
-                    StringBuilder.Append(charbyte.ToString("X2"));
-                return (StringBuilder.ToString());
+                StringBuilder.Append(charbyte.ToString("X2"));
             }
+            return (StringBuilder.ToString());
         }
 
         public static string UppercaseFirstCharacters(this String str)
@@ -158,5 +158,19 @@ namespace Okurdostu.Web.Extensions
             return DottedPrice;
         }
 
+        public static string StarsToEmail(this String email)
+        {
+            //input     halil.i.kocaoz@gmail.com
+            //output    ha************@g*****com
+            char[] emailArray = email.ToCharArray();
+            for (int i = 2; i < emailArray.Length - 3; i++)
+            {
+                if (emailArray[i] != '@' && emailArray[i - 1] != '@' )
+                {
+                    emailArray[i] = '*';
+                }
+            }
+            return new string(emailArray);
+        }
     }
 }

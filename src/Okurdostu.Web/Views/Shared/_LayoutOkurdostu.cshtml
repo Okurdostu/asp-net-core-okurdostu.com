@@ -73,51 +73,54 @@
         </div>
     </div>
     <div class="container">
-        <div class="sidebar pb-0">
-            <div>
-                <a class="@ViewData["BetaActiveClass"]" href="/beta"><i class="fas fa-home"></i> <span>Beta</span></a>
-            </div>
-            <div>
-                <a class="@ViewData["SearchActiveClass"]" href="/arama" id="search"><i class="fas fa-search"></i> <span>Arama</span></a>
-            </div>
-            <div>
-                <a class="@ViewData["NeedsActiveClass"]" href="/ihtiyaclar" id="ihtiyaclar"><i class="fas fa-layer-group"></i> <span>İhtiyaçlar</span></a>
-            </div>
-            <div>
-                <a class="@ViewData["UniversityActiveClass"]" href="/universiteler" id="universiteler"><i class="fas fa-school"></i> <span>Üniversiteler</span></a>
-            </div>
-            @if (IsAuthenticated)
-            {
-                @await Component.InvokeAsync("UserMenu")
-            }
-            else
-            {
+        @if (ViewData["AppMenu"]?.ToString() != "Hide")
+        {
+            <div class="sidebar pb-0">
                 <div>
-                    <a href="/girisyap"><i class="fas fa-sign-in-alt"></i> <span>Giriş yap</span></a>
+                    <a class="@ViewData["BetaActiveClass"]" href="/beta"><i class="fas fa-home"></i> <span>Beta</span></a>
                 </div>
-            }
-        </div>
+                <div>
+                    <a class="@ViewData["SearchActiveClass"]" href="/arama" id="search"><i class="fas fa-search"></i> <span>Arama</span></a>
+                </div>
+                <div>
+                    <a class="@ViewData["NeedsActiveClass"]" href="/ihtiyaclar" id="ihtiyaclar"><i class="fas fa-layer-group"></i> <span>İhtiyaçlar</span></a>
+                </div>
+                <div>
+                    <a class="@ViewData["UniversityActiveClass"]" href="/universiteler" id="universiteler"><i class="fas fa-school"></i> <span>Üniversiteler</span></a>
+                </div>
+                @if (IsAuthenticated)
+                {
+                    @await Component.InvokeAsync("UserMenu")
+                }
+                else
+                {
+                    <div>
+                        <a href="/girisyap"><i class="fas fa-sign-in-alt"></i> <span>Giriş yap</span></a>
+                    </div>
+                }
+            </div>
+        }
         <div class="content">
             <div class="row">
                 <div class="pt-3 pr-2 pl-2 pb-3 col rounded-custom shadow rounded-custom">
                     @RenderBody()
                 </div>
                 @*<div class="pt-3 pr-2 pl-2 pb-3 col-xl-9 col-md-9 col rounded-custom shadow rounded-custom">
-                        @RenderBody()
-                    </div>
-                    <div class="col-xl-3 col-md-3 d-none d-md-block pl-1 pr-0">
-                        <div class="card">
-                            <div class="card-header">
-                                Featured
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item pl-1 pr-1">Cras justo odio</li>
-                                <li class="list-group-item pl-1 pr-1">Dapibus ac facilisis in</li>
-                                <li class="list-group-item pl-1 pr-1">Vestibulum at eros</li>
-                                <li class="list-group-item pl-1 pr-1">Vestibulum at eros</li>
-                            </ul>
+                    @RenderBody()
+                </div>
+                <div class="col-xl-3 col-md-3 d-none d-md-block pl-1 pr-0">
+                    <div class="card">
+                        <div class="card-header">
+                            Featured
                         </div>
-                    </div>*@
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item pl-1 pr-1">Cras justo odio</li>
+                            <li class="list-group-item pl-1 pr-1">Dapibus ac facilisis in</li>
+                            <li class="list-group-item pl-1 pr-1">Vestibulum at eros</li>
+                            <li class="list-group-item pl-1 pr-1">Vestibulum at eros</li>
+                        </ul>
+                    </div>
+                </div>*@
             </div>
             <div class="text-center mt-2 small">
                 <div>

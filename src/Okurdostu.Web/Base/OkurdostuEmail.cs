@@ -38,6 +38,23 @@ namespace Okurdostu.Web
             return message;
         }
 
+        public MimeMessage PasswordResetMail(string FullName, string Email, Guid guid)
+        {
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(this.SenderName, this.SenderMail));
+            message.To.Add(new MailboxAddress(FullName, Email));
+            message.Subject = "Okurdostu | Şifre sıfırlama isteği";
+            var builder = new BodyBuilder();
+            using (StreamReader SourceReader = File.OpenText("Views/PasswordResetMail.html")) 
+            {
+                builder.HtmlBody = SourceReader.ReadToEnd();
+            }
+            builder.HtmlBody = builder.HtmlBody.Replace("{fullname}", FullName).Replace("{guid}", guid.ToString());
+
+            message.Body = builder.ToMessageBody();
+            return message;
+        }
+
         public void Send(MimeMessage Mail)
         {
             using (var client = new SmtpClient())
