@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Okurdostu.Data.Model;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
+using Okurdostu.Web.Services;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -36,53 +37,56 @@ namespace Okurdostu.Web.Controllers
                 Password = Model.Password.SHA512(),
                 FullName = Model.FullName,
             };
+
+            int result = 0;
             try
             {
                 await Context.User.AddAsync(User);
-                var result = await Context.SaveChangesAsync();
-                if (result > 0)
-                {
-                    var ClaimList = new List<Claim>();
-                    ClaimList.Add(new Claim("Id", User.Id.ToString()));
-                    var ClaimsIdentity = new ClaimsIdentity(ClaimList, CookieAuthenticationDefaults.AuthenticationScheme);
-                    var AuthProperties = new AuthenticationProperties
-                    {
-                        AllowRefresh = true,
-                        IsPersistent = true
-                    };
-                    await HttpContext.SignInAsync(
-                        CookieAuthenticationDefaults.AuthenticationScheme,
-                        new ClaimsPrincipal(ClaimsIdentity),
-                        AuthProperties);
-
-                    Logger.LogInformation("{username}({userid}) signed up on {datetime}", User.Username, User.Id, DateTime.Now);
-                    var _UserEmailConfirmation = new UserEmailConfirmation()
-                    {
-                        UserId = User.Id
-                    };
-                    await Context.AddAsync(_UserEmailConfirmation);
-                    await Context.SaveChangesAsync();
-
-                    //Hoş geldiniz e-maili yollanacak ve email adresini onaylaması için: _UserEmailConfirmation.GUID'ı /confirmemail/{guid} ile yollanacak
-
-                    return string.IsNullOrEmpty(ReturnUrl) ? Redirect("/beta") : Redirect(ReturnUrl);
-                }
-                else
-                {
-                    TempData["SignUpMessage"] = "Sorun yaşadık, kaydolmayı tekrar deneyiniz";
-                }
+                result = await Context.SaveChangesAsync();
+                Logger.LogInformation("{username}({userid}) signed up on {datetime}", User.Username, User.Id, DateTime.Now);
             }
             catch (Exception e)
             {
-                if (e.InnerException.Message.Contains("Unique_Key_Username"))
+                if (e.InnerException != null && e.InnerException.Message.Contains("Unique_Key_Username"))
                     TempData["SignUpMessage"] = "Bu kullanıcı adını kullanamazsınız";
-                else if (e.InnerException.Message.Contains("Unique_Key_Email"))
+                else if (e.InnerException != null && e.InnerException.Message.Contains("Unique_Key_Email"))
                     TempData["SignUpMessage"] = "Bu e-mail adresini kullanamazsınız";
                 else
                 {
-                    Logger.LogError("Guest taking a error when trying sign up Ex message: {ex.message}, InnerEx Message: {iex.message}", e.Message, e.InnerException.Message);
+                    Logger.LogError("Guest taking a error when trying sign up Ex message: {ex.message}, InnerEx Message: {iex.message}", e?.Message, e?.InnerException?.Message);
                     TempData["SignUpMessage"] = "Başaramadık ve ne olduğunu bilmiyoruz";
                 }
+            }
+            if (result > 0)
+            {
+                var ClaimList = new List<Claim>();
+                ClaimList.Add(new Claim("Id", User.Id.ToString()));
+                var ClaimsIdentity = new ClaimsIdentity(ClaimList, CookieAuthenticationDefaults.AuthenticationScheme);
+                var AuthProperties = new AuthenticationProperties
+                {
+                    AllowRefresh = true,
+                    IsPersistent = true
+                };
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(ClaimsIdentity),
+                    AuthProperties);
+
+                var _UserEmailConfirmation = new UserEmailConfirmation()
+                {
+                    UserId = User.Id
+                };
+                await Context.AddAsync(_UserEmailConfirmation);
+                await Context.SaveChangesAsync();
+
+                var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)));
+                Email.SendFromHalil(Email.NewUserMail(User.FullName, User.Email, _UserEmailConfirmation.GUID));
+
+                return string.IsNullOrEmpty(ReturnUrl) ? Redirect("/beta") : Redirect(ReturnUrl);
+            }
+            else
+            {
+                TempData["SignUpMessage"] = "Sorun yaşadık, kaydolmayı tekrar deneyiniz";
             }
             return View();
         }
