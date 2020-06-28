@@ -10,6 +10,10 @@ namespace Okurdostu.Web
 {
     public class OkurdostuEmail
     {
+        public string SenderMail { get; set; }
+
+        public string SenderName { get; set; }
+
         private readonly IEmailConfiguration EmailConfigurations;
 
         public OkurdostuEmail(IEmailConfiguration emailConfigurations)
@@ -20,11 +24,11 @@ namespace Okurdostu.Web
         public MimeMessage NewUserMail(string FullName, string Email, Guid guid)
         {
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("Halil İbrahim Kocaöz", "halil@okurdostu.com"));
+            message.From.Add(new MailboxAddress(this.SenderName, this.SenderMail));
             message.To.Add(new MailboxAddress(FullName, Email));
             message.Subject = "Okurdostu | Hoş geldin";
             var builder = new BodyBuilder();
-            using (StreamReader SourceReader = File.OpenText("Views/NewUserMail.html"))
+            using (StreamReader SourceReader = File.OpenText("Views/NewUserMail.html")) //mail içeriği değişecek
             {
                 builder.HtmlBody = SourceReader.ReadToEnd();
             }
@@ -34,12 +38,12 @@ namespace Okurdostu.Web
             return message;
         }
 
-        public void SendFromHalil(MimeMessage Mail)
+        public void Send(MimeMessage Mail)
         {
             using (var client = new SmtpClient())
             {
                 client.Connect(EmailConfigurations.Server, EmailConfigurations.Port, false);
-                client.Authenticate("halil@okurdostu.com", EmailConfigurations.Password);
+                client.Authenticate(SenderMail, EmailConfigurations.Password);
                 client.Send(Mail);
                 client.Disconnect(true);
             }

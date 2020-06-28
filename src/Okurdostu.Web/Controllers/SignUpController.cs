@@ -79,8 +79,13 @@ namespace Okurdostu.Web.Controllers
                 await Context.AddAsync(_UserEmailConfirmation);
                 await Context.SaveChangesAsync();
 
-                var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)));
-                Email.SendFromHalil(Email.NewUserMail(User.FullName, User.Email, _UserEmailConfirmation.GUID));
+                var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
+                {
+                    SenderMail = "halil@okurdostu.com",
+                    SenderName = "Halil İbrahim Kocaöz"
+                };
+
+                Email.Send(Email.NewUserMail(User.FullName, User.Email, _UserEmailConfirmation.GUID));
 
                 return string.IsNullOrEmpty(ReturnUrl) ? Redirect("/beta") : Redirect(ReturnUrl);
             }
