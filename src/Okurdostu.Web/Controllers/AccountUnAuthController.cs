@@ -164,7 +164,8 @@ namespace Okurdostu.Web.Controllers
                 var elapsedTime = DateTime.Now - _UserPaswordReset.CreatedOn;
                 if (elapsedTime.Value.Hours < 12)
                 {
-                    return View(_UserPaswordReset);
+                    TempData["_UserPasswordResetGuid"] = _UserPaswordReset.GUID;
+                    return View();
                 }
                 else
                 {
@@ -179,13 +180,16 @@ namespace Okurdostu.Web.Controllers
 
         //changing the password
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePassword(ProfileModel Model, Guid guid) //it's changing password
+        public async Task<IActionResult> ChangePassword(ProfileModel Model) //it's changing password
         {
 
             if (HttpContext.User.Identity.IsAuthenticated)
             {
                 return Redirect("/");
             }
+
+            Guid guid = Guid.Parse(TempData["_UserPasswordResetGuid"]?.ToString());
+            TempData.Clear();
 
             var _UserPaswordReset = await Context.UserPasswordReset.FirstOrDefaultAsync(x => x.GUID == guid && !x.IsUsed);
 
@@ -199,6 +203,7 @@ namespace Okurdostu.Web.Controllers
                     var result = await Context.SaveChangesAsync();
                     if (result > 0)
                     {
+                        _UserPaswordReset.UsedOn = DateTime.Now;
                         _UserPaswordReset.IsUsed = true;
                         await Context.SaveChangesAsync();
                         TempData["LoginMessage"] = "Giriş için yeni şifrenizi kullanabilirsiniz";
@@ -206,7 +211,8 @@ namespace Okurdostu.Web.Controllers
                     }
                     else
                     {
-                        TempData["ResetPasswordMessage"] = "Şifrenizi değiştiremedik, lütfen tekrar deneyin";
+                        TempData["ResetPasswordMessage"] = "Şifrenizi değiştiremedik, lütfen tekrar deneyin<br />" +
+                            "Şuan ki şifreniz ile aynı şifreyi giriyor olabilirsiniz";
                         return Redirect("~/account/resetpassword/" + guid.ToString());
                     }
                 }
