@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data.Model;
+using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 using Okurdostu.Web.Services;
 
@@ -119,11 +120,9 @@ namespace Okurdostu.Web.Controllers
                 };
 
                 var preCreatedPaswordReset = await Context.UserPasswordReset.Include(x => x.User).FirstOrDefaultAsync(x => x.UserId == _User.Id && !x.IsUsed);
-                var x = DateTime.Now - preCreatedPaswordReset?.CreatedOn;
+                var elapsedTime = DateTime.Now - preCreatedPaswordReset?.CreatedOn;
 
-                //kullanıcı için önceden oluşturulmuş bir password reset guid varsa ve o keyin oluşturulmasından şuan ki zamana kadar 
-                //11.5 saatten az bir süre geçtiyse onu seçip onu key olarak mail yolluyoruz.
-                if (preCreatedPaswordReset != null && x.Value.Hours < 11.5)
+                if (preCreatedPaswordReset != null && elapsedTime.Value.Hours < 11.5)
                 {
                     Email.Send(Email.PasswordResetMail(preCreatedPaswordReset.User.FullName, preCreatedPaswordReset.User.Email, preCreatedPaswordReset.GUID));
                 }
@@ -150,29 +149,74 @@ namespace Okurdostu.Web.Controllers
 
         //catching the key and sending post ChangePassword
         [Route("~/account/resetpassword/{guid}")]
-        public IActionResult ResetPassword(Guid guid)
+        public async Task<IActionResult> ResetPassword(Guid guid)
         {
-            //keyin oluşturulması üzerinden 12 saat geçmişse key yakalansa bile yok edilecek, şifre değiştirmeye izin verilmeyecek.
+
             if (HttpContext.User.Identity.IsAuthenticated)
             {
                 return Redirect("/");
             }
 
-            return View();
+            var _UserPaswordReset = await Context.UserPasswordReset.FirstOrDefaultAsync(x => x.GUID == guid && !x.IsUsed);
+
+            if (_UserPaswordReset != null)
+            {
+                var elapsedTime = DateTime.Now - _UserPaswordReset.CreatedOn;
+                if (elapsedTime.Value.Hours < 12)
+                {
+                    return View(_UserPaswordReset);
+                }
+                else
+                {
+                    Context.Remove(_UserPaswordReset);
+                    await Context.SaveChangesAsync();
+                }
+            }
+            return NotFound("Böyle bir şey yok");
 
         }
 
 
         //changing the password
-        [HttpPost]
-        public IActionResult ChangePassword(ProfileModel Model) //it's changing password
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ProfileModel Model, Guid guid) //it's changing password
         {
+
             if (HttpContext.User.Identity.IsAuthenticated)
             {
                 return Redirect("/");
             }
 
-            return View();
+            var _UserPaswordReset = await Context.UserPasswordReset.FirstOrDefaultAsync(x => x.GUID == guid && !x.IsUsed);
+
+            if (_UserPaswordReset != null)
+            {
+                var elapsedTime = DateTime.Now - _UserPaswordReset.CreatedOn;
+                if (elapsedTime.Value.Hours < 12)
+                {
+                    var User = await Context.User.FirstOrDefaultAsync(x => x.Id == _UserPaswordReset.UserId);
+                    User.Password = Model.Password.SHA512();
+                    var result = await Context.SaveChangesAsync();
+                    if (result > 0)
+                    {
+                        _UserPaswordReset.IsUsed = true;
+                        await Context.SaveChangesAsync();
+                        TempData["LoginMessage"] = "Giriş için yeni şifrenizi kullanabilirsiniz";
+                        return Redirect("/girisyap");
+                    }
+                    else
+                    {
+                        TempData["ResetPasswordMessage"] = "Şifrenizi değiştiremedik, lütfen tekrar deneyin";
+                        return Redirect("~/account/resetpassword/" + guid.ToString());
+                    }
+                }
+                else
+                {
+                    Context.Remove(_UserPaswordReset);
+                    await Context.SaveChangesAsync();
+                }
+            }
+            return NotFound("Böyle bir şey yok");
 
         }
         #endregion
