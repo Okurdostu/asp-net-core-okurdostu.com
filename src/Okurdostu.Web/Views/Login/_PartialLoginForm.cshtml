@@ -21,22 +21,25 @@
             @Html.Raw(TempData["LoginMessage"])
         </p>
     }
-    @using (Html.BeginForm("Index", "Login", FormMethod.Post, new { id = "LoginForm" }))
+    @using (Html.BeginForm("Index", "Login", FormMethod.Post, new { id = "LoginForm", @class = "text-left" }))
     {
         @Html.Hidden("ReturnUrl")
         <div class="form-group mb-2">
+            <span class="text-black-50 font-weight-bold ml-2">
+                Kullanıcı adı, email veya telefon numarası
+            </span>
             @Html.EditorFor(model => model.Username, new { htmlAttributes = new { @class = "form-control rounded-pill font-weight-bold text-black-50", @placeholder = "Kullanıcı adı, telefon veya email", autocomplete = "username" } })
-            @Html.ValidationMessageFor(model => model.Username, "", new { @class = "text-danger font-weight-bold float-left" })
+            @Html.ValidationMessageFor(model => model.Username, "", new { @class = "text-danger font-weight-bold" })
         </div>
         <div class="form-group mb-2">
-            @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control rounded-pill font-weight-bold text-black-50", @placeholder = "Parola", autocomplete = "current-password" } })
-            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger font-weight-bold float-left" })
-        </div>
-        <div class="form-group mb-2">
-            @if (TempData["InvalidCaptcha"] != null)
-            {
-                <span class="font-weight-bold text-danger">@Html.Raw(TempData["InvalidCaptcha"])</span>
-            }
+            <span class="text-black-50 font-weight-bold ml-2">
+                Parola
+            </span>
+            @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control rounded-pill font-weight-bold text-black-50 mt-1", @placeholder = "Parola" } })
+            <div class="mt-1 mb-1 ml-1 text-left">
+                <a class="od font-weight-bold" href="/account/beginpasswordreset">Parolamı hatırlamıyorum</a>
+            </div>
+            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger font-weight-bold" })
         </div>
         <hr class="mt-2 mb-2" />
         <div class="form-group">
@@ -49,7 +52,6 @@
         <partial name="~/Views/Shared/_GoogleRecaptchaWarningPartial.cshtml" />
     }
 </div>
-
 <script>
     $('#LoginForm').on('submit', function () {
         setTimeout(function () {

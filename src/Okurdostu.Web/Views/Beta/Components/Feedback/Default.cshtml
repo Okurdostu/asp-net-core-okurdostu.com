@@ -1,8 +1,5 @@
 ﻿@model FeedbackModel
-
-
 <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
-
 @using (Html.BeginForm("Feedback", "Beta", FormMethod.Post, new { @id = "FeedbackForm" }))
 {
     <div class="form-horizontal">
@@ -18,15 +15,13 @@
         </div>
         <div class="form-group">
         </div>
+        <div class="modal-footer pb-0 pt-1">
+            <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
+            <input type="submit" value="Gönder" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" />
+        </div>
     </div>
-    <div class="modal-footer">
-        <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
-        <input type="submit" value="Gönder" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" />
-    </div>
-    <hr />
     <partial name="~/Views/Shared/_GoogleRecaptchaWarningPartial.cshtml" />
 }
-
 <script>
     $('#FeedbackForm').on('submit', function () {
         setTimeout(function () {

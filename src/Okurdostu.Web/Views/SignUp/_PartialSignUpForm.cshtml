@@ -22,24 +22,43 @@
             @Html.Raw(TempData["SignUpMessage"])
         </h4>
     }
-    @using (Html.BeginForm("Index", "Kaydol", FormMethod.Post, new { id = "SignupForm" }))
+    @using (Html.BeginForm("Index", "Kaydol", FormMethod.Post, new { id = "SignupForm", @class = "text-left" }))
     {
         @Html.Hidden("ReturnUrl")
         <div class="form-group mb-2">
-            @Html.EditorFor(model => model.FullName, new { htmlAttributes = new { @class = "form-control rounded-pill font-weight-bold text-black-50", @placeholder = "Adınız ve soyadınız", @autocomplete = "off" } })
-            @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "text-danger font-weight-bold float-left" })
+            <span class="text-black-50 font-weight-bold ml-2">
+                Ad ve soyad
+            </span>
+            @Html.EditorFor(model => model.FullName, new { htmlAttributes = new { @class = "form-control rounded-pill font-weight-bold text-black-50", @placeholder = "Ad ve soyad", @autocomplete = "off" } })
+            @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "text-danger font-weight-bold" })
         </div>
         <div class="form-group mb-2">
+            <span class="text-black-50 font-weight-bold ml-2">
+                Kullanıcı adı
+            </span>
             @Html.EditorFor(model => model.Username, new { htmlAttributes = new { @class = "form-control rounded-pill font-weight-bold text-black-50", @placeholder = "Kullanıcı adı", autocomplete = "off" } })
-            @Html.ValidationMessageFor(model => model.Username, "", new { @class = "text-danger font-weight-bold float-left" })
+            @Html.ValidationMessageFor(model => model.Username, "", new { @class = "text-danger font-weight-bold" })
         </div>
         <div class="form-group mb-2">
-            @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control rounded-pill font-weight-bold text-black-50", @placeholder = "Email", autocomplete = "off" } })
-            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger font-weight-bold float-left" })
+            <span class="text-black-50 font-weight-bold ml-2">
+                Email adresi
+            </span>
+            @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control rounded-pill font-weight-bold text-black-50", @placeholder = "adres@domain.com", autocomplete = "off" } })
+            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger font-weight-bold" })
         </div>
         <div class="form-group mb-2">
-            @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control rounded-pill font-weight-bold text-black-50", @placeholder = "Parola" } })
-            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger font-weight-bold float-left" })
+            <span class="text-black-50 font-weight-bold ml-2">
+                Parola
+            </span>
+            <div class="input-group">
+                <div class="input-group-prepend rounded-custom">
+                    <span class="input-group-text pl-0 pr-1" style="background-color:transparent; border-color:transparent;" id="basic-addon1">
+                        <a href="" class="font-weight-bold text-black-50" id="show_hide_password"><i id="eye" class="fa fa-eye-slash" aria-hidden="true"></i></a>
+                    </span>
+                </div>
+                @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control rounded-pill font-weight-bold text-black-50 mt-1", @placeholder = "Parola" } })
+            </div>
+            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger font-weight-bold" })
         </div>
         <hr class="mb-1 mt-1" />
         <p class="text-black-50 text-center font-weight-bold pb-1" style="font-size:14px !important;">
@@ -55,7 +74,6 @@
         <partial name="~/Views/Shared/_GoogleRecaptchaWarningPartial.cshtml" />
     }
 </div>
-
 <script>
     $('#SignupForm').on('submit', function () {
         setTimeout(function () {

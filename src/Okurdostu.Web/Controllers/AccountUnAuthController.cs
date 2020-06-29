@@ -165,6 +165,7 @@ namespace Okurdostu.Web.Controllers
                 if (elapsedTime.Value.Hours < 12)
                 {
                     TempData["_UserPasswordResetGuid"] = _UserPaswordReset.GUID;
+                    TempData["PasswordResetUser"] = await Context.User.FirstOrDefaultAsync(x => x.Id == _UserPaswordReset.UserId);
                     return View();
                 }
                 else
@@ -177,8 +178,8 @@ namespace Okurdostu.Web.Controllers
 
         }
 
-
         //changing the password
+        [Route("~/account/changepassword")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ProfileModel Model) //it's changing password
         {
@@ -188,8 +189,12 @@ namespace Okurdostu.Web.Controllers
                 return Redirect("/");
             }
 
-            Guid guid = Guid.Parse(TempData["_UserPasswordResetGuid"]?.ToString());
-            TempData.Clear();
+            Guid guid = Guid.Empty;
+            if (TempData["_UserPasswordResetGuid"]?.ToString() != null)
+            {
+                guid = Guid.Parse(TempData["_UserPasswordResetGuid"]?.ToString());
+                TempData.Clear();
+            }
 
             var _UserPaswordReset = await Context.UserPasswordReset.FirstOrDefaultAsync(x => x.GUID == guid && !x.IsUsed);
 

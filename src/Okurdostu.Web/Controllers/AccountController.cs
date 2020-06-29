@@ -107,29 +107,24 @@ namespace Okurdostu.Web.Controllers
         {
             if (await ConfirmIdentityWithPassword(Model.ConfirmPassword))
             {
-                if (Model.RePassword == Model.Password)
+
+                Model.Password = Model.Password.SHA512();
+                if (AuthUser.Password != Model.Password)
                 {
-                    Model.Password = Model.Password.SHA512();
-                    if (AuthUser.Password != Model.Password)
+                    AuthUser.Password = Model.Password;
+                    var result = await Context.SaveChangesAsync();
+                    if (result > 0)
                     {
-                        AuthUser.Password = Model.Password;
-                        var result = await Context.SaveChangesAsync();
-                        if (result > 0)
-                        {
-                            TempData["ProfileMessage"] = "Artık giriş yaparken yeni parolanızı kullanabilirsiniz";
-                            Logger.LogInformation("User({Id}) changed their password: ", AuthUser.Id);
-                        }
-                        else
-                        {
-                            TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
-                            Logger.LogError("Changes aren't save, User({Id}) take error when trying change their password: ", AuthUser.Id);
-                        }
+                        TempData["ProfileMessage"] = "Artık giriş yaparken yeni parolanızı kullanabilirsiniz";
+                        Logger.LogInformation("User({Id}) changed their password: ", AuthUser.Id);
+                    }
+                    else
+                    {
+                        TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
+                        Logger.LogError("Changes aren't save, User({Id}) take error when trying change their password: ", AuthUser.Id);
                     }
                 }
-                else
-                {
-                    TempData["ProfileMessage"] = "Yeni parolalarınız birbiri ile eşleşmedi";
-                }
+
             }
             else
             {
