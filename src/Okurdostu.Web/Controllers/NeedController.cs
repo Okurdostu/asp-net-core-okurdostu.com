@@ -98,6 +98,7 @@ namespace Okurdostu.Web.Controllers
                         foreach (var item in UnRemovedItems)
                             TotalCharge += item.Price;
 
+                        Need.TotalCollectedMoney = 0;
                         Need.TotalCharge = TotalCharge;
                         Need.IsSentForConfirmation = true;
 
