@@ -17,12 +17,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="refresh" content="120">
-    <title>@Html.Raw(ViewData["Title"])</title>
-    <meta name="description" content="Öğrenci ve öğrenci dostunu bir araya getiren platform" />
-    <meta name="keywords" content="okurdostu,kitap,akademik burs,kitap ihtiyaç,kitap burs,öğrenci,ihtiyaç,bağış,destekleme,üniversite,eğitim,burs,burslar,bursları,bursiyer,bursiyerler,kyk @Html.Raw(","+ViewBag.Keywords)">
+    <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="refresh" content="120"> <title>@Html.Raw(ViewData["Title"])</title> <meta name="description" content="Öğrenci ve öğrenci dostunu bir araya getiren platform"/> <meta name="keywords" content="okurdostu,kitap,akademik burs,kitap ihtiyaç,kitap burs,öğrenci,ihtiyaç,bağış,destekleme,üniversite,eğitim,burs,burslar,bursları,bursiyer,bursiyerler,kyk @Html.Raw(","+ViewBag.Keywords)">
     @if (ViewBag.OGImage != null)
     {
         <meta name="twitter:card" content="summary" />
@@ -31,11 +26,7 @@
     {
         <meta name="twitter:card" content="summary_large_image" />
     }
-    <meta name="twitter:site" content="@Html.Raw("@okurdostucom")" />
-    <meta property="og:site_name" content="Okurdostu" />
-    <meta property="og:locale" content="tr_TR" />
-    <meta property="og:url" content="Url" />
-    <meta property="og:title" content="@Html.Raw(ViewData["Title"])" />
+    <meta name="twitter:site" content="@Html.Raw("@okurdostucom")"/> <meta property="og:site_name" content="Okurdostu"/> <meta property="og:locale" content="tr_TR"/> <meta property="og:url" content="Url"/> <meta property="og:title" content="@Html.Raw(ViewData["Title"])"/>
     @if (ViewBag.Description != null)
     {
         <meta property="og:description" content="@Html.Raw(ViewBag.Description)" />
@@ -66,12 +57,7 @@
     {
         <meta property="og:type" content="website" />
     }
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700,700i" rel="stylesheet">
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <link href="~/css/bs-edited.css" rel="stylesheet" />
-    <link href="~/css/style-introduction.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet"> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700" rel="stylesheet"> <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700,700i" rel="stylesheet"> <script src="~/lib/jquery/dist/jquery.min.js"></script> <link href="~/css/bs-edited.css" rel="stylesheet"/> <link href="~/css/style-introduction.css" rel="stylesheet"/>
     @if (!IsAuthenticated)
     {
         <link href="~/css/preloader.css" rel="stylesheet" />
@@ -144,16 +130,6 @@
     {
         <div class="modal fade" id="signup" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-lg modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body p-0" style="border-radius: 25px;"> <partial name="~/Views/SignUp/_PartialSignUpForm.cshtml"> </div></div></div></div><div class="modal fade" id="login" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body p-0" style="border-radius: 25px;"> <partial name="~/Views/Login/_PartialLoginForm.cshtml"> </div></div></div></div>
     }
-    <script src="~/js/showhidepass.js"></script>
-    <script src="~/js/bootstrap.min.js"></script>
-    <script src="~/js/script-introduction.js"></script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-13125894-3"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-
-        gtag('config', 'UA-13125894-3');
-    </script>
+    <script src="~/js/showhidepass.js"></script> <script src="~/js/bootstrap.min.js"></script> <script src="~/js/script-introduction.js"></script> <script async src="https://www.googletagmanager.com/gtag/js?id=UA-13125894-3"></script> <script>window.dataLayer=window.dataLayer || []; function gtag(){dataLayer.push(arguments);}gtag('js', new Date()); gtag('config', 'UA-13125894-3'); </script>
 </body>
 </html>

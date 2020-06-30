@@ -14,18 +14,11 @@
             <div class="col-auto pr-1 pl-1">
                 @if (item.PictureUrl != null)
                 {
-                    <a href="/@item.Username">
-                        <img src="@item.PictureUrl"
-                             class="profil-image rounded-pill " style="width:50px; height:50px" />
-                    </a>
-
+                    <a href="/@item.Username"> <img src="@item.PictureUrl" class="profil-image rounded-pill " style="width:50px; height:50px" /> </a>
                 }
                 else
                 {
-                    <a href="/@item.Username">
-                        <img src="~/svg/user.svg"
-                             class="profil-image rounded-pill " style="width:50px; height:50px;" />
-                    </a>
+                    <a href="/@item.Username"> <img src="~/svg/user.svg" class="profil-image rounded-pill " style="width:50px; height:50px;" /> </a>
                 }
             </div>
             <div class="col p-0"> <a class="od text-break" href="/@item.Username"> <h6 style="font-size:15px !important"> @item.FullName <br /> <span class="text-black-50">(@Html.Raw("@" + item.Username))</span> <br /> </h6> </a> </div>

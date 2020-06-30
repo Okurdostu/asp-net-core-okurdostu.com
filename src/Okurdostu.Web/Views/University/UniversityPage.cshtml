@@ -1,9 +1,6 @@
 ﻿@model Okurdostu.Data.Model.University
-
 @{
-    ViewData["Title"] = Model.Name + " | Okurdostu";
-    Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
-    ViewBag.Description = Model.Name + " öğrencilerinin ihtiyaçları, öğrencileri ve sayfası";
+    ViewData["Title"] = Model.Name + " | Okurdostu"; Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml"; ViewBag.Description = Model.Name + " öğrencilerinin ihtiyaçları, öğrencileri ve sayfası";
     if (Model.LogoUrl != null)
     {
         ViewBag.OGImage = "https://okurdostu.com" + Model.LogoUrl;
@@ -17,32 +14,10 @@
         }
         else
         {
-            <img src="~/svg/building.svg"
-                 class="profil-image rounded-pill" style="width:100px;" />
+            <img src="~/svg/building.svg"class="profil-image rounded-pill" style="width:100px;" />
         }
-    </div>
-    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 text-center">
-        <h5 class="text-black-50">
-            @Model.Name
-        </h5>
-    </div>
-</div>
-<ul class="nav nav-tabs justify-content-center font-weight-bold" id="menu" role="tablist">
-    <li class="nav-item">
-        <a class="nav-link active" data-toggle="tab" href="#students" role="tab" aria-controls="students" aria-selected="true">Öğrenciler</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" href="#needs" role="tab" aria-controls="needs" aria-selected="false">İhtiyaçlar</a>
-    </li>
-</ul>
-<div class="tab-content" id="menuContent">
-    <div class="tab-pane fade show active" id="students" role="tabpanel" aria-labelledby="ogrenciler-tab">
-        @await Component.InvokeAsync("UniversityStudents", new { friendlyname = Model.FriendlyName })
-    </div>
-    <div class="tab-pane fade" id="needs" role="tabpanel" aria-labelledby="ihtiyaclar-tab">
-        <p class="font-weight-bold text-black-50">Lütfen biraz bekleyin..</p>
-    </div>
-</div>
-<script>
-    $("#needs").load("/ihtiyaclar/@Model.FriendlyName/jquery");
-</script>
+ </div><div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 text-center"> <h5 class="text-black-50"> @Model.Name </h5> </div></div>
+<ul class="nav nav-tabs justify-content-center font-weight-bold" id="menu" role="tablist"> <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#students" role="tab" aria-controls="students" aria-selected="true">Öğrenciler</a> </li><li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#needs" role="tab" aria-controls="needs" aria-selected="false">İhtiyaçlar</a> </li></ul>
+<div class="tab-content" id="menuContent"> <div class="tab-pane fade show active" id="students" role="tabpanel" aria-labelledby="ogrenciler-tab"> @await Component.InvokeAsync("UniversityStudents", new { friendlyname = Model.FriendlyName }) </div><div class="tab-pane fade" id="needs" role="tabpanel" aria-labelledby="ihtiyaclar-tab"> <p class="font-weight-bold text-black-50">Lütfen biraz bekleyin..</p></div></div>
+
+<script>$("#needs").load("/ihtiyaclar/@Model.FriendlyName/jquery");</script>
