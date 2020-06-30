@@ -68,6 +68,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                 if (_UserPaswordReset != null)
                 {
                     var elapsedTime = DateTime.Now - _UserPaswordReset.CreatedOn;
+
                     if (elapsedTime.Value.Hours < 12)
                     {
                         var User = await Context.User.FirstOrDefaultAsync(x => x.Id == _UserPaswordReset.UserId);
@@ -85,7 +86,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                             }
                             else
                             {
-                                TempData["ResetPasswordMessage"] = "Þifrenizi deðiþtiremedik, lütfen tekrar deneyin<br />" +
+                                TempData["ChangePasswordMessage"] = "Þifrenizi deðiþtiremedik, lütfen tekrar deneyin<br />" +
                                     "Þuan ki þifreniz ile ayný þifreyi giriyor olabilirsiniz";
                                 return Redirect("~/account/resetpassword/" + guid.ToString());
                             }
@@ -96,6 +97,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                         Context.Remove(_UserPaswordReset);
                         await Context.SaveChangesAsync();
                     }
+
                 }
             }
             return NotFound("Böyle bir þey yok");

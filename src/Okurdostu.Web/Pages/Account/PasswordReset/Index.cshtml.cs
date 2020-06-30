@@ -57,7 +57,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                 else
                 {
                     TempData.Set("resetPasswordEmail", User.Email.StarsToEmail());
-                    TempData.Set("resetPasswordEmail", "Telephone");
+                    TempData.Set("IdentificationType", "Telephone");
                 }
 
                 return Redirect("~/account/passwordreset/sendmail");
