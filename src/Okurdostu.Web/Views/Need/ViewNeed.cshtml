@@ -34,43 +34,8 @@
 
 @if (!Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUserEqualModelUser)
 {
-    <p class="font-weight-bold text-black-50 text-center">İkinci aşama</p>
-    <div class="small">
-        <p class="font-weight-bold text-black-50">
-            Merhaba dostum.<br />
-            İhtiyacınız olan hedefler için para toplamaya çok yakınsınız.<br />
-            İlk başta şunları bilmelisiniz:
-        </p>
-        <p class="font-weight-bold text-black-50">
-            1.İhtiyaç kampanyanız için 3 adet hedef belirleyebilirsiniz.<br />
-            2.İhtiyaç kampanyanızı başlatmak için en az bir hedef belirlemelisiniz <br />
-            3.İhtiyaç kampanyanıza hedef eklemek için biraz aşağıda ki kısmı kullanabilirsiniz <br />
-            4.Bu sayfadayken, ihtiyaç kampayanızı (başlık, açıklama) düzenleyip, gözden geçirebilirsiniz.
-        </p>
-        <hr />
-        <div class="text-center">
-            <button class="btn btn-outline-primary rounded-custom font-weight-bold" href="" data-toggle="modal" data-target="#confirm" style="cursor:pointer;">
-                <i class="fas fa-approval"></i> Onaylama
-            </button>
-            <span class="font-weight-bold text-black-50">
-                <br />
-                İhtiyaç kampanyanızı hazır olduğunu düşünüyorsanız artık her hangi bir hedef eklemek veya çıkarmak gibi bir kararsızlığınız yoksa onay için yollayabilirsiniz.
-            </span>
-        </div>
-    </div>
-    <hr />
-    <div class="modal fade" id="confirm" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal modal-dialog-centered" role="document">
-            <div class="modal-content" style="background: transparent;">
-                <div class="modal-body bg-light" style="border-radius: 25px;">
-                    <h4 class="text-center text-black-50">
-                        Onaylama
-                    </h4>
-                    <hr />
-                    <div>
-                        <p class="text-black-50 font-weight-bold text-md-left text-center">
-                            Seçtiğiniz başlığa ve hedeflerinize son bir kez göz atıp onay için yollayabilirsiniz.
-                        </p>
+    <p class="font-weight-bold text-black-50 text-center">İkinci aşama</p><div class="small"> <p class="font-weight-bold text-black-50"> Merhaba dostum.<br /> İhtiyacınız olan hedefler için para toplamaya çok yakınsınız.<br /> İlk başta şunları bilmelisiniz: </p><p class="font-weight-bold text-black-50"> 1.İhtiyaç kampanyanız için 3 adet hedef belirleyebilirsiniz.<br /> 2.İhtiyaç kampanyanızı başlatmak için en az bir hedef belirlemelisiniz <br /> 3.İhtiyaç kampanyanıza hedef eklemek için biraz aşağıda ki kısmı kullanabilirsiniz <br /> 4.Bu sayfadayken, ihtiyaç kampayanızı (başlık, açıklama) düzenleyip, gözden geçirebilirsiniz. </p><hr /> <div class="text-center"> <button class="btn btn-outline-primary rounded-custom font-weight-bold" href="" data-toggle="modal" data-target="#confirm" style="cursor:pointer;"> <i class="fas fa-approval"></i> Onaylama </button> <span class="font-weight-bold text-black-50"> <br /> İhtiyaç kampanyanızı hazır olduğunu düşünüyorsanız artık her hangi bir hedef eklemek veya çıkarmak gibi bir kararsızlığınız yoksa onay için yollayabilirsiniz. </span> </div></div>
+<hr/> <div class="modal fade" id="confirm" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light" style="border-radius: 25px;"> <h4 class="text-center text-black-50"> Onaylama </h4> <hr/> <div> <p class="text-black-50 font-weight-bold text-md-left text-center"> Seçtiğiniz başlığa ve hedeflerinize son bir kez göz atıp onay için yollayabilirsiniz. </p>
                         @using (Html.BeginForm("SendToConfirmation", "Need", FormMethod.Post))
                         {
                             @Html.Hidden("NeedId", Model.Id)
@@ -78,21 +43,11 @@
                                 Tamamdır, onay için yolla
                             </button>
                         }
-                        <hr />
-                        <button type="button" class="btn  btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <hr/> <button type="button" class="btn btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button> </div></div></div></div></div>
 }
 else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUserEqualModelUser)
 {
-    <h4 class="text-center text-black-50">
-        Tebrikler ! <br />
-        Bu kampanyanız onaylanması için yollanmış.<br />
-        En kısa zamanda sizi hiç tanımadığınız dostlarınız ile bir araya getireceğiz.
-    </h4>
+    <h4 class="text-center text-black-50"> Tebrikler ! <br /> Bu kampanyanız onaylanması için yollanmış.<br /> En kısa zamanda sizi hiç tanımadığınız dostlarınız ile bir araya getireceğiz. </h4>
 }
 @if (Model.IsConfirmed || IsAuthenticatedUserEqualModelUser)
 {
@@ -100,25 +55,8 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
         <div>
             @if (IsAuthenticatedUserEqualModelUser && !Model.IsConfirmed)
             {
-                <center>
-                    <button class="btn btn-outline-purple rounded-custom w-75  mb-3 pt-1 pl-1 font-weight-bold" href="" data-toggle="modal" data-target="#edittitle" style="cursor:pointer;">
-                        <i class="far fa-edit"></i> Başlığı düzenle
-                    </button>
-                </center>
-                <div class="modal fade" id="edittitle" tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                        <div class="modal-content" style="background: transparent;">
-                            <div class="modal-body bg-light" style="border-radius: 25px;">
-                                <h3 class="font-weight-bold text-center text-black-50">
-                                    Başlığı düzenleme
-                                </h3>
-                                <hr />
-                                @await Component.InvokeAsync("EditNeedTitle", new { Id = Model.Id })
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
+                <center> <button class="btn btn-outline-purple rounded-custom w-75 mb-3 pt-1 pl-1 font-weight-bold" href="" data-toggle="modal" data-target="#edittitle" style="cursor:pointer;"> <i class="far fa-edit"></i> Başlığı düzenle </button> </center>
+                <div class="modal fade" id="edittitle" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-lg modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light" style="border-radius: 25px;"> <h3 class="font-weight-bold text-center text-black-50"> Başlığı düzenleme </h3> <hr /> @await Component.InvokeAsync("EditNeedTitle", new { Id = Model.Id }) </div></div></div></div>
             }
             <h5 class="text-center text-black-50 text-break">
                 @Model.Title
@@ -144,16 +82,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
         </div>
         @if (Model.IsConfirmed == true)
         {
-            <hr class="mb-1" />
-            <div class="text-center">
-                <div>
-                    <h4>
-                        Onaylanmış kampanya
-                    </h4>
-                    <p class="text-black-50 mb-1">Bu kampanyayı oluşturan öğrecinin, eğitim bilgileri e-devlet belgesi ile onaylanmıştır.</p>
-                </div>
-            </div>
-            <hr class="mt-0" />
+            <hr class="mb-1" /> <div class="text-center"> <div> <h4> Onaylanmış kampanya </h4> <p class="text-black-50 mb-1">Bu kampanyayı oluşturan öğrecinin, eğitim bilgileri e-devlet belgesi ile onaylanmıştır.</p></div></div><hr class="mt-0" />
         }
         else
         {
@@ -164,72 +93,19 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
 
     @if (!HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
     {
-
-        <div class="modal fade" id="login" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content" style="background: transparent;">
-                    <div class="modal-body p-0" style="border-radius: 25px;">
-                        <div class="shadow p-2 bg-white rounded-custom mt-5 mb-5">
-                            <div class="mt-5 mb-5 text-center font-weight-bold text-black-50">
-                                <h3 class="mb-1 rounded-custom">
-                                    <i class="fas fa-heart od"></i>
-                                </h3>
-                                <p>Kampanyayı sevgin ile destekle</p>
-                            </div>
-                            <a class="btn-block btn-purple font-weight-bold text-center" href="/girisyap?ReturnUrl=@HttpContextAccessor.HttpContext.Request.Path">
-                                Giriş yap
-                            </a>
-                            <a class="btn-block btn-purple font-weight-bold text-center" href="/kaydol?ReturnUrl=@HttpContextAccessor.HttpContext.Request.Path">
-                                Kaydol
-                            </a>
-                            <center class="mt-2">
-                                <button type="button" class="btn w-75 btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Sonra bakarız yaa</button>
-                            </center>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        <div class="modal fade" id="login" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body p-0" style="border-radius: 25px;"> <div class="shadow p-2 bg-white rounded-custom mt-5 mb-5"> <div class="mt-5 mb-5 text-center font-weight-bold text-black-50"> <h3 class="mb-1 rounded-custom"> <i class="fas fa-heart od"></i> </h3> <p>Kampanyayı sevgin ile destekle</p></div><a class="btn-block btn-purple font-weight-bold text-center" href="/girisyap?ReturnUrl=@HttpContextAccessor.HttpContext.Request.Path"> Giriş yap </a> <a class="btn-block btn-purple font-weight-bold text-center" href="/kaydol?ReturnUrl=@HttpContextAccessor.HttpContext.Request.Path"> Kaydol </a> <center class="mt-2"> <button type="button" class="btn w-75 btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Sonra bakarız yaa</button> </center> </div></div></div></div></div>
         <script>
-            function GetInf() {
-                    $("#LikeCount").load("/like/count/@Model.Id");
-            };
-            $("#ShowLikers").on("click", function () {
-                    $("#Likers").load("/like/Likers/@Model.Id/@Model.User.Username", function () {
-                    });
-            });
-            setInterval(function () { GetInf(); }, 5000);
+            function GetInf(){$("#LikeCount").load("/like/count/@Model.Id")}$("#ShowLikers").on("click",function(){$("#Likers").load("/like/Likers/@Model.Id/@Model.User.Username",function(){})}),setInterval(function(){GetInf()},5e3);
         </script>
     }
     else
     {
         <script type="text/javascript">
-            $(document).ready(function () {
-                function GetInf() {
-                    $("#Like").load("/like/button/@Model.Id");
-                    $("#LikeCount").load("/like/count/@Model.Id");
-                };
-                $("#Like").on("click", function () {
-                    $.ajax({
-                        type: "POST", url: "/like", data: { id: '@Model.Id',username: '@Model.User.Username'}, dataType: "json", success() {
-                            GetInf();
-                        },
-                    });
-                });
-                $("#ShowLikers").on("click", function () {
-                    $("#Likers").load("/like/likers/@Model.Id/@Model.User.Username", function () {
-                    });
-                });
-                setInterval(function () { GetInf(); }, 5000);
-            });
+            $(document).ready(function(){function e(){$("#Like").load("/like/button/@Model.Id"),$("#LikeCount").load("/like/count/@Model.Id")}$("#Like").on("click",function(){$.ajax({type:"POST",url:"/like",data:{id:"@Model.Id",username:"@Model.User.Username"},dataType:"json",success(){e()}})}),$("#ShowLikers").on("click",function(){$("#Likers").load("/like/likers/@Model.Id/@Model.User.Username",function(){})}),setInterval(function(){e()},5e3)});
         </script>
     }
 }
 else
 {
-    @:
-    <p class="font-weight-bold text-warning mb-5 mt-5 text-center">
-        Bu ihtiyaç kampanyası onaylanmamış, onaylanana kadar sadece ihtiyaç kampanyasını oluşturan kişi görebilir.
-    </p>
+    @: <p class="font-weight-bold text-warning mb-5 mt-5 text-center"> Bu ihtiyaç kampanyası onaylanmamış, onaylanana kadar sadece ihtiyaç kampanyasını oluşturan kişi görebilir. </p>
 }

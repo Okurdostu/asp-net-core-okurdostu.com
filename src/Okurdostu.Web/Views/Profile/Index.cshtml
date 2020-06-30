@@ -48,28 +48,8 @@
                     <h3 class="font-weight-bold text-center text-black-50">
                         Hesap ayarları
                     </h3>
-                    <ul class="nav nav-tabs font-weight-bold justify-content-center" id="tab" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" id="username-tab" data-toggle="tab" href="#username" role="tab" aria-controls="basic" aria-selected="true">Kullanıcı adı</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="password-tab" data-toggle="tab" href="#password" role="tab" aria-controls="password" aria-selected="false">Parola</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="email-tab" data-toggle="tab" href="#email" role="tab" aria-controls="email" aria-selected="false">Email</a>
-                        </li>
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane fade show active" id="username" role="tabpanel" aria-labelledby="username-tab">
-                            @await Component.InvokeAsync("EditUsername")
-                        </div>
-                        <div class="tab-pane fade" id="password" role="tabpanel" aria-labelledby="password-tab">
-                            @await Component.InvokeAsync("EditPassword")
-                        </div>
-                        <div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">
-                            @await Component.InvokeAsync("EditEmail", new { Email = Model.Email })
-                        </div>
-                    </div>
+                    <ul class="nav nav-tabs font-weight-bold justify-content-center" id="tab" role="tablist"> <li class="nav-item"> <a class="nav-link active" id="username-tab" data-toggle="tab" href="#username" role="tab" aria-controls="basic" aria-selected="true">Kullanıcı adı</a> </li><li class="nav-item"> <a class="nav-link" id="password-tab" data-toggle="tab" href="#password" role="tab" aria-controls="password" aria-selected="false">Parola</a> </li><li class="nav-item"> <a class="nav-link" id="email-tab" data-toggle="tab" href="#email" role="tab" aria-controls="email" aria-selected="false">Email</a> </li></ul>
+                    <div class="tab-content"> <div class="tab-pane fade show active" id="username" role="tabpanel" aria-labelledby="username-tab"> @await Component.InvokeAsync("EditUsername") </div><div class="tab-pane fade" id="password" role="tabpanel" aria-labelledby="password-tab"> @await Component.InvokeAsync("EditPassword") </div><div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab"> @await Component.InvokeAsync("EditEmail", new { Email = Model.Email }) </div></div>
                 </div>
             </div>
         </div>
@@ -81,23 +61,8 @@
                     <h3 class="font-weight-bold text-center text-black-50">
                         Profil düzenleme
                     </h3>
-                    <ul class="nav nav-tabs font-weight-bold justify-content-center" id="tab" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="true">Profil</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">İletişim</a>
-                        </li>
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profil-tab">
-                            @await Component.InvokeAsync("ProfileBasic")
-                        </div>
-                        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-                            @await Component.InvokeAsync("Contact")
-                        </div>
-                    </div>
-
+                    <ul class="nav nav-tabs font-weight-bold justify-content-center" id="tab" role="tablist"> <li class="nav-item"> <a class="nav-link active" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="true">Profil</a> </li><li class="nav-item"> <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">İletişim</a> </li></ul>
+                    <div class="tab-content"> <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profil-tab"> @await Component.InvokeAsync("ProfileBasic") </div><div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab"> @await Component.InvokeAsync("Contact") </div></div>
                 </div>
             </div>
         </div>
@@ -121,28 +86,7 @@
                     <input hidden="hidden" id="file" name="file" type="file" onchange="Selected()" accept="image/*" />
                     <button hidden="hidden" type="submit" id="AddPhotoButton"></button>
                 }
-                <div class="modal fade" id="profile-photo" tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-                        <div class="modal-content" style="background: transparent;">
-                            <div class="modal-body bg-light text-center" style="border-radius: 25px;">
-                                <h3 class="font-weight-bold text-center text-black-50">
-                                    Profil fotoğrafı
-                                </h3>
-                                <hr />
-                                <button class="btn btn-block btn-outline-info rounded-custom font-weight-bold" onclick="FileSelect();">
-                                    Yeni fotoğraf yükle
-                                </button>
-                                @using (Html.BeginForm("RemovePhoto", "Account", FormMethod.Post))
-                                {
-                                    <button class="btn btn-block btn-danger rounded-custom font-weight-bold mb-1 mt-1" type="submit">Şuan ki fotoğrafı kaldır</button>
-                                }
-                                <button class="btn btn-block btn-outline-secondary rounded-custom font-weight-bold" data-dismiss="modal">
-                                    Vazgeçtim
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div class="modal fade" id="profile-photo" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-sm modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light text-center" style="border-radius: 25px;"> <h3 class="font-weight-bold text-center text-black-50"> Profil fotoğrafı </h3> <hr/> <button class="btn btn-block btn-outline-info rounded-custom font-weight-bold" onclick="FileSelect();"> Yeni fotoğraf yükle </button> @using (Html.BeginForm("RemovePhoto", "Account", FormMethod.Post)){<button class="btn btn-block btn-danger rounded-custom font-weight-bold mb-1 mt-1" type="submit">Şuan ki fotoğrafı kaldır</button>}<button class="btn btn-block btn-outline-secondary rounded-custom font-weight-bold" data-dismiss="modal"> Vazgeçtim </button> </div></div></div></div>
             }
         }
         @if (Model.PictureUrl != null)
@@ -162,9 +106,7 @@
         {
             if (IsAuthenticatedUserEqualModelUser)
             {
-                <a data-toggle="modal" data-target="#profile-photo" style="cursor:pointer;">
-                    <img src="~/svg/user.svg" class="profil-image img-thumbnail rounded-pill mb-2" style="width:150px; max-height:150px;" />
-                </a>
+                <a data-toggle="modal" data-target="#profile-photo" style="cursor:pointer;"> <img src="~/svg/user.svg" class="profil-image img-thumbnail rounded-pill mb-2" style="width:150px; max-height:150px;"/> </a>
             }
             else
             {
@@ -204,45 +146,34 @@
         </span>
     </div>
     <div>
+        <hr class="mb-1" />
         @if (IsAuthenticatedUserEqualModelUser)
         {
-            <div>
-                <hr />
-                <a class="btn btn-outline-purple font-weight-bold rounded-custom btn-block" href="/ihtiyac-olustur" style="font-size:16px">
-                    İhtiyaç oluştur
-                </a>
-            </div>
+            @:
+            <div>  <a class="btn btn-outline-purple font-weight-bold rounded-custom btn-block mb-2" href="/ihtiyac-olustur" style="font-size:16px"> İhtiyaç oluştur </a> </div>
         }
+        <ul class="nav nav-tabs font-weight-bold justify-content-center" id="tab" role="tablist">
+            <li class="nav-item"><a class="nav-link active" id="openneeds-tab" data-toggle="tab" href="#openneeds" role="tab" aria-controls="openneeds" aria-selected="true">Sergilenen</a></li>
+            <li class="nav-item"><a class="nav-link" id="completedneeds-tab" data-toggle="tab" href="#completedneeds" role="tab" aria-controls="completedneeds" aria-selected="false">Tamamlanmış</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="openneeds" role="tabpanel" aria-labelledby="openneeds-tab">@await Component.InvokeAsync("OpenNeeds", new { UserId = Model.Id })</div>
+            <div class="tab-pane fade" id="completedneeds" role="tabpanel" aria-labelledby="completedneeds-tab">@await Component.InvokeAsync("CompletedNeeds", new { UserId = Model.Id })</div>
+        </div>
+
     </div>
 </div>
 @if (IsAuthenticatedUserEqualModelUser)
 {
-    <hr class="mb-1" />
-    <div class="row">
-        <div class="col-auto">
-            <h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim</h4>
-        </div>
-        <div class="col">
-            <div class="float-right">
-                <a class="btn od rounded-custom p-0 font-weight-bold" data-toggle="modal" data-target="#AddEducation" style="cursor:pointer; font-size:18px"><i class="fas fa-plus"></i> Eğitim</a>
-            </div>
-        </div>
-
-        <div class="modal fade" id="AddEducation" tabindex="-1" role="dialog" aria-hidden="true">
-            @await Component.InvokeAsync("AddEducation")
-        </div>
-    </div>
+ <hr class="mb-1"/> <div class="row"> <div class="col-auto"> <h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim</h4> </div><div class="col"> <div class="float-right"> <a class="btn od rounded-custom p-0 font-weight-bold" data-toggle="modal" data-target="#AddEducation" style="cursor:pointer; font-size:18px"><i class="fas fa-plus"></i> Eğitim</a> </div></div><div class="modal fade" id="AddEducation" tabindex="-1" role="dialog" aria-hidden="true"> @await Component.InvokeAsync("AddEducation") </div></div>
 }
 else
 {
-    <hr class="mb-1" />
-    <h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim</h4>
+    <hr class="mb-1" /><h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim</h4>
 }
 @if (Model.UserEducation.Count == 0)
 {
-    <h5 class="text-black-50 text-center">
-        Eğitim bilgisi yok
-    </h5>
+    <h5 class="text-black-50 text-center">Eğitim bilgisi yok</h5>
 }
 else
 {
@@ -299,17 +230,10 @@ else
                                         <p>
                                             ...
                                         </p>
-
                                         @using (Html.BeginForm("SendEducationDocument", "Account", FormMethod.Post, new { enctype = "multipart/form-data" }))
                                         {
                                             @Html.Hidden("Id", item.Id)
-
-                                            <input type="file" id="file" name="file" required class="form-control mb-1">
-
-                                            <div class="modal-footer pb-0 pt-1">
-                                                <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
-                                                <input type="submit" value="Dökümanı yolla" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" />
-                                            </div>
+                                            <input type="file" id="file" name="file" required class="form-control mb-1"> <div class="modal-footer pb-0 pt-1"> <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button> <input type="submit" value="Dökümanı yolla" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" /> </div>
                                         }
                                     </div>
                                 </div>
@@ -323,20 +247,7 @@ else
                 }
                 @if (IsAuthenticatedUserEqualModelUser)
                 {
-
-                    <div class="row">
-                        <div class="col-auto" style="padding-right:3px">
-                            <a class="btn btn-outline-info rounded-custom" href="" data-toggle="modal" data-target="#education-edit-@item.Id" style="cursor:pointer;">
-                                <i class="far fa-edit mr-3 ml-3"></i>
-                            </a>
-                        </div>
-                        <div class="col-auto" style="padding-left:3px;">
-                            <a class="btn btn-outline-danger rounded-custom" href="" data-toggle="modal" data-target="#education-remove-@item.Id" style="cursor:pointer;">
-                                <i class="fas fa-trash-alt mr-3 ml-3"></i>
-                            </a>
-                        </div>
-                    </div>
-
+                    <div class="row"> <div class="col-auto" style="padding-right:3px"> <a class="btn btn-outline-info rounded-custom" href="" data-toggle="modal" data-target="#education-edit-@item.Id" style="cursor:pointer;"> <i class="far fa-edit mr-3 ml-3"></i> </a> </div><div class="col-auto" style="padding-left:3px;"> <a class="btn btn-outline-danger rounded-custom" href="" data-toggle="modal" data-target="#education-remove-@item.Id" style="cursor:pointer;"> <i class="fas fa-trash-alt mr-3 ml-3"></i> </a> </div></div>
                     <div class="modal fade" id="education-remove-@item.Id" tabindex="-1" role="dialog" aria-hidden="true">
                         <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
                             <div class="modal-content" style="background: transparent;">
@@ -347,11 +258,7 @@ else
                                     <hr />
                                     @using (Html.BeginForm("RemoveEducation", "Account", FormMethod.Post))
                                     {
-                                        <input type="hidden" id="Username" name="Username" value="@item.User.Username" />
-                                        <input type="hidden" id="Id" name="Id" value="@item.Id" />
-                                        <button type="submit" class="btn btn-danger btn-block font-weight-bold rounded-custom">
-                                            Kaldır
-                                        </button>
+                                        <input type="hidden" id="Username" name="Username" value="@item.User.Username"/> <input type="hidden" id="Id" name="Id" value="@item.Id"/> <button type="submit" class="btn btn-danger btn-block font-weight-bold rounded-custom"> Kaldır </button>
                                     }
                                     <hr />
                                     <button type="button" class="btn btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>

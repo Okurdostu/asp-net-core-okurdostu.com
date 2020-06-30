@@ -6,10 +6,7 @@
 <html lang="tr">
 <head>
     @Html.Raw(ViewBag.Meta)
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>@Html.Raw(ViewData["Title"])</title>
-    <meta name="keywords" content="okurdostu,kitap,akademik burs,kitap ihtiyaç,kitap burs,öğrenci,ihtiyaç,bağış,destekleme,üniversite,eğitim,burs,burslar,bursları,bursiyer,bursiyerler,kyk">
+    <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <title>@Html.Raw(ViewData["Title"])</title> <meta name="keywords" content="okurdostu,kitap,akademik burs,kitap ihtiyaç,kitap burs,öğrenci,ihtiyaç,bağış,destekleme,üniversite,eğitim,burs,burslar,bursları,bursiyer,bursiyerler,kyk"> 
     @if (ViewData["Description"] != null)
     {
         <meta name="description" content="@Html.Raw(ViewData["Description"])">
@@ -26,11 +23,7 @@
     {
         <meta name="twitter:card" content="summary_large_image" />
     }
-    <meta name="twitter:site" content="@Html.Raw("@okurdostucom")" />
-    <meta property="og:site_name" content="Okurdostu" />
-    <meta property="og:locale" content="tr_TR" />
-    <meta property="og:url" content="@Context.Request.GetDisplayUrl()" />
-    <meta property="og:title" content="@Html.Raw(ViewData["Title"])" />
+    <meta name="twitter:site" content="@Html.Raw("@okurdostucom")"/> <meta property="og:site_name" content="Okurdostu"/> <meta property="og:locale" content="tr_TR"/> <meta property="og:url" content="@Context.Request.GetDisplayUrl()"/> <meta property="og:title" content="@Html.Raw(ViewData["Title"])"/>
     @if (ViewData["Description"] != null)
     {
         <meta property="og:description" content="@Html.Raw(ViewData["Description"])" />
@@ -57,129 +50,29 @@
     {
         <meta property="og:type" content="website" />
     }
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
-    <link href="~/css/style-okurdostu.css" rel="stylesheet" />
-    <link href="~/css/bs-edited.css" rel="stylesheet" />
-    <link href="~/css/preloader.css" rel="stylesheet" />
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700" rel="stylesheet"> <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet"> <link href="~/css/style-okurdostu.css" rel="stylesheet"/> <link href="~/css/bs-edited.css" rel="stylesheet"/> <link href="~/css/preloader.css" rel="stylesheet"/> <script src="~/lib/jquery/dist/jquery.min.js"></script>
 </head>
 <body class="bg-white">
     <partial name="~/Views/Shared/_SpinnerPartial.cshtml" />
     <div class="container">
         @if (ViewData["AppMenu"]?.ToString() != "Hide")
         {
-            <div class="sidebar pb-0">
-                <div>
-                    <a class="@ViewData["BetaActiveClass"]" href="/beta"><i class="fas fa-home"></i> <span>Beta</span></a>
-                </div>
-                <div>
-                    <a class="@ViewData["SearchActiveClass"]" href="/arama" id="search"><i class="fas fa-search"></i> <span>Arama</span></a>
-                </div>
-                <div>
-                    <a class="@ViewData["NeedsActiveClass"]" href="/ihtiyaclar" id="ihtiyaclar"><i class="fas fa-layer-group"></i> <span>İhtiyaçlar</span></a>
-                </div>
-                <div>
-                    <a class="@ViewData["UniversityActiveClass"]" href="/universiteler" id="universiteler"><i class="fas fa-school"></i> <span>Üniversiteler</span></a>
-                </div>
-                @if (IsAuthenticated)
-                {
-                    @await Component.InvokeAsync("UserMenu")
-                }
-                else
-                {
-                    <div>
-                        <a href="/girisyap"><i class="fas fa-sign-in-alt"></i> <span>Giriş yap</span></a>
-                    </div>
-                }
-            </div>
+            <div class="sidebar pb-0"> <div> <a class="@ViewData["BetaActiveClass"]" href="/beta"><i class="fas fa-home"></i> <span>Beta</span></a> </div><div> <a class="@ViewData["SearchActiveClass"]" href="/arama" id="search"><i class="fas fa-search"></i> <span>Arama</span></a> </div><div> <a class="@ViewData["NeedsActiveClass"]" href="/ihtiyaclar" id="ihtiyaclar"><i class="fas fa-layer-group"></i> <span>İhtiyaçlar</span></a> </div><div> <a class="@ViewData["UniversityActiveClass"]" href="/universiteler" id="universiteler"><i class="fas fa-school"></i> <span>Üniversiteler</span></a> </div>@if (IsAuthenticated){@await Component.InvokeAsync("UserMenu")}else{<div> <a href="/girisyap"><i class="fas fa-sign-in-alt"></i> <span>Giriş yap</span></a> </div>}</div>
         }
         <div class="content">
             <div class="row">
                 <div class="pt-3 pr-2 pl-2 pb-3 col rounded-custom shadow rounded-custom">
                     @RenderBody()
                 </div>
-                @*<div class="pt-3 pr-2 pl-2 pb-3 col-xl-9 col-md-9 col rounded-custom shadow rounded-custom">
-                        @RenderBody()
-                    </div>
-                    <div class="col-xl-3 col-md-3 d-none d-md-block pl-1 pr-0">
-                        <div class="card">
-                            <div class="card-header">
-                                Featured
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item pl-1 pr-1">Cras justo odio</li>
-                                <li class="list-group-item pl-1 pr-1">Dapibus ac facilisis in</li>
-                                <li class="list-group-item pl-1 pr-1">Vestibulum at eros</li>
-                                <li class="list-group-item pl-1 pr-1">Vestibulum at eros</li>
-                            </ul>
-                        </div>
-                    </div>*@
             </div>
-            <div class="text-center mt-2 small">
-                <div>
-                    <a class="od font-weight-bold" href="/">Okurdostu</a>
-                </div>
-                <div>
-                    <div class="row">
-                        <div class="col">
-                            @if (Context.Request.Path.Value.ToLower() == "/beta")
-                            {
-                                <a class="font-weight-bold text-black-50" href="" data-toggle="modal" data-target="#Feedback" style="cursor:pointer;">Geri bildirim</a>
-                            }
-                            else
-                            {
-                                <a class="font-weight-bold text-black-50" href="/beta#Feedback">Geri bildirim</a>
-                            }
-                        </div>
-                        <div class="col">
-                            <a class="font-weight-bold text-black-50" href="/beta/kullanim">Nasıl kullanabilirim?</a>
-                        </div>
-                        <div class="col">
-                            <a class="font-weight-bold text-black-50" href="/SSS">SSS</a>
-                        </div>
-                    </div>
-                    <a class="font-weight-bold text-black-50 " href="/kullanici-sozlesmesi">Kullanıcı sözleşmesi</a>
-                    <br />
-                    <a class="font-weight-bold text-black-50 " href="/gizlilik-politikasi">Gizlilik politikası</a>
-                </div>
-            </div>
+ <div class="text-center mt-2 small"> <div> <a class="od font-weight-bold" href="/">Okurdostu</a> </div><div> <div class="row"> 
+     <div class="col"> @if (Context.Request.Path.Value.ToLower()=="/beta"){<a class="font-weight-bold text-black-50" href="" data-toggle="modal" data-target="#Feedback" style="cursor:pointer;">Geri bildirim</a>}else{<a class="font-weight-bold text-black-50" href="/beta#Feedback">Geri bildirim</a>}</div><div class="col"> <a class="font-weight-bold text-black-50" href="/beta/kullanim">Nasıl kullanabilirim?</a> </div><div class="col"> <a class="font-weight-bold text-black-50" href="/SSS">SSS</a> </div></div><a class="font-weight-bold text-black-50 " href="/kullanici-sozlesmesi">Kullanıcı sözleşmesi</a> <br/> <a class="font-weight-bold text-black-50 " href="/gizlilik-politikasi">Gizlilik politikası</a> </div></div>
         </div>
     </div>
     @if (IsAuthenticated)
     {
-        <div class="modal fade" id="LogoutModal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-                <div class="modal-content" style="background: transparent;">
-                    <div class="modal-body bg-light" style="border-radius: 25px;">
-                        <p class="text-center font-weight-bold text-black-50">
-                            Çıkış mı yapmak istiyorsunuz?
-                        </p>
-                        <hr />
-                        <div>
-                            @using (Html.BeginForm("Index", "Logout", FormMethod.Post))
-                            {
-                                <button type="submit" class="btn btn-secondary btn-block font-weight-bold rounded-custom">
-                                    Evet, çıkış yap
-                                </button>
-                            }
-                            <hr class="mb-2 mt-2" />
-                            <button type="button" class="btn  btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="modal fade" id="LogoutModal" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-sm modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light" style="border-radius: 25px;"> <p class="text-center font-weight-bold text-black-50"> Çıkış mı yapmak istiyorsunuz? </p><hr/> <div> @using (Html.BeginForm("Index", "Logout", FormMethod.Post)){<button type="submit" class="btn btn-secondary btn-block font-weight-bold rounded-custom"> Evet, çıkış yap </button>}<hr class="mb-2 mt-2"/> <button type="button" class="btn btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button> </div></div></div></div></div>
     }
-    <script async src="~/js/bootstrap.min.js">
-    </script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-13125894-3"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-
-        gtag('config', 'UA-13125894-3');
-    </script>
+ <script async src="~/js/bootstrap.min.js"> </script> <script async src="https://www.googletagmanager.com/gtag/js?id=UA-13125894-3"></script> <script>window.dataLayer=window.dataLayer || []; function gtag(){dataLayer.push(arguments);}gtag('js', new Date()); gtag('config', 'UA-13125894-3'); </script>
 </body>
 </html>

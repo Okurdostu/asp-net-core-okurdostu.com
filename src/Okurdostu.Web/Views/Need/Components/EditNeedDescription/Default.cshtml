@@ -3,15 +3,7 @@
 {
     @Html.HiddenFor(x => x.Id)
     <div class="form-horizontal h-100">
-        <div class="form-group h-100">
-            <div class="h-100">
-                <textarea class="form-control" style="height: 65vh"  asp-for="Description" autocomplete="off"></textarea>
-                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger font-weight-bold" })
-            </div>
-        </div>
-        <div class="modal-footer pb-0 pt-1">
-            <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
-            <input type="submit" value="Düzenle" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" />
-        </div>
+        <div class="form-group h-100"> <div class="h-100"> <textarea class="form-control" style="height: 65vh" asp-for="Description" autocomplete="off"></textarea> @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger font-weight-bold" }) </div></div>
+        <div class="modal-footer pb-0 pt-1"> <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button> <input type="submit" value="Düzenle" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" /> </div>
     </div>
 }

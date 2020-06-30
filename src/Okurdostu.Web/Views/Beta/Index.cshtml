@@ -8,9 +8,5 @@
 }
 <div> <a class="btn btn-outline-purple font-weight-bold rounded-custom btn-block p-1" href="/ihtiyac-olustur" style="font-size:20px"> İhtiyaç oluştur </a></div><div class="text-black-50 text-center"> <h1><span class="od">Okurdostu</span> Beta</h1> <div class="font-weight-bold"> <p> Beta sürümü temel olarak sistemin nasıl işleyeceğini öğrencilerin ve onları destekleyecek, bağış yapacak okurdostlarının daha iyi anlaması ve bir geliştirici olarak sistemin işleyişini analiz edip, eklenmesi gereken özellikler veya giderilmesi gereken sorunlar hakkında bilgi toplamak için çıkarılmış bir sürümdür. </p><p> Bu sürüm ne yazık ki şirketleşme öncesi yayınlandığı için, bir ödeme yöntemi eklemek yasal olmadığı için, sistem üzerinden bir öğrenci ihtiyacını desteklemek, bağış yapmak mümkün olmayacak. </p></div></div><div> <a class="od font-weight-bold btn-block text-center fontrem1" href="/beta/kullanim"> Okurdostunu nasıl kullanabilirim? </a></div><div class="modal fade" id="Feedback" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-lg modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light text-black-50" style="border-radius: 25px;"> <h3 class="font-weight-bold text-center text-black-50"> Geri bildirim </h3> <div class="text-center"> <span class="font-weight-bold small text-center p-0"> Buradan bize soru sorabilir, Okurdostu.com'da ki bir hatayı bildirebilir veya her ne istiyorsanız yazabilirsin, bilin ki kesinlikle okuyacağız. </span> </div><hr /> @await Component.InvokeAsync("Feedback") </div></div></div></div>
 <script>
-    $(document).ready(function () {
-        if (window.location.href.indexOf('#Feedback') != -1) {
-            $('#Feedback').modal('show');
-        }
-    });
+    $(document).ready(function () { -1 != window.location.href.indexOf("#Feedback") && $("#Feedback").modal("show") });
 </script>
