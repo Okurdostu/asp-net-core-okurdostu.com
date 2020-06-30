@@ -1,0 +1,21 @@
+﻿@model Okurdostu.Web.Models.ProfileModel
+
+@using (Html.BeginForm("GetConfirmationToEmailChange", "Account", FormMethod.Post))
+{
+    <div class="form-horizontal">
+        <span class="control-label pl-2 pr-0 font-weight-bold text-black-50">Onay parolası</span>
+        @Html.EditorFor(model => model.ConfirmPassword, new { htmlAttributes = new { @class = "form-control font-weight bold", @autocomplete = "off" } })
+        @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger font-weight-bold" })
+        <div class="form-group">
+            <span class="control-label pl-2 pr-0 font-weight-bold text-black-50">Şuan ki email adresin</span>
+            <input class="form-control font-weight bold" type="text" disabled="disabled" asp-for="Email" />
+        </div>
+        <p class="font-weight-bold text-center text-black-50">
+            Şuanki parolanızı girerek E-mail adresinizi değiştirme işlemi başlatabilirsiniz
+        </p>
+        <div class="modal-footer pb-0 pt-1">
+            <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
+            <input type="submit" value="Başlat" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" />
+        </div>
+    </div>
+}

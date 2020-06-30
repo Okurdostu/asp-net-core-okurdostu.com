@@ -1,0 +1,34 @@
+﻿@page
+@using Okurdostu.Web.Extensions
+@model Okurdostu.Web.Pages.Account.PasswordReset.SendMailModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    string IdType = TempData.Get<string>("IdentificationType");
+}
+@{
+    ViewData["Title"] = "Parola sıfırlama"; ViewData["AppMenu"] = "Hide"; Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
+}
+<h4 class="text-black-50 text-center text-md-left">Okurdostu hesabınızı bulduk</h4>
+@if (IdType == "Username")
+{
+    <partial name="~/Pages/Account/PasswordReset/_PartialProfile.cshtml" model="@Model._User" />
+}
+@if (IdType == "Email")
+{
+    <p class="font-weight-bold text-black-50 mt-2">
+        E-mail: @Model._User.Email <br />
+    </p>
+}
+else
+{
+    <p class="font-weight-bold text-black-50 mt-2">
+        E-mail: @Model._User.Email.StarsToEmail() <br />
+    </p>
+}
+<partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
+<form method="post">
+    <label class="font-weight-bold text-black-50 mb-0">
+        E-mail adresime parola sıfırlama isteği
+        <input type="submit" value="Gönder" class="p-3 btn-purple rounded-custom font-weight-bold" />
+    </label>
+</form>

@@ -37,7 +37,7 @@
             </span>
             @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control rounded-pill font-weight-bold text-black-50 mt-1", @placeholder = "Parola" } })
             <div class="mt-1 mb-1 ml-1 text-left">
-                <a class="od font-weight-bold" href="/account/beginpasswordreset">Parolamı hatırlamıyorum</a>
+                <a class="od font-weight-bold" href="/account/passwordreset">Parolamı hatırlamıyorum</a>
             </div>
             @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger font-weight-bold" })
         </div>
