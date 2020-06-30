@@ -70,14 +70,15 @@ namespace Okurdostu.Web.Controllers
             else
             {
                 TempData["ProfileMessage"] = "Kimliğinizi doğrulayamadık";
+                return Redirect("/" + AuthUser.Username);
             }
 
-            return Redirect("/" + AuthUser.Username);
         }
 
         [Route("~/account/changeemail")]
         public IActionResult CreateEmailChangeRequest()
         {
+            //EmailChangingUserId is coming from GetConfirmationToEmailChange IActionResult.
             var UserId = TempData.Get<string>("EmailChangingUserId");
 
             if (UserId != null)
@@ -88,6 +89,7 @@ namespace Okurdostu.Web.Controllers
             {
                 return Unauthorized();
             }
+
         }
 
         [HttpPost, ValidateAntiForgeryToken]
@@ -96,23 +98,27 @@ namespace Okurdostu.Web.Controllers
         {
             Model.Email = Model.Email.ToLower();
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-            var UniqueEmailControl = await Context.User.FirstOrDefaultAsync(x => x.Email == Model.Email);
 
-            if (UniqueEmailControl == null)//Değiştirilmesini istediği email adresi veritabanında var mı?
+            bool IsThereAnyUserWithThatEmailAdress = false;
+            if (await Context.User.FirstOrDefaultAsync(x => x.Email == Model.Email) != null)
+                IsThereAnyUserWithThatEmailAdress = true;
+
+            if (!IsThereAnyUserWithThatEmailAdress)
             {
-
-                if (AuthUser.Email != Model.Email) //değiştirilmesi için girdiği email şuan ki ile eş değilse devam et
+                if (AuthUser.Email != Model.Email)
                 {
+
                     var Email = new OkurdostuEmail(null)
                     {
                         SenderMail = "noreply@okurdostu.com",
                         SenderName = "Okurdostu"
                     };
 
-                    var RequestWithSameEmail = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.NewEmail == Model.Email && x.UserId == AuthUser.Id && !x.IsUsed);
+                    var RequestWithSameEmailandUser = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.NewEmail == Model.Email && x.UserId == AuthUser.Id && !x.IsUsed);
 
-                    if (RequestWithSameEmail == null) //authuser önceden aynı mail ile ve kullanılmamış e-mail değiştirme isteğinde bulunduysa yeni bir veri oluşturmuyoruz eski verilerle mail yolluyoruz.
+                    if (RequestWithSameEmailandUser == null)
                     {
+
                         var UserEmailConfirmation = new UserEmailConfirmation() //UserEmailConfirmation'u oluştur
                         {
                             UserId = AuthUser.Id,
@@ -123,28 +129,30 @@ namespace Okurdostu.Web.Controllers
                             //onay mailini de yeni e-maile yolladığımız için e-mail adresini onaylayacak.
                             //yani aslında buralarda e-mailini değiştirmiyoruz confirmemail aşamasında e-mail adresi değişiyor.
                         };
+
                         await Context.AddAsync(UserEmailConfirmation);
                         var result = await Context.SaveChangesAsync();
-                        if (result > 0) //veritabanına kaydet, kaydolduysa devam et
+                        if (result > 0)
                         {
-                            //Email.Send(Email.NewUserMail(_User.FullName, UserEmailConfirmation.NewEmail, UserEmailConfirmation.GUID));
+                            Email.Send(Email.EmailAddressChangeMail(AuthUser.FullName, UserEmailConfirmation.NewEmail, UserEmailConfirmation.GUID));
                             TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + UserEmailConfirmation.NewEmail + ") onaylamanız için bir e-mail gönderildi";
                         }
                         else
                         {
                             TempData["ProfileMessage"] = "Bir değişiklik yapılamadı";
                         }
+
                     }
                     else
                     {
-                        //Email.Send(Email.NewUserMail(_User.FullName, __.NewEmail, UserEmailConfirmation.GUID));
-                        TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + RequestWithSameEmail.NewEmail + ") onaylamanız için bir e-mail gönderildi";
+                        Email.Send(Email.EmailAddressChangeMail(AuthUser.FullName, RequestWithSameEmailandUser.NewEmail, RequestWithSameEmailandUser.GUID));
+                        TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + RequestWithSameEmailandUser.NewEmail + ") onaylamanız için bir e-mail gönderildi";
                     }
 
                 }
                 else
                 {
-                    TempData["ProfileMessage"] = "Şuan ki e-mail adresinile aynı değeri giriyorsunuz";
+                    TempData["ProfileMessage"] = "Şuan ki e-mail adresiniz ile aynı değeri giriyorsunuz";
                 }
 
             }
@@ -160,34 +168,45 @@ namespace Okurdostu.Web.Controllers
         public async Task ConfirmEmail(Guid guid)
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-            var Key = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => !x.IsUsed && x.UserId == AuthUser.Id && x.GUID == guid);
+            var ConfirmationRequest = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => !x.IsUsed && x.UserId == AuthUser.Id && x.GUID == guid);
 
-            if (Key != null)
+            if (ConfirmationRequest != null)
             {
-                if (Key.NewEmail != null) //yeni bir user onaylaması değilde e-mail değiştirme isteği ile geldiyse.
+                string Email = AuthUser.Email;
+                bool EmailConfirmState = AuthUser.IsEmailConfirmed;
+
+                if (ConfirmationRequest.NewEmail != null)
                 {
-                    AuthUser.Email = Key.NewEmail;
-                    TempData["ProfileMessage"] = "Yeni e-mail adresiniz hesabınızla eşleşti";
+                    //yeni bir user onaylaması değilde e-mail değiştirme isteği ile geldiyse.
+                    AuthUser.Email = ConfirmationRequest.NewEmail;
+                    TempData["ProfileMessage"] = "Yeni e-mail adresiniz hesabınıza eşleştirildi";
                 }
                 try
                 {
                     AuthUser.IsEmailConfirmed = true;
-                    Key.IsUsed = true;
-                    Key.UsedOn = DateTime.Now;
+                    ConfirmationRequest.IsUsed = true;
+                    ConfirmationRequest.UsedOn = DateTime.Now;
                     if (TempData["ProfileMessage"] != null)
                     {
                         TempData["ProfileMessage"] += "<br/>E-mail adresiniz onaylandı, teşekkürler";
                     }
                     else
                     {
-                        TempData["ProfileMessage"] += "E-mail adresiniz onaylandı, teşekkürler";
+                        TempData["ProfileMessage"] = "E-mail adresiniz onaylandı, teşekkürler";
                     }
                     await Context.SaveChangesAsync();
                 }
                 catch (Exception e)
                 {
                     if (e.InnerException != null && e.InnerException.Message.Contains("Unique_Key_Email"))
+                    {
                         TempData["ProfileMessage"] = "Değiştirme talebinde bulunduğunuz e-mail adresini kullanamazsınız, e-mail değiştirme isteğiniz geçersiz kılındı";
+                        AuthUser.Email = Email;
+                        AuthUser.IsEmailConfirmed = EmailConfirmState;
+                        ConfirmationRequest.IsUsed = true;
+                        ConfirmationRequest.UsedOn = DateTime.Now;
+                        await Context.SaveChangesAsync();
+                    }
                 }
             }
             else
