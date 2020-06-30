@@ -1,0 +1,14 @@
+﻿@page
+@using Okurdostu.Web.Extensions
+@{
+    ViewData["Title"] = "Parola sıfırlama"; ViewData["AppMenu"] = "Hide"; Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
+    Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
+}
+@{
+    string resetPasswordEmail = TempData.Get<string>("resetPasswordEmail");
+    if (resetPasswordEmail == null)
+    {
+        Response.Redirect("/");
+    }
+}
+<div class="text-center"><img src="~/svg/mailsent.svg" style="width:128px;"></div><p class="font-weight-bold text-black-50 mb-0 mt-3 text-center">@resetPasswordEmail adresine parolanızı sıfırlamanız için bir bağlantı gönderildi.<br /><br />Maili gelen kutunuzda göremezseniz, spam, sosyal veya diğer klasörlerinizi kontrol ediniz.</p>

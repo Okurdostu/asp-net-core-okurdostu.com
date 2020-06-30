@@ -25,6 +25,7 @@ namespace Okurdostu.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddRazorPages();
             services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("Email").Get<EmailConfiguration>());
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -32,12 +33,13 @@ namespace Okurdostu.Web
                 {
                     options.Cookie.Name = "okurdostu-authentication";
                     options.LoginPath = "/girisyap";
-                    
+
                     options.ExpireTimeSpan = System.TimeSpan.FromDays(1);
                     options.SlidingExpiration = true;
                     options.Cookie.HttpOnly = true;
                 });
 
+            services.AddMemoryCache();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddControllersWithViews();
             services.AddDbContext<OkurdostuContext>(option => option.UseSqlServer(Configuration.GetConnectionString("OkurdostuConnectionString")));
@@ -68,6 +70,8 @@ namespace Okurdostu.Web
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapRazorPages();
+
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}");
