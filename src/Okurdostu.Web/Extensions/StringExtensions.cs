@@ -138,6 +138,7 @@ namespace Okurdostu.Web.Extensions
 
             //7;    örnek olarak 1500,00 gibi bir price geldiği zaman
             //      1.500,00 olarak döndürmek için kullanılıyor
+            price = price.Replace(".", ",");
 
             string DeletedLast2Digit = price.Substring(0, price.Length - 2);
             return DeletedLast2Digit.Length >= 7 ? AddDot(DeletedLast2Digit) : DeletedLast2Digit;
@@ -165,7 +166,7 @@ namespace Okurdostu.Web.Extensions
             char[] emailArray = email.ToCharArray();
             for (int i = 2; i < emailArray.Length - 3; i++)
             {
-                if (emailArray[i] != '@' && emailArray[i - 1] != '@' )
+                if (emailArray[i] != '@' && emailArray[i - 1] != '@')
                 {
                     emailArray[i] = '*';
                 }

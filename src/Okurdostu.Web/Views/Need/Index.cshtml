@@ -96,13 +96,13 @@ else
                         </div>
                         <h6 class="text-center mt-0">
                             <span class="font-weight-bold">
-                                @item.TotalCollectedMoney.ToString().NormalizePrice().Replace(".", ",") &#8378
+                                @item.TotalCollectedMoney?.ToString().NormalizePrice() &#8378
                             </span>
                             <span class="small text-black-50 font-weight-bold">
                                 toplandı, hedef
                             </span>
                             <span class="font-weight-bold">
-                                @item.TotalCharge.ToString().NormalizePrice().Replace(".", ",") &#8378
+                                @item.TotalCharge?.ToString().NormalizePrice() &#8378
                             </span>
                         </h6>
                         <div class="mb-2 mt-2 mr-3 ml-3">
