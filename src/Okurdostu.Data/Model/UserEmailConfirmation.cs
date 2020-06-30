@@ -14,6 +14,7 @@ namespace Okurdostu.Data.Model
 
         [Key]
         public Guid GUID { get; private set; }
+        public string NewEmail { get; set; }
         public long UserId { get; set; }
         public bool IsUsed { get; set; }
         public DateTime? CreatedOn { get; private set; }

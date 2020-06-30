@@ -1,0 +1,19 @@
+﻿@model ProfileModel
+@{
+    ViewData["Title"] = "E-mail değiştirme isteği"; Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
+}
+@using (Html.BeginForm(FormMethod.Post, new { @class = "text-left" }))
+{
+    @Html.Hidden("ReturnUrl")
+    <div class="form-group mb-2">
+        <span class="text-black-50 font-weight-bold ml-2">
+            Yeni e-mail adresi
+        </span>
+        @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control font-weight-bold text-black-50", @placeholder = "Yeni e-mail adresi", autocomplete = "username" } })
+        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger font-weight-bold" })
+    </div>
+    <center><span class="font-weight-bold justify-content-center text-black-50">Giriş yaptığınız yeni e-mail adresine bir mail yollanacak ve sizden onay isteyeceğiz, onaylayana kadar eski e-mail adresinizi kullanmaya devam edeceksiniz.</span></center>
+    <div class="form-group">
+        <input type="submit" value="Değiştir" class="btn-purple btn-block" />
+    </div>
+}

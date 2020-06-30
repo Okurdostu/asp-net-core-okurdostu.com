@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Okurdostu.Data;
 using Okurdostu.Data.Model;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
@@ -57,45 +58,141 @@ namespace Okurdostu.Web.Controllers
         #endregion
 
         #region account
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> GetConfirmationToEmailChange(ProfileModel Model)
+        {
 
-        //  email editleme:
+            if (await ConfirmIdentityWithPassword(Model.ConfirmPassword))
+            {
+                TempData.Set("EmailChangingUserId", AuthUser.Id.ToString());
+                return Redirect("/account/changeemail");
+            }
+            else
+            {
+                TempData["ProfileMessage"] = "Kimliğinizi doğrulayamadık";
+            }
 
-        //  1.  Guid ile bir key oluşturulacak ve kullanıcı ile bu key eşleştirilip veritabanına alınacak
-        //  2.  Keye ulaşabileceği bir link o an kullandığı e-mail adresine yollanacak
-        //  3.  O keyli link kullanılarak yeni bir e-mail adresi girişi yapabilecek
-        //  4.  Yeni girişin yapıldığı e-mail ilk başta veritabanında eşleştirdiğimiz(key ve kullanıcı) kullanıcıya atanıp: yeni e-mail için onay istenecek
+            return Redirect("/" + AuthUser.Username);
+        }
+
+        [Route("~/account/changeemail")]
+        public IActionResult CreateEmailChangeRequest()
+        {
+            var UserId = TempData.Get<string>("EmailChangingUserId");
+
+            if (UserId != null)
+            {
+                return View();
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        [Route("~/account/changeemail")]
+        public async Task<IActionResult> CreateEmailChangeRequest(ProfileModel Model)
+        {
+            Model.Email = Model.Email.ToLower();
+            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+            var UniqueEmailControl = await Context.User.FirstOrDefaultAsync(x => x.Email == Model.Email);
+
+            if (UniqueEmailControl == null)//Değiştirilmesini istediği email adresi veritabanında var mı?
+            {
+
+                if (AuthUser.Email != Model.Email) //değiştirilmesi için girdiği email şuan ki ile eş değilse devam et
+                {
+                    var Email = new OkurdostuEmail(null)
+                    {
+                        SenderMail = "noreply@okurdostu.com",
+                        SenderName = "Okurdostu"
+                    };
+
+                    var RequestWithSameEmail = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.NewEmail == Model.Email && x.UserId == AuthUser.Id && !x.IsUsed);
+
+                    if (RequestWithSameEmail == null) //authuser önceden aynı mail ile ve kullanılmamış e-mail değiştirme isteğinde bulunduysa yeni bir veri oluşturmuyoruz eski verilerle mail yolluyoruz.
+                    {
+                        var UserEmailConfirmation = new UserEmailConfirmation() //UserEmailConfirmation'u oluştur
+                        {
+                            UserId = AuthUser.Id,
+                            NewEmail = Model.Email, //değiştirilmesini istediği email newemail olarak kolona al
+
+                            //bu veri kolonu emailconfirmation/guid ile geldiği zaman
+                            //newemail kolonu yakalanıp veri varsa kullanıcıya direkt olarak o e-maili atayıp
+                            //onay mailini de yeni e-maile yolladığımız için e-mail adresini onaylayacak.
+                            //yani aslında buralarda e-mailini değiştirmiyoruz confirmemail aşamasında e-mail adresi değişiyor.
+                        };
+                        await Context.AddAsync(UserEmailConfirmation);
+                        var result = await Context.SaveChangesAsync();
+                        if (result > 0) //veritabanına kaydet, kaydolduysa devam et
+                        {
+                            //Email.Send(Email.NewUserMail(_User.FullName, UserEmailConfirmation.NewEmail, UserEmailConfirmation.GUID));
+                            TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + UserEmailConfirmation.NewEmail + ") onaylamanız için bir e-mail gönderildi";
+                        }
+                        else
+                        {
+                            TempData["ProfileMessage"] = "Bir değişiklik yapılamadı";
+                        }
+                    }
+                    else
+                    {
+                        //Email.Send(Email.NewUserMail(_User.FullName, __.NewEmail, UserEmailConfirmation.GUID));
+                        TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + RequestWithSameEmail.NewEmail + ") onaylamanız için bir e-mail gönderildi";
+                    }
+
+                }
+                else
+                {
+                    TempData["ProfileMessage"] = "Şuan ki e-mail adresinile aynı değeri giriyorsunuz";
+                }
+
+            }
+            else
+            {
+                TempData["ProfileMessage"] = "Bu email adresini kullanamazsınız";
+            }
+
+            return Redirect("/" + AuthUser.Username);
+        }
 
         [Route("~/confirmemail/{guid}")]
         public async Task ConfirmEmail(Guid guid)
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-            if (!AuthUser.IsEmailConfirmed)
+            var Key = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => !x.IsUsed && x.UserId == AuthUser.Id && x.GUID == guid);
+
+            if (Key != null)
             {
-                var Key = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => !x.IsUsed && x.UserId == AuthUser.Id && x.GUID == guid);
-                if (Key != null)
+                if (Key.NewEmail != null) //yeni bir user onaylaması değilde e-mail değiştirme isteği ile geldiyse.
+                {
+                    AuthUser.Email = Key.NewEmail;
+                    TempData["ProfileMessage"] = "Yeni e-mail adresiniz hesabınızla eşleşti";
+                }
+                try
                 {
                     AuthUser.IsEmailConfirmed = true;
-                    var result = await Context.SaveChangesAsync();
-                    if (result > 0)
+                    Key.IsUsed = true;
+                    Key.UsedOn = DateTime.Now;
+                    if (TempData["ProfileMessage"] != null)
                     {
-                        Key.IsUsed = true;
-                        Key.UsedOn = DateTime.Now;
-                        TempData["ProfileMessage"] = "E-mail adresiniz onaylandı, teşekkürler";
-                        await Context.SaveChangesAsync();
+                        TempData["ProfileMessage"] += "<br/>E-mail adresiniz onaylandı, teşekkürler";
                     }
                     else
                     {
-                        TempData["ProfileMessage"] = "E-mail adresiniz onaylayamadık, bu bağlantıyı başka zaman bir daha kullanabilirsiniz";
+                        TempData["ProfileMessage"] += "E-mail adresiniz onaylandı, teşekkürler";
                     }
+                    await Context.SaveChangesAsync();
                 }
-                else
+                catch (Exception e)
                 {
-                    TempData["ProfileMessage"] = "Sanırım bir hata yapıyorsunuz, size gönderdiğimiz bağlantıyı kullanın";
+                    if (e.InnerException != null && e.InnerException.Message.Contains("Unique_Key_Email"))
+                        TempData["ProfileMessage"] = "Değiştirme talebinde bulunduğunuz e-mail adresini kullanamazsınız, e-mail değiştirme isteğiniz geçersiz kılındı";
                 }
             }
             else
             {
-                TempData["ProfileMessage"] = "Bunu yapmaya ihtiyacınız yok, e-mail adresiniz zaten onaylanmış";
+                TempData["ProfileMessage"] = "Sanırım bir hata yapıyorsunuz, size gönderdiğimiz bağlantıyı kullanın";
             }
 
             Response.Redirect("/" + AuthUser.Username);
