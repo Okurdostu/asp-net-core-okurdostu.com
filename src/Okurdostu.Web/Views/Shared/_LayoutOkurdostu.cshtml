@@ -65,13 +65,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
 </head>
 <body class="bg-white">
-    <div class="spinner-form" id="spinner-form" style="display:none;">
-        <div class="spinner">
-            <div class="bounce1"></div>
-            <div class="bounce2"></div>
-            <div class="bounce3"></div>
-        </div>
-    </div>
+    <partial name="~/Views/Shared/_SpinnerPartial.cshtml" />
     <div class="container">
         @if (ViewData["AppMenu"]?.ToString() != "Hide")
         {
@@ -106,21 +100,21 @@
                     @RenderBody()
                 </div>
                 @*<div class="pt-3 pr-2 pl-2 pb-3 col-xl-9 col-md-9 col rounded-custom shadow rounded-custom">
-                    @RenderBody()
-                </div>
-                <div class="col-xl-3 col-md-3 d-none d-md-block pl-1 pr-0">
-                    <div class="card">
-                        <div class="card-header">
-                            Featured
-                        </div>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item pl-1 pr-1">Cras justo odio</li>
-                            <li class="list-group-item pl-1 pr-1">Dapibus ac facilisis in</li>
-                            <li class="list-group-item pl-1 pr-1">Vestibulum at eros</li>
-                            <li class="list-group-item pl-1 pr-1">Vestibulum at eros</li>
-                        </ul>
+                        @RenderBody()
                     </div>
-                </div>*@
+                    <div class="col-xl-3 col-md-3 d-none d-md-block pl-1 pr-0">
+                        <div class="card">
+                            <div class="card-header">
+                                Featured
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item pl-1 pr-1">Cras justo odio</li>
+                                <li class="list-group-item pl-1 pr-1">Dapibus ac facilisis in</li>
+                                <li class="list-group-item pl-1 pr-1">Vestibulum at eros</li>
+                                <li class="list-group-item pl-1 pr-1">Vestibulum at eros</li>
+                            </ul>
+                        </div>
+                    </div>*@
             </div>
             <div class="text-center mt-2 small">
                 <div>
