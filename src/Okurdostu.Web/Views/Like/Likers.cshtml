@@ -28,20 +28,11 @@
                     </a>
                 }
             </div>
-            <div class="col p-0">
-                <a class="od text-break" href="/@item.Username">
-                    <h6 style="font-size:15px !important">
-                        @item.FullName <br />
-                        <span class="text-black-50">(@Html.Raw("@" + item.Username))</span> <br />
-                    </h6>
-                </a>
-            </div>
+            <div class="col p-0"> <a class="od text-break" href="/@item.Username"> <h6 style="font-size:15px !important"> @item.FullName <br /> <span class="text-black-50">(@Html.Raw("@" + item.Username))</span> <br /> </h6> </a> </div>
         </div>
     }
 }
 else
 {
-    <div class="font-weight-bold text-black-50 text-center pt-4 pb-2">
-        <p>Bu ihtiyacı beğenen kimse yok</p>
-    </div>
+    <div class="font-weight-bold text-black-50 text-center pt-4 pb-2"> <p>Bu kampanyayı beğenen kimse yok</p></div>
 }

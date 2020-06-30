@@ -10,38 +10,7 @@
 <!--
    bonsai.css
 -->
-<style>
-    [style*="--levitate:"] {
-        box-shadow: 0 calc(var(--levitate) * .5px) calc(var(--levitate) * .6px) rgba(0,0,0,calc(var(--levitate) * .013)),0 calc(var(--levitate) * 1px) calc(var(--levitate) * 1.2px) rgba(0,0,0,calc(var(--levitate) * .013)),0 calc(var(--levitate) * 2px) calc(var(--levitate) * 2.4px) rgba(0,0,0,calc(var(--levitate) * .013)),0 calc(var(--levitate) * 4px) calc(var(--levitate) * 4.4px) rgba(0,0,0,calc(var(--levitate) * .013));
-        transform: translateY(calc(var(--levitate) * -1.2px))
-    }
-
-    [style*="--levitate-hvr:"] {
-        transition: all .4s ease
-    }
-
-        [style*="--levitate-hvr:"]:focus, [style*="--levitate-hvr:"]:hover {
-            box-shadow: 0 calc(var(--levitate-hvr) * .5px) calc(var(--levitate-hvr) * .6px) #6c63ff,0 calc(var(--levitate-hvr) * 1px) calc(var(--levitate-hvr) * 1.2px) #6c63ff,0 calc(var(--levitate-hvr) * 2px) calc(var(--levitate-hvr) * 2.4px) #6c63ff,0 calc(var(--levitate-hvr) * 4px) calc(var(--levitate-hvr) * 4.4px) rgba(0,0,0,calc(var(--levitate-hvr) * .013));
-            transform: translateY(calc(var(--levitate-hvr) * -1.2px))
-        }
-</style>
-@{
-    //bu sayfa aşağıda ki türde linklerle gelir:
-
-    // -/ihtiyaclar :                                               bütün ihtiyaçlar
-    // -/ihtiyaclar/universite-namefriendly :                       üniversitenin öğrencilerinin bütün ihtiyaçları
-    // -/ihtiyaclar/{herhangi bir arama} :                          filtrelenmiş texte göre ihtiyaçlar
-
-
-    // -/ihtiyaclar/universite-namefriendly/jquery
-    //jquery ile bu sayfayı üniversite sayfasında ki ihtiyaçlar sekmesine çağırıyorum ve
-    //parametreye jquery yolladığım zaman - TempData["Jquery"]'nın içine 'Yes' diye bir değer atıyorum,
-    //ve sayfanın designi buna ve bununla bağlantılı isRequestComingFromUniversityPage'e göre değişiyor.
-
-    //aspnetmvc'de renderaction kullanırken sayfanın hangi url tarafından çağrıldığını kontrol ediyordum designi ona göre ayarlıyordum
-    //buda bir nevi aynı bug olacağını sanmıyorum ama yine de kontrol et.
-}
-
+<style>[style*="--levitate:"]{box-shadow: 0 calc(var(--levitate) * .5px) calc(var(--levitate) * .6px) rgba(0,0,0,calc(var(--levitate) * .013)),0 calc(var(--levitate) * 1px) calc(var(--levitate) * 1.2px) rgba(0,0,0,calc(var(--levitate) * .013)),0 calc(var(--levitate) * 2px) calc(var(--levitate) * 2.4px) rgba(0,0,0,calc(var(--levitate) * .013)),0 calc(var(--levitate) * 4px) calc(var(--levitate) * 4.4px) rgba(0,0,0,calc(var(--levitate) * .013)); transform: translateY(calc(var(--levitate) * -1.2px))}[style*="--levitate-hvr:"]{transition: all .4s ease}[style*="--levitate-hvr:"]:focus, [style*="--levitate-hvr:"]:hover{box-shadow: 0 calc(var(--levitate-hvr) * .5px) calc(var(--levitate-hvr) * .6px) #6c63ff,0 calc(var(--levitate-hvr) * 1px) calc(var(--levitate-hvr) * 1.2px) #6c63ff,0 calc(var(--levitate-hvr) * 2px) calc(var(--levitate-hvr) * 2.4px) #6c63ff,0 calc(var(--levitate-hvr) * 4px) calc(var(--levitate-hvr) * 4.4px) rgba(0,0,0,calc(var(--levitate-hvr) * .013)); transform: translateY(calc(var(--levitate-hvr) * -1.2px))}</style>
 @if (TempData["Jquery"] != null && TempData["Jquery"].ToString() == "Yes")
 {
     isRequestComingFromUniversityPage = true;

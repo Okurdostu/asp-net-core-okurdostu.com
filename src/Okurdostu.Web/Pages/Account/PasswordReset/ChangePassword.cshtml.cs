@@ -88,7 +88,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                             {
                                 TempData["ChangePasswordMessage"] = "Þifrenizi deðiþtiremedik, lütfen tekrar deneyin<br />" +
                                     "Þuan ki þifreniz ile ayný þifreyi giriyor olabilirsiniz";
-                                return Redirect("~/account/resetpassword/" + guid.ToString());
+                                return Redirect("~/account/passwordreset/changepassword/" + _UserPaswordReset.GUID);
                             }
                         }
                     }
