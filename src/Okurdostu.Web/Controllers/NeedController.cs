@@ -36,7 +36,7 @@ namespace Okurdostu.Web.Controllers
                 .ThenInclude(x => x.University).Where(x => x.IsConfirmed == true && x.IsRemoved != true)
                 .OrderByDescending(x => x.CreatedOn)
                 .ToListAsync();
-            NeedDefaultList = NeedDefaultList.OrderByDescending(x => x.percentageCompleted).ToList();
+            NeedDefaultList = NeedDefaultList.OrderByDescending(x => x.CompletedPercentage).ToList();
             NeedDefaultList = NeedDefaultList.OrderByDescending(x => !x.IsCompleted).ToList();
 
             if (!string.IsNullOrEmpty(filtreText))

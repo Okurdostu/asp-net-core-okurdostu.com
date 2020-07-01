@@ -9,6 +9,7 @@ using Okurdostu.Data;
 using Okurdostu.Data.Model;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
+using Okurdostu.Web.Services;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using System;
@@ -108,7 +109,7 @@ namespace Okurdostu.Web.Controllers
                 if (AuthUser.Email != Model.Email)
                 {
 
-                    var Email = new OkurdostuEmail(null)
+                    var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
                     {
                         SenderMail = "noreply@okurdostu.com",
                         SenderName = "Okurdostu"

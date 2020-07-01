@@ -146,21 +146,20 @@
         </span>
     </div>
     <div>
-        <hr class="mb-1" />
         @if (IsAuthenticatedUserEqualModelUser)
         {
+            <hr class="mb-1" />
             @:
-            <div>  <a class="btn btn-outline-purple font-weight-bold rounded-custom btn-block mb-2" href="/ihtiyac-olustur" style="font-size:16px"> İhtiyaç oluştur </a> </div>
+            <div>  <a class="btn btn-outline-purple font-weight-bold rounded-custom btn-block" href="/ihtiyac-olustur" style="font-size:16px">İhtiyaç oluştur</a> </div>
         }
-        <ul class="nav nav-tabs font-weight-bold justify-content-center" id="tab" role="tablist">
+        @*<ul class="nav nav-tabs font-weight-bold justify-content-center" id="tab" role="tablist">
             <li class="nav-item"><a class="nav-link active" id="openneeds-tab" data-toggle="tab" href="#openneeds" role="tab" aria-controls="openneeds" aria-selected="true">Sergilenen</a></li>
             <li class="nav-item"><a class="nav-link" id="completedneeds-tab" data-toggle="tab" href="#completedneeds" role="tab" aria-controls="completedneeds" aria-selected="false">Tamamlanmış</a></li>
         </ul>
         <div class="tab-content">
             <div class="tab-pane fade show active" id="openneeds" role="tabpanel" aria-labelledby="openneeds-tab">@await Component.InvokeAsync("OpenNeeds", new { UserId = Model.Id })</div>
             <div class="tab-pane fade" id="completedneeds" role="tabpanel" aria-labelledby="completedneeds-tab">@await Component.InvokeAsync("CompletedNeeds", new { UserId = Model.Id })</div>
-        </div>
-
+        </div>*@
     </div>
 </div>
 @if (IsAuthenticatedUserEqualModelUser)

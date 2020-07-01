@@ -3,6 +3,8 @@ universite-logo/
 profil-fotograf/
 documents/
 notes.txt
+src/Okurdostu.Web/appsettings.json
+Mailtemplates/
 
 #vscode
 .vscode/*
@@ -35,4 +37,5 @@ msbuild.wrn
 *.user
 *.userosscache
 *.sln.docstates
-src/Okurdostu.Web/appsettings.json
+
+

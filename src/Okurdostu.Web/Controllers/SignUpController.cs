@@ -89,7 +89,7 @@ namespace Okurdostu.Web.Controllers
 
                 return string.IsNullOrEmpty(ReturnUrl) ? Redirect("/beta") : Redirect(ReturnUrl);
             }
-            else
+            else if (TempData["SignUpMessage"] == null)
             {
                 TempData["SignUpMessage"] = "Sorun yaşadık, kaydolmayı tekrar deneyiniz";
             }
