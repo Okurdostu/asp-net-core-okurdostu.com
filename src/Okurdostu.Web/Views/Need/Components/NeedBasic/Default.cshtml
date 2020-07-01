@@ -37,11 +37,8 @@
                     @Model.TotalCharge.ToString().NormalizePrice().Replace(".", ",") &#8378
                 </span>
             </h5>
-            @{
-                decimal? x = (100 - (Model.TotalCharge - Model.TotalCollectedMoney) * 100 / Model.TotalCharge);
-            }
             <div class="progress rounded-custom">
-                <div class="progress-bar progress-bar-striped progress-bar-animated bg-od" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:@Html.Raw(x.ToString() + "%")"></div>
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-od" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:@Html.Raw(Model.percentageCompleted.ToString() + "%")"></div>
             </div>
             <button class="btn btn-outline-purple rounded-custom font-weight-bold fontrem1 btn-block mt-2" data-toggle="modal" data-target="#paymentmethods" style="cursor:pointer;">
                 <i class="fas fa-hands-helping"></i> Destekle

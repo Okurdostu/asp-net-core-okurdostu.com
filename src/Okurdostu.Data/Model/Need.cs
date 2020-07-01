@@ -34,6 +34,8 @@ namespace Okurdostu.Data.Model
         public DateTime? FinishedOn { get; set; }
         public bool IsWrong { get; set; }
 
+        public decimal? percentageCompleted => 100 - (TotalCharge - TotalCollectedMoney) * 100 / TotalCharge;
+
         public virtual User User { get; set; }
         public virtual ICollection<NeedItem> NeedItem { get; set; }
         public virtual ICollection<NeedLike> NeedLike { get; set; }
