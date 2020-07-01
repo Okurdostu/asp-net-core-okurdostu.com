@@ -90,18 +90,20 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
         }
         @await Component.InvokeAsync("NeedDescriptionSupporter", new { need = Model })
     </div>
-
+    <script>
+        $("#ShowLikers").on("click",function(){$("#Likers").load("/like/likers/@Model.Id/@Model.User.Username",function(){})});
+    </script>
     @if (!HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
     {
         <div class="modal fade" id="login" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body p-0" style="border-radius: 25px;"> <div class="shadow p-2 bg-white rounded-custom mt-5 mb-5"> <div class="mt-5 mb-5 text-center font-weight-bold text-black-50"> <h3 class="mb-1 rounded-custom"> <i class="fas fa-heart od"></i> </h3> <p>Kampanyayı sevgin ile destekle</p></div><a class="btn-block btn-purple font-weight-bold text-center" href="/girisyap?ReturnUrl=@HttpContextAccessor.HttpContext.Request.Path"> Giriş yap </a> <a class="btn-block btn-purple font-weight-bold text-center" href="/kaydol?ReturnUrl=@HttpContextAccessor.HttpContext.Request.Path"> Kaydol </a> <center class="mt-2"> <button type="button" class="btn w-75 btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Sonra bakarız yaa</button> </center> </div></div></div></div></div>
-        <script>
-            function GetInf(){$("#LikeCount").load("/like/count/@Model.Id")}$("#ShowLikers").on("click",function(){$("#Likers").load("/like/Likers/@Model.Id/@Model.User.Username",function(){})}),setInterval(function(){GetInf()},5e3);
+        <script type="text/javascript">
+            $(document).ready(function () { function e() { $("#LikeCount").load("/like/count/@Model.Id") } e(), $("#ShowLikers").on("click", function () { $("#Likers").load("/like/Likers/@Model.Id/@Model.User.Username", function () { }) }), setInterval(function () { e() }, 2e3) });
         </script>
     }
     else
     {
         <script type="text/javascript">
-            $(document).ready(function(){function e(){$("#Like").load("/like/button/@Model.Id"),$("#LikeCount").load("/like/count/@Model.Id")}$("#Like").on("click",function(){$.ajax({type:"POST",url:"/like",data:{id:"@Model.Id",username:"@Model.User.Username"},dataType:"json",success(){e()}})}),$("#ShowLikers").on("click",function(){$("#Likers").load("/like/likers/@Model.Id/@Model.User.Username",function(){})}),setInterval(function(){e()},5e3)});
+            $(document).ready(function () { function e() { $.ajax({ url: "/like/LikeState/@Model.Id", type: "Get", contentType: "application/json;", success: function (e) { e ? $("#Like").html("<h3 class='unlike mb-0 rounded-custom'><i class='fas fa-heart'></i></h3>") : $("#Like").html("<h3 class='like mb-0 rounded-custom'><i class='far fa-heart'></i></h3>") } }), $("#LikeCount").load("/like/count/@Model.Id") } e(), $("#Like").on("click", function () { $.ajax({ type: "POST", url: "/like", data: { id: "@Model.Id", username: "@Model.User.Username" }, dataType: "json", success() { e() } }) }), setInterval(function () { e() }, 2e3) });
         </script>
     }
 }
