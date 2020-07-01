@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Okurdostu.Data.Model;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,6 @@ namespace Okurdostu.Web.Controllers
 {
     public class LikeController : BaseController<LikeController>
     {
-        [Route("~/Like")]
         [HttpPost, Authorize]
         public async Task<JsonResult> Index(int id, string username)
         {
@@ -40,33 +40,21 @@ namespace Okurdostu.Web.Controllers
                 }
 
                 await Context.SaveChangesAsync();
+                Logger.LogInformation("test");
                 return Json(new { succes = true });
             }
             return Json(new { error = true });
         }
 
-        [Route("~/Like/Likers/{id}/{username}")]
-        public ActionResult Likers(int id, string username)
-        {
-            List<User> Likers = Context.NeedLike.Where(x =>
-               x.IsCurrentLiked
-            && x.NeedId == id
-            && x.Need.User.Username == username).Select(a => a.User).ToList();
-            return View(Likers);
-        }
-
-        [Route("Like/Count/{id}")]
-        public async Task<int> CountAsync(int id) //liker count
-        {
-            return await Context.NeedLike.CountAsync(x => x.IsCurrentLiked && x.NeedId == id);
-        }
-
+        [HttpPost, ValidateAntiForgeryToken]
+        [Route("/Like/Likers")]
+        public async Task<ActionResult> LikersAsync(int id, string username) => View(await Context.NeedLike.Where(x => x.IsCurrentLiked && x.NeedId == id && x.Need.User.Username == username).Select(a => a.User).ToListAsync());
+        
+        [Route("/Like/Count/{id}")]
+        public async Task<int> CountAsync(long id) => await Context.NeedLike.CountAsync(x => x.IsCurrentLiked && x.NeedId == id);
+        
         [Authorize]
-        [Route("Like/LikeState/{id}")]
-        public async Task<bool> LikeStateAsync(int id) //like state auth user
-        {
-            bool LikeState = await Context.NeedLike.AnyAsync(x => x.IsCurrentLiked && x.NeedId == id && x.UserId == long.Parse(User.Identity.GetUserId()));
-            return LikeState;
-        }
+        [Route("/Like/LikeState/{id}")]
+        public async Task<bool> LikeStateAsync(long id) => await Context.NeedLike.AnyAsync(x => x.IsCurrentLiked && x.NeedId == id && x.UserId == long.Parse(User.Identity.GetUserId()));
     }
 }

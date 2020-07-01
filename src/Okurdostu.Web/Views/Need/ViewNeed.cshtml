@@ -90,8 +90,13 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
         }
         @await Component.InvokeAsync("NeedDescriptionSupporter", new { need = Model })
     </div>
+    @Html.AntiForgeryToken();
     <script>
-        $("#ShowLikers").on("click",function(){$("#Likers").load("/like/likers/@Model.Id/@Model.User.Username",function(){})});
+        var validatetoken = $("input[name=__RequestVerificationToken]").last().val();
+        $("#ShowLikers").on("click", function () {
+            $.post("/Like/Likers", { id: '@Model.Id', username: '@Model.User.Username', __RequestVerificationToken: validatetoken })
+                .done(function (data) {$("#Likers").html(data)});
+        });
     </script>
     @if (!HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
     {
