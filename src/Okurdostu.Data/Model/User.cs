@@ -31,6 +31,7 @@ namespace Okurdostu.Data.Model
         public string ContactEmail { get; set; }
 
         public virtual ICollection<Need> Need { get; set; }
+        public virtual ICollection<NeedComment> NeedComment { get; set; }
         public virtual ICollection<NeedLike> NeedLike { get; set; }
         public virtual ICollection<UserEducation> UserEducation { get; set; }
     }
