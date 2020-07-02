@@ -1,0 +1,84 @@
+﻿@model List<Okurdostu.Data.Model.NeedComment>
+@{
+    Layout = null;
+}
+@{
+    string mainUsername = null;
+    string relatedUsername = null;
+}
+@foreach (var MainComment in Model.Where(x => x.RelatedCommentId == null).ToList())
+{
+    {
+        mainUsername = MainComment.User.Username;
+    }
+    <div class="row mr-md-3 ml-md-3">
+        @* user photo *@
+        <a href="/@MainComment.User.Username">
+            @if (MainComment.User.PictureUrl != null)
+            {
+                <div class="col-auto pl-md-0 pr-0"><img src="@MainComment.User.PictureUrl" class="rounded-pill" style="width:35px; height:35px" /></div>
+            }
+            else
+            {
+                <div class="col-auto pl-md-0 pr-0"><img src="~/svg/user.svg" class="rounded-pill" style="width:35px; height:35px" /></div>
+            }
+        </a>
+        <div class="col pl-1 pr-md-0 pr-2">
+            @* user bilgileri *@
+            <p class="font-weight-bold">
+                <a class="od" href="/@MainComment.User.Username">
+                    @MainComment.User.FullName <span class="text-black-50" style="font-size:15px">@Html.Raw("(@" + MainComment.User.Username + ")")</span>
+                </a>
+            </p>
+            @* yorum *@
+            <p style="font-size:15.5px">
+                @MainComment.Comment.ToString()
+            </p>
+            <!-- ilişkili yorum -->
+            @{
+                var RelatedComments = Model.Where(x => x.RelatedCommentId == MainComment.Id || x.RelatedMainCommentId == MainComment.Id).ToList();
+            }
+            @if (RelatedComments != null)
+            {
+                foreach (var relatedComment in RelatedComments)
+                {
+                    {
+                        relatedUsername = Model.Where(x => x.Id == relatedComment.RelatedCommentId).FirstOrDefault().User.Username;
+                    }
+                    <div class="row mr-0 ml-0">
+                        @* user photo *@
+                        <a href="/@relatedComment.User.Username">
+                            @if (relatedComment.User.PictureUrl != null)
+                            {
+                                <div class="col-auto pl-md-0 pr-0"><img src="@relatedComment.User.PictureUrl" class="rounded-pill" style="width:35px; height:35px" /></div>
+                            }
+                            else
+                            {
+                                <div class="col-auto pl-md-0 pr-0"><img src="~/svg/user.svg" class="rounded-pill" style="width:35px; height:35px" /></div>
+                            }
+                        </a>
+                        <div class="col pl-1 pr-md-0 pr-2">
+                            @* user bilgileri *@
+                            <p class="font-weight-bold mb-0">
+                                <a class="od" href="/@relatedComment.User.Username">
+                                    @relatedComment.User.FullName <span class="text-black-50" style="font-size:15px">@Html.Raw("(@" + relatedComment.User.Username + ")")</span>
+                                </a>
+                            </p>
+                            <p class="small font-weight-bold">
+                                @if (mainUsername == relatedUsername && mainUsername != relatedComment.User.Username){ <span>Yanıtladı: <a class="od" href="/@mainUsername">@Html.Raw("@" + mainUsername)</a></span> }
+                                else if (mainUsername == relatedComment.User.Username){ <span>Yanıtladı: <a class="od" href="/@relatedUsername">@Html.Raw("@" + relatedUsername)</a></span> }
+                                else if (relatedUsername == relatedComment.User.Username && mainUsername != relatedUsername){ <span>Kendine ekleme yaptı ve yanıtladı: <a class="od" href="/@mainUsername">@Html.Raw("@" + mainUsername)</a></span> }
+                                else if (relatedUsername == mainUsername){<span>Kendine ekleme yaptı.</span> }
+                                else{ <span>Yanıtladı: <a class="od" href="/@relatedUsername">@Html.Raw("@" + relatedUsername)</a>, <a class="od" href="/@mainUsername">@Html.Raw("@" + mainUsername)</a></span> }
+                            </p>
+                            @* yorum *@
+                            <p style="font-size:15.5px">
+                                @relatedComment.Comment.ToString()
+                            </p>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+}
