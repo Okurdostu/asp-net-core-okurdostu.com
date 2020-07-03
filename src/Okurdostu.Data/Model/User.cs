@@ -10,9 +10,11 @@ namespace Okurdostu.Data.Model
             IsEmailConfirmed = false;
             IsActive = true;
             CreatedOn = DateTime.Now;
+
             Need = new HashSet<Need>();
             NeedLike = new HashSet<NeedLike>();
             UserEducation = new HashSet<UserEducation>();
+            NeedComment = new HashSet<NeedComment>();
         }
 
         public long Id { get; private set; }
@@ -33,5 +35,6 @@ namespace Okurdostu.Data.Model
         public virtual ICollection<Need> Need { get; set; }
         public virtual ICollection<NeedLike> NeedLike { get; set; }
         public virtual ICollection<UserEducation> UserEducation { get; set; }
+        public virtual ICollection<NeedComment> NeedComment { get; set; }
     }
 }
