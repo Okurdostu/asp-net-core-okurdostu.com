@@ -7,6 +7,7 @@ using Okurdostu.Data.Model;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 using Okurdostu.Web.Models.NeedItem;
+using Okurdostu.Web.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,10 +25,10 @@ namespace Okurdostu.Web.Controllers
         [Route("~/ihtiyaclar/{filtreText}/{_}")]
         public async Task<IActionResult> Index(string filtreText, string _)
         {
-
-
             if (_ == "jquery")
                 TempData["Jquery"] = "Yes";
+            else
+                ViewData["NeedsActiveClass"] = "active";
 
             List<Need> NeedDefaultList =
                 await Context.Need

@@ -28,13 +28,13 @@
         <div class="card-body pt-3 pb-2 pr-1 pl-1">
             <h5>
                 <span class="font-weight-bold">
-                    @Model.TotalCollectedMoney.ToString().NormalizePrice().Replace(".", ",") &#8378
+                    @Model.TotalCollectedMoney.ToString().NormalizePrice() &#8378
                 </span>
                 <span class="small text-black-50 font-weight-bold">
                     toplandı, hedef
                 </span>
                 <span class="font-weight-bold">
-                    @Model.TotalCharge.ToString().NormalizePrice().Replace(".", ",") &#8378
+                    @Model.TotalCharge.ToString().NormalizePrice() &#8378
                 </span>
             </h5>
             <div class="progress rounded-custom">
@@ -51,107 +51,16 @@
         <div>
             @if (!HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
             {
-                <a data-toggle="modal" data-target="#login" style="cursor:pointer;" class="od">
-                    <h3 class="like mb-0">
-                        <i class="far fa-heart"></i>
-                    </h3>
-                </a>
+                <a data-toggle="modal" data-target="#login" style="cursor:pointer;" class="od"> <h3 class="like mb-0"> <i class="far fa-heart"></i> </h3> </a>
             }
             else
             {
-                <a class="od" id="Like">
-                    
-                </a>
+                <a class="od" id="Like"> </a>
             }
-            <a href="#" id="ShowLikers" data-toggle="modal" data-target="#LikersModal" style="cursor:pointer;" class="od">
-                <span class="od font-weight-bold" id="LikeCount">
-                </span>
-            </a>
+            <a href="#" id="ShowLikers" data-toggle="modal" data-target="#LikersModal" style="cursor:pointer;" class="od"> <span class="od font-weight-bold" id="LikeCount"> </span> </a>
         </div>
     </div>
-    <div class="modal fade" id="LikersModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-            <div class="modal-content" style="background: transparent;">
-                <div class="modal-body bg-light text-center" style="border-radius: 25px;" id="Likers">
-
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="sharesocial" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content" style="background: transparent;">
-                <div class="modal-body bg-light" style="border-radius: 25px;">
-                    <h3 class="font-weight-bold text-center text-black-50">
-                        Paylaşın
-                    </h3>
-                    <p class=" text-black-50 font-weight-bold text-center small">
-                        İhtiyaçları farklı iletişim veya sosyal medya kanalları aracılığı ile paylaşarak daha çabuk ihtiyaç sahibine kavuşturabilirsiniz.
-                    </p>
-                    <hr />
-                    <div>
-                        <div>
-                            <a class="btn-lg rounded-custom font-weight-normal" style="background: #25D366; color:white;"
-                               href="whatsapp://send?text=https://okurdostu.com/ihtiyac/@Model.Id" data-action="share/whatsapp/share"
-                               data-size="large">
-                                <i class="fab fa-whatsapp"></i> Whatsapp
-                            </a>
-                        </div>
-                        <hr />
-                        <div>
-                            <a class="btn-lg rounded-custom font-weight-normal" style="background-color:#55ACEE; color:white;"
-                               href="https://twitter.com/intent/tweet?text=https://okurdostu.com/ihtiyac/@Model.Id" target="_blank"
-                               data-size="large">
-                                <i class="fab fa-twitter"></i> Twitter
-                            </a>
-                        </div>
-                        <hr />
-                        <div>
-                            <a class="btn-lg rounded-custom font-weight-normal" style="background: #eea055; color:white;"
-                               href="mailto:?subject=Ihtiyacı için bekleyen bir öğrenci var&amp;body= https://okurdostu.com/ihtiyac/@Model.Id" target="_blank"
-                               data-size="large">
-                                <i class="fa fa-envelope"></i> E-mail
-                            </a>
-                        </div>
-                        <hr />
-                        <div>
-                            <input readonly type="text" id="url" class="form-control" value="https://okurdostu.com/ihtiyac/@Model.Id">
-                            <button onclick="funcCopy()" class="btn btn-outline-purple rounded-custom btn-block mt-1 font-weight-bold" id="linkButton">Kopyala</button>
-                        </div>
-                        <script>
-                            function funcCopy() {
-                                var copyLink = document.getElementById("url");
-                                copyLink.focus();
-                                copyLink.setSelectionRange(0, 10000)
-                                document.execCommand("copy");
-                                document.getElementById("linkButton").innerHTML = "Kopyalandı.. <br> İstediğiniz yerde paylaşabilirsiniz.";
-                                document.getElementById("linkButton").disabled = true;
-                            }
-                        </script>
-                    </div>
-                    <hr />
-                    <button type="button" class="btn btn-block btn-outline-secondary rounded-custom font-weight-bold" data-dismiss="modal">Kapat</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="paymentmethods" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content" style="background: transparent;">
-                <div class="modal-body bg-light" style="border-radius: 25px;">
-                    <h3 class="font-weight-bold text-center text-black-50">
-                        Destekleme yöntemleri
-                    </h3>
-                    <hr />
-                    <button class="btn btn-lg rounded-custom text-primary btn-block border">
-                        <i class="fas fa-credit-card"></i>
-                    </button>
-                    <button class="btn btn-lg rounded-custom text-dark btn-block border">
-                        <i class="fab fa-bitcoin"></i>
-                    </button>
-                    <p class="small font-weight-bold text-black-50 text-center">Beta sürecinde yasal sebeplerden dolayı destekleme hizmeti veremiyoruz, <a href="/beta" class="od">daha fazla bilgi için tıklayın</a>.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="modal fade" id="LikersModal" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-sm modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light text-center" style="border-radius: 25px;" id="Likers"> </div></div></div></div>
+    <div class="modal fade" id="sharesocial" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-lg modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light" style="border-radius: 25px;"> <h3 class="font-weight-bold text-center text-black-50"> Paylaşın </h3> <p class=" text-black-50 font-weight-bold text-center small"> İhtiyaçları farklı iletişim veya sosyal medya kanalları aracılığı ile paylaşarak daha çabuk ihtiyaç sahibine kavuşturabilirsiniz. </p><hr/> <div> <div> <a class="btn-lg rounded-custom font-weight-normal" style="background: #25D366; color:white;" href="whatsapp://send?text=https://okurdostu.com/ihtiyac/@Model.Id" data-action="share/whatsapp/share" data-size="large"> <i class="fab fa-whatsapp"></i> Whatsapp </a> </div><hr/> <div> <a class="btn-lg rounded-custom font-weight-normal" style="background-color:#55ACEE; color:white;" href="https://twitter.com/intent/tweet?text=https://okurdostu.com/ihtiyac/@Model.Id" target="_blank" data-size="large"> <i class="fab fa-twitter"></i> Twitter </a> </div><hr/> <div> <a class="btn-lg rounded-custom font-weight-normal" style="background: #eea055; color:white;" href="mailto:?subject=Ihtiyacı için bekleyen bir öğrenci var&amp;body=https://okurdostu.com/ihtiyac/@Model.Id" target="_blank" data-size="large"> <i class="fa fa-envelope"></i> E-mail </a> </div><hr/> <div> <input readonly type="text" id="url" class="form-control" value="https://okurdostu.com/ihtiyac/@Model.Id"> <button onclick="funcCopy()" class="btn btn-outline-purple rounded-custom btn-block mt-1 font-weight-bold" id="linkButton">Kopyala</button> </div><script>function funcCopy(){var copyLink=document.getElementById("url"); copyLink.focus(); copyLink.setSelectionRange(0, 10000) document.execCommand("copy"); document.getElementById("linkButton").innerHTML="Kopyalandı.. <br>İstediğiniz yerde paylaşabilirsiniz."; document.getElementById("linkButton").disabled=true;}</script> </div><hr/> <button type="button" class="btn btn-block btn-outline-secondary rounded-custom font-weight-bold" data-dismiss="modal">Kapat</button> </div></div></div></div>
+    <div class="modal fade" id="paymentmethods" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light" style="border-radius: 25px;"> <h3 class="font-weight-bold text-center text-black-50"> Destekleme yöntemleri </h3> <hr /> <button class="btn btn-lg rounded-custom text-primary btn-block border"> <i class="fas fa-credit-card"></i> </button> <button class="btn btn-lg rounded-custom text-dark btn-block border"> <i class="fab fa-bitcoin"></i> </button> <p class="small font-weight-bold text-black-50 text-center">Beta sürecinde yasal sebeplerden dolayı destekleme hizmeti veremiyoruz, <a href="/beta" class="od">daha fazla bilgi için tıklayın</a>.</p></div></div></div></div>
 }

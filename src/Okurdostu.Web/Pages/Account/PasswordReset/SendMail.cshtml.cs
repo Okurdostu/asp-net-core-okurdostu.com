@@ -14,8 +14,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
     [ValidateAntiForgeryToken]
     public class SendMailModel : PageModel
     {
-        private OkurdostuContext _con;
-        public OkurdostuContext Context => _con ?? (OkurdostuContext)HttpContext?.RequestServices.GetService(typeof(OkurdostuContext));
+        public OkurdostuContext Context => (OkurdostuContext)HttpContext?.RequestServices.GetService(typeof(OkurdostuContext));
         public User _User { get; set; }
 
         public IActionResult OnGet()

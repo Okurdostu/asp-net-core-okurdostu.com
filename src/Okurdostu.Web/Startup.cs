@@ -38,7 +38,6 @@ namespace Okurdostu.Web
                     options.SlidingExpiration = true;
                     options.Cookie.HttpOnly = true;
                 });
-
             services.AddMemoryCache();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddControllersWithViews();
