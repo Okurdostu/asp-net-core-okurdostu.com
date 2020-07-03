@@ -73,7 +73,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
 
             if (preCreatedPaswordReset != null && elapsedTime.Value.Hours < 11.5)
             {
-                //Email.Send(Email.PasswordResetMail(preCreatedPaswordReset.User.FullName, preCreatedPaswordReset.User.Email, preCreatedPaswordReset.GUID));
+                Email.Send(Email.PasswordResetMail(preCreatedPaswordReset.User.FullName, preCreatedPaswordReset.User.Email, preCreatedPaswordReset.GUID));
             }
             else
             {
@@ -85,7 +85,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
                 {
-                    //Email.Send(Email.PasswordResetMail(_User.FullName, _User.Email, UserPaswordReset.GUID));
+                    Email.Send(Email.PasswordResetMail(_User.FullName, _User.Email, UserPaswordReset.GUID));
                 }
             }
             return Redirect("/account/passwordreset/successent");

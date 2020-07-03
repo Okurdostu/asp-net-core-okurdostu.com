@@ -2,6 +2,41 @@
     ViewData["Title"] = "Beta | Okurdostu";
     Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
 }
+
+@if (TempData["emailstate"] != null && !(bool)TempData["emailstate"])
+{
+    <div class="modal fade" id="emailconfirm" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content" style="background: transparent;">
+                <div class="modal-body bg-light" style="border-radius: 25px;">
+                    <div class="font-weight-bold text-black-50">
+                        <p class="text-center">
+                            Okurdostu hesabınızı rahatça kullanabilmek için lütfen bize verdiğiniz: @TempData["email"] adresine yolladığımız onay mailine göz atınız.<br />
+                            Eğer ki gelen mailleriniz arasında göremiyorsanız, spam veya sosyal gibi diğer mail klasörleriniz kontrol ediniz
+                        </p>
+                        <hr />
+                        <div class="text-center">
+                            <p>@TempData["email"] adresi bana ait</p>
+                            <form method="post" action="/sendconfirmationemail">
+                                @Html.AntiForgeryToken()
+                                <input type="submit" value="Yeni bir mail gönder" class="btn btn-block btn-outline-purple rounded-custom font-weight-bold" />
+                            </form>
+                        </div>
+                        <hr />
+                        <p>Yanlış bir e-mail adresi verdiniğizi verdiğinizi düşünüyorsanız<br />Profiliniz ><br />Ayarlar ><br />Hesap ayarları > Email'den kendinize yeni bir e-mail adresi seçebilirsiniz.</p>
+                        <button type="button" class="btn  btn-outline-primary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Anladım</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $('#emailconfirm').modal('show')
+        });
+    </script>
+}
+
 @if (TempData["BetaMessage"] != null)
 {
     <div class="alert alert-secondary text-center font-weight-bold" role="alert"> <span> @Html.Raw(TempData["BetaMessage"]) </span></div>

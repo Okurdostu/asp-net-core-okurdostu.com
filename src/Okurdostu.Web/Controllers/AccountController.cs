@@ -59,6 +59,26 @@ namespace Okurdostu.Web.Controllers
         #endregion
 
         #region account
+
+        [HttpPost, ValidateAntiForgeryToken]
+        [Route("/sendconfirmationemail")]
+        public async Task<IActionResult> SendConfirmationEmail()
+        {
+            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+            var _UserEmailConfirmation = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.UserId == AuthUser.Id && !x.IsUsed);
+
+            var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
+            {
+                SenderMail = "halil@okurdostu.com",
+                SenderName = "Halil İbrahim Kocaöz"
+            };
+
+            Email.Send(Email.NewUserMail(AuthUser.FullName, AuthUser.Email, _UserEmailConfirmation.GUID));
+            TempData["ProfileMessage"] = AuthUser.Email + " adresine yeni bir onay maili gönderildi";
+            return Redirect("/" + AuthUser.Username);
+        }
+
+
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> GetConfirmationToEmailChange(ProfileModel Model)
         {
@@ -201,7 +221,7 @@ namespace Okurdostu.Web.Controllers
                 {
                     if (e.InnerException != null && e.InnerException.Message.Contains("Unique_Key_Email"))
                     {
-                        TempData["ProfileMessage"] = "Değiştirme talebinde bulunduğunuz e-mail adresini kullanamazsınız, e-mail değiştirme isteğiniz geçersiz kılındı";
+                        TempData["ProfileMessage"] = "Değiştirme talebinde bulunduğunuz e-mail adresini kullanamazsınız.<br>E-mail değiştirme isteğiniz geçersiz kılındı";
                         AuthUser.Email = Email;
                         AuthUser.IsEmailConfirmed = EmailConfirmState;
                         ConfirmationRequest.IsUsed = true;
@@ -602,7 +622,6 @@ namespace Okurdostu.Web.Controllers
 
             Response.Redirect("/" + AuthUser.Username);
         }
-
 
 
         [HttpPost, ValidateAntiForgeryToken]
