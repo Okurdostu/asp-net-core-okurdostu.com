@@ -76,7 +76,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                     @await Component.InvokeAsync("NeedItem", new { need = Model })
                 </div>
             }
-            <div class="col pl-xl-0 pl-lg-0 pl-md-0" @*style="pointer-events: none; opacity: 0.4;"*@>
+            <div class="col pl-xl-0 pl-lg-0 pl-md-0">
                 @await Component.InvokeAsync("NeedBasic", new { need = Model })
             </div>
         </div>
@@ -90,22 +90,12 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
         }
         @await Component.InvokeAsync("NeedDescriptionSupporter", new { need = Model })
     </div>
-    @Html.AntiForgeryToken();
     <script type="text/javascript">
         var validatetoken = $("input[name=__RequestVerificationToken]").last().val();
-
-        function GetComments() {
-            $.post("/Comments", { id: @Model.Id, __RequestVerificationToken: validatetoken })
-                .done(function (comments) { $("#pills-comments").html(comments) });
-        };
-        GetComments();
-
         $("#ShowLikers").on("click", function () {
             $.post("/Like/Likers", { id: '@Model.Id', username: '@Model.User.Username', __RequestVerificationToken: validatetoken })
                 .done(function (likers) { $("#Likers").html(likers) });
         });
-
-        setInterval(function () { GetComments() }, 5000)
     </script>
     @if (!HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
     {
@@ -149,7 +139,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                         success() { refresh(); },
                     });
                 }),
-                    setInterval(function () { e(); }, 7500);
+                    setInterval(function () { refresh(); }, 7500);
             });
         </script>
     }
@@ -158,3 +148,4 @@ else
 {
     @: <p class="font-weight-bold text-warning mb-5 mt-5 text-center"> Bu ihtiyaç kampanyası onaylanmamış, onaylanana kadar sadece ihtiyaç kampanyasını oluşturan kişi görebilir. </p>
 }
+@Html.AntiForgeryToken();

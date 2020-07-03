@@ -38,7 +38,6 @@ namespace Okurdostu.Data.Model
 
         public virtual User User { get; set; }
         public virtual ICollection<NeedItem> NeedItem { get; set; }
-        public virtual ICollection<NeedComment> NeedComment { get; set; }
         public virtual ICollection<NeedLike> NeedLike { get; set; }
     }
 }
