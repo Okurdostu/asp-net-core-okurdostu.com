@@ -1,0 +1,102 @@
+﻿@model List<Okurdostu.Data.Model.NeedComment>
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
+@{long AuthenticatedUserId = 0;}
+@{
+    if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+    {
+        AuthenticatedUserId = long.Parse(HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value);
+    }
+}
+@{Layout = null;}
+
+@foreach (var item in Model)
+{
+    <div class="row ml-md-1 text-break pt-4">
+        <!-- Profil fotoğrafı -->
+        <div class="comments-vertical-line">
+            @if (item.IsRemoved)
+            {
+                <div class="col-auto pl-md-0 pr-0"><img src="~/svg/user.svg" class="rounded-pill" style="width:35px; height:35px" /></div>
+            }
+            else
+            {
+                <a href="/@item.User.Username">
+                    @if (item.User.PictureUrl != null)
+                    {
+                        <div class="col-auto pl-md-0 pr-0"><img src="@item.User.PictureUrl" class="rounded-pill" style="width:35px; height:35px" /></div>
+                    }
+                    else
+                    {
+                        <div class="col-auto pl-md-0 pr-0"><img src="~/svg/user.svg" class="rounded-pill" style="width:35px; height:35px" /></div>
+                    }
+                </a>
+            }
+        </div>
+        <div class="col-auto pl-1">
+            <!-- Kullanıcı bilgileri -->
+            <div class="small">
+                @if (item.IsRemoved)
+                {
+                    <p class="font-weight-bold mb-0">
+                        <a class="od" style="cursor:pointer">[Silinmiş]</a>
+                    </p>
+                }
+                else
+                {
+                    <p class="font-weight-bold mb-0">
+                        <a class="od" href="/@item.User.Username">
+                            @item.User.FullName <span class="text-black-50 font-weight-bold">@Html.Raw("(@" + item.User.Username + ")")</span>
+                        </a>
+                    </p>
+                }
+            </div>
+            <!-- Kime cevap yazıyor -->
+            <div class="small">
+                @if (!item.RelatedComment.IsRemoved)
+                {
+                    if (!item.RelatedComment.IsRemoved && item.RelatedComment.User.Username == item.User.Username)
+                    {
+                        <p class="small font-weight-bold text-black-50 mb-1"> Kendine ekleme yapıyor</p>
+                    }
+                    else if (!item.RelatedComment.IsRemoved)
+                    {
+                        <p class="small font-weight-bold text-black-50 mb-1">
+                            Cevaplıyor: <a class="od" href="/@item.RelatedComment.User.Username"> @Html.Raw("@" + item.RelatedComment.User.Username + "")</a>
+                        </p>
+                    }
+                }
+                else
+                {
+                    <p class="small font-weight-bold text-black-50 mb-1">Silinmiş yorumu cevaplamış</p>
+                }
+            </div>
+            <!-- Yorum -->
+            <div>
+                @if (item.IsRemoved)
+                {
+                    <p class="mb-0" style="font-size:15.5px">[Silinmiş]</p>
+                }
+                else
+                {
+                    <p class="mb-0" style="font-size:13.5px"> @item.Comment.ToString()</p>
+                }
+            </div>
+            <!-- İşlemler -->
+            <div>
+                @if (!item.IsRemoved)
+                {
+                    <span class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-comment-dots"></i> Cevapla</span>
+                    @if (AuthenticatedUserId == item.UserId)
+                    {
+                        <span class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-edit"></i> Düzenle</span>
+                    }
+                    @if (AuthenticatedUserId == item.UserId)
+                    {
+                        <span class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-trash-alt"></i> Sil</span>
+                    }
+                }
+            </div>
+            @await Component.InvokeAsync("RelatedComment", item.Id)
+        </div>
+    </div>
+}

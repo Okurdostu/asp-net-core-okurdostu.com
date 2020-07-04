@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Okurdostu.Data.Model;
+using System;
 using System.Collections.Generic;
 
-namespace Okurdostu.Data
+namespace Okurdostu.Data.Model
 {
     public partial class NeedComment
     {
