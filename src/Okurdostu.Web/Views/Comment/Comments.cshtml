@@ -7,17 +7,8 @@
         AuthenticatedUserId = long.Parse(HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value);
     }
 }
-
 @{ Layout = null; }
-<style>
-    .comments-vertical-line {
-        font-weight: bold;
-        color: rgba(0,0,0,.5) !important;
-        display: block;
-        border-left: 1px solid;
-        height: 100% !important;
-    }
-</style>
+<style> .comments-vertical-line{font-weight:700;color:rgba(0,0,0,.5)!important;display:block;border-left:1px solid;height:100%!important} </style>
 <div class="container pr-1">
     @foreach (var mainComment in Model.Where(x => x.RelatedCommentId == null).OrderByDescending(x => x.InverseRelatedComment.Count()).ToList())
     {
@@ -27,18 +18,18 @@
                 <div class="mb-1">
                     @if (mainComment.IsRemoved)
                     {
-                        <div class="col-auto"><img src="~/svg/user.svg" class="rounded-pill" style="width:35px; height:35px" /></div>
+                        <div class="col-auto"><img src="~/svg/user.svg" class="img-thumbnail p-0 rounded-pill" style="width:35px; height:35px" /></div>
                     }
                     else
                     {
                         <a href="/@mainComment.User.Username">
                             @if (mainComment.User.PictureUrl != null)
                             {
-                                <div class="col-auto"><img src="@mainComment.User.PictureUrl" class="rounded-pill" style="width:35px; height:35px" /></div>
+                                <div class="col-auto"><img src="@mainComment.User.PictureUrl" class="img-thumbnail p-0 rounded-pill" style="width:35px; height:35px" /></div>
                             }
                             else
                             {
-                                <div class="col-auto"><img src="~/svg/user.svg" class="rounded-pill" style="width:35px; height:35px" /></div>
+                                <div class="col-auto"><img src="~/svg/user.svg" class="img-thumbnail p-0 rounded-pill" style="width:35px; height:35px" /></div>
                             }
                         </a>
                     }
@@ -48,17 +39,12 @@
                     <div class="small">
                         @if (mainComment.IsRemoved)
                         {
-                            <p class="font-weight-bold mb-1">
-                                <a class="od" style="cursor:pointer">[Silinmiş]</a>
+                            <p class="font-weight-bold mb-1"><a class="od" style="cursor:pointer">[Silinmiş]</a>
                             </p>
                         }
                         else
                         {
-                            <p class="font-weight-bold  mb-1">
-                                <a class="od" href="/@mainComment.User.Username">
-                                    @mainComment.User.FullName <span class="text-black-50 font-weight-bold">@Html.Raw("(@" + mainComment.User.Username + ")")</span>
-                                </a>
-                            </p>
+                            <p class="font-weight-bold mb-1"><a class="od" href="/@mainComment.User.Username">@mainComment.User.FullName <span class="text-black-50 font-weight-bold">@Html.Raw("(@" + mainComment.User.Username + ")")</span> </a></p>
                         }
                     </div>
                     <!-- Yorum -->
@@ -73,17 +59,20 @@
                         }
                     </div>
                     <!-- İşlemler -->
-                    <div>
-                        <span class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-comment-dots"></i> Cevapla</span>
-                        @if (AuthenticatedUserId == mainComment.UserId)
-                        {
-                            <span class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-edit"></i> Düzenle</span>
-                        }
-                        @if (AuthenticatedUserId == mainComment.UserId)
-                        {
-                            <span class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-trash-alt"></i> Sil</span>
-                        }
-                    </div>
+                    @if (!mainComment.IsRemoved)
+                    {
+                        <div>
+                            <span class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-comment-dots"></i> Cevapla</span>
+                            @if (AuthenticatedUserId == mainComment.UserId)
+                            {
+                                <span class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-edit"></i> Düzenle</span>
+                            }
+                            @if (AuthenticatedUserId == mainComment.UserId)
+                            {
+                                <span onclick="getDeleteDialog('@mainComment.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-trash-alt"></i> Sil</span>
+                            }
+                        </div>
+                    }
                     @await Component.InvokeAsync("RelatedComment", mainComment.Id)
                 </div>
             </div>
@@ -91,3 +80,19 @@
         <br />
     }
 </div>
+<script>
+    var DeletingComment;
+    function getDeleteDialog(id) {
+        DeletingComment = id;
+        $('#delete-comment').modal('show');
+    };
+    $("#delete").click(function () {
+        $.post("/DeleteComment", { Id: DeletingComment, __RequestVerificationToken: validatetoken })
+            .done(function (bool) {
+                if (bool) {
+                    $('#delete-comment').modal('hide');
+                    GetComments(null);
+                }
+            });
+    });
+</script>

@@ -18,7 +18,7 @@ namespace Okurdostu.Data.Model
         public string Comment { get; set; }
         public Guid? RelatedCommentId { get; set; }
         public long NeedId { get; set; }
-        public long UserId { get; set; }
+        public long? UserId { get; set; }
         public bool IsRemoved { get; set; }
         public DateTime CreatedOn { get; set; }
 

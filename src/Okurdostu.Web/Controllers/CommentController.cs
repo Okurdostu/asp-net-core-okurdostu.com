@@ -74,12 +74,16 @@ namespace Okurdostu.Web.Controllers
                 if (AuthUser.Id == DeletedComment.User.Id)
                 {
                     DeletedComment.IsRemoved = true;
-                    var result = await Context.SaveChangesAsync();
+                    DeletedComment.UserId = null;
+                    DeletedComment.Comment = "";
+                    //bir daha görüntülenemeyecek yorum(geri getirme olmayacak): userini veya comment içeriğini tutmaya gerek yok
+                    //ve hiyerarşik ağaç yapısını bozmaması için tamamen kaldırmıyorum
+                    await Context.SaveChangesAsync();
                     return Json(true);
                 }
             }
 
-            return null;
+            return Json(false);
         }
 
 
