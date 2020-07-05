@@ -38,10 +38,7 @@
 <hr/> <div class="modal fade" id="confirm" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light" style="border-radius: 25px;"> <h4 class="text-center text-black-50"> Onaylama </h4> <hr/> <div> <p class="text-black-50 font-weight-bold text-md-left text-center"> Seçtiğiniz başlığa ve hedeflerinize son bir kez göz atıp onay için yollayabilirsiniz. </p>
                         @using (Html.BeginForm("SendToConfirmation", "Need", FormMethod.Post))
                         {
-                            @Html.Hidden("NeedId", Model.Id)
-                            <button type="submit" class="btn btn-primary btn-block font-weight-bold rounded-custom">
-                                Tamamdır, onay için yolla
-                            </button>
+                            @Html.Hidden("NeedId", Model.Id) <button type="submit" class="btn btn-primary btn-block font-weight-bold rounded-custom"> Tamamdır, onay için yolla </button>
                         }
     <hr/> <button type="button" class="btn btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button> </div></div></div></div></div>
 }
@@ -92,22 +89,24 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
     </div>
     @Html.AntiForgeryToken()
     <script type="text/javascript">
-        var validatetoken = $("input[name=__RequestVerificationToken]").val();
-        var oldDataFromComments = "oldDataFromComments";
-        var newDataFromComments = "newDataFromComments";
+        var validatetoken = $("input[name=__RequestVerificationToken]").val(); var oldDataFromComments = "oldDataFromComments"; var newDataFromComments = "newDataFromComments";
 
-        function GetComments() {
+        function GetComments(scrollingTargetId) {
             $.post("/Comments", { id: @Model.Id, __RequestVerificationToken: validatetoken })
                 .done(function (newDataFromComments) {
                     if (newDataFromComments != oldDataFromComments) {
-                        $("#pills-comments").html(newDataFromComments)
+                        $("#comments").html(newDataFromComments)
+
+                        if (scrollingTargetId != null) {
+                            $('html, body').animate({
+                                scrollTop: $('#' + scrollingTargetId).offset().top
+                            }, 2000);
+                            $("#Comment").val("");
+                        }
                     }
                     oldDataFromComments = newDataFromComments;
                 });
-        };
-
-        GetComments();
-        setInterval(function () { GetComments(); }, 5000);
+        }; GetComments(); setInterval(function () { GetComments(); }, 5000);
 
         $("#ShowLikers").on("click", function () {
             $.post("/Like/Likers", { id: '@Model.Id', username: '@Model.User.Username', __RequestVerificationToken: validatetoken })
@@ -117,16 +116,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
     @if (!HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
     {
         <script type="text/javascript">
-            $(document).ready(function () {
-                function refresh() {
-                    $("#LikeCount").load("/like/count/@Model.Id");
-                }
-                refresh();
-                $("#ShowLikers").on("click", function () {
-                    $("#Likers").load("/like/Likers/@Model.Id/@Model.User.Username", function () { });
-                }),
-                    setInterval(function () { refresh(); }, 7500);
-            });
+            $(document).ready(function(){function n(){$("#LikeCount").load("/like/count/@Model.Id")}n(),setInterval(function(){n()},5e3)});
         </script>
         <div class="modal fade" id="login" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body p-0" style="border-radius: 25px;"> <div class="shadow p-2 bg-white rounded-custom mt-5 mb-5"> <div class="mt-5 mb-5 text-center font-weight-bold text-black-50"> <h3 class="mb-1 rounded-custom"> <i class="fas fa-heart od"></i> </h3> <p>Kampanyayı sevgin ile destekle</p></div><a class="btn-block btn-purple font-weight-bold text-center" href="/girisyap?ReturnUrl=@HttpContextAccessor.HttpContext.Request.Path"> Giriş yap </a> <a class="btn-block btn-purple font-weight-bold text-center" href="/kaydol?ReturnUrl=@HttpContextAccessor.HttpContext.Request.Path"> Kaydol </a> <center class="mt-2"> <button type="button" class="btn w-75 btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Sonra bakarız yaa</button> </center> </div></div></div></div></div>
     }
@@ -134,7 +124,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
     {
         <script type="text/javascript">
             $(document).ready(function () {
-                function refresh() {
+                function LikeRefresh() {
                     $.ajax({
                         url: "/like/LikeState/@Model.Id",
                         type: "Get",
@@ -144,19 +134,29 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                         },
                     }),
                         $("#LikeCount").load("/like/count/@Model.Id");
-                }
+                }; LikeRefresh(); setInterval(function () { LikeRefresh(); }, 10000);
 
-                refresh();
+                $("#DoComment").click(function () {
+                    $.post("/Comment", { NeedId: @Model.Id, Comment: $("#Comment").val(), __RequestVerificationToken: validatetoken })
+                        .done(function (result) {
+                            if (result.id != null) {
+                                GetComments(result.id);
+                            }
+                            else {
+                                alert(result.error); //toast gelecek
+                            }
+                        });
+                });
+
                 $("#Like").on("click", function () {
                     $.ajax({
                         type: "POST",
                         url: "/like",
                         data: { id: "@Model.Id", username: "@Model.User.Username" },
                         dataType: "json",
-                        success() { refresh(); },
+                        success() { LikeRefresh(); },
                     });
-                }),
-                    setInterval(function () { refresh(); }, 7500);
+                });
             });
         </script>
     }

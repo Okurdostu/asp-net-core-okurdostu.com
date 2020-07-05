@@ -19,9 +19,9 @@
     }
 </style>
 <div class="container pr-1">
-    @foreach (var mainComment in Model.Where(x => x.RelatedCommentId == null).ToList())
+    @foreach (var mainComment in Model.Where(x => x.RelatedCommentId == null).OrderByDescending(x => x.InverseRelatedComment.Count()).ToList())
     {
-        <div class="row">
+        <div class="row" id="@mainComment.Id">
             <div class="comments-vertical-line">
                 <!-- Profil fotoğraf -->
                 <div class="mb-1">

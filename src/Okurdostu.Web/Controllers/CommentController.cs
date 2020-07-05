@@ -22,7 +22,7 @@ namespace Okurdostu.Web.Controllers
             //  aynı veya benzer comment içeriğini girme,
             //  çok fazla ard arda giriş yapma.
 
-            if (Model.NeedId != null)
+            if (Model.NeedId == null)
             {
                 return null;
             }

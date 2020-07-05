@@ -15,15 +15,15 @@
 
 @if (Model.IsConfirmed)
 {
-    <ul class="nav nav-pills mb-3 d-flex justify-content-center" id="pills-tab" role="tablist">
+    <ul class="nav nav-pills mb-3 d-flex justify-content-center" id="pills-tab" role="tablist" style="font-size:15px;">
         <li class="nav-item" role="presentation">
-            <a class="nav-link active" data-toggle="pill" href="#pills-description" role="tab" aria-controls="pills-description" aria-selected="true">Hakkında</a>
+            <a class="nav-link active pr-2 pl-2" data-toggle="pill" href="#pills-description" role="tab" aria-controls="pills-description" aria-selected="true">Hakkında</a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link" id="pills-comment-tab" data-toggle="pill" href="#pills-comments" role="tab" aria-controls="pills-comments" aria-selected="false">Tartışmalar</a>
+            <a class="nav-link pr-2 pl-2" id="pills-comment-tab" data-toggle="pill" href="#pills-comments" role="tab" aria-controls="pills-comments" aria-selected="false">Tartışmalar</a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link" data-toggle="pill" href="#pills-supporters" role="tab" aria-controls="pills-supporters" aria-selected="false">Destekleyenler</a>
+            <a class="nav-link pr-2 pl-2" data-toggle="pill" href="#pills-supporters" role="tab" aria-controls="pills-supporters" aria-selected="false">Destekleyenler</a>
         </li>
     </ul>
 }
@@ -79,6 +79,9 @@
             </div>*@
     </div>
     <div class="tab-pane fade text-break" id="pills-comments" role="tabpanel" aria-labelledby="pills-comments-tab">
+        <partial name="~/Views/Comment/_DoCommentPartial.cshtml" model="null">
+            <div id="comments">
 
+            </div>
     </div>
 </div>
