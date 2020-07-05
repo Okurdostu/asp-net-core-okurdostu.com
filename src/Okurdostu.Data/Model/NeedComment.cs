@@ -8,6 +8,9 @@ namespace Okurdostu.Data.Model
     {
         public NeedComment()
         {
+            Id = Guid.NewGuid();
+            CreatedOn = DateTime.Now;
+            IsRemoved = false;
             InverseRelatedComment = new HashSet<NeedComment>();
         }
 
