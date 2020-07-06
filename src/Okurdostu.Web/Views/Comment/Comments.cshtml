@@ -81,6 +81,7 @@
         <br />
     }
 </div>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 @if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
 {
     <script>
@@ -114,16 +115,38 @@
                 }
             });
         };
-        // check input validations.
+        
         $("#EditCommentButton").click(function () {
             var NewComment = $('#EditCommentInput').val();
-            $.post("/EditComment", { Id: EditingCommentId, EditCommentInput: NewComment, __RequestVerificationToken: validatetoken })
-                .done(function (bool) {
-                    if (bool) {
-                        $('#edit-comment').modal('hide');
-                        GetComments(null);
-                    }
+            if (NewComment.length < 5) {
+                swal("Yorum düzenleme", "En az 5 karakter", "error", {
+                    button: "Tamam",
                 });
+            }
+            else if (NewComment.length > 100) {
+                swal("Yorum düzenleme", "En fazla 100 karakter", "error", {
+                    button: "Tamam",
+                });
+            }
+            else {
+                $.post("/EditComment", { Id: EditingCommentId, EditCommentInput: NewComment, __RequestVerificationToken: validatetoken })
+                    .done(function (response) {
+                        if (response.state == true) {
+                            $('#edit-comment').modal('hide');
+                            GetComments(null);
+                        }
+                        else if (response.state == false && response.errorMessage.length > 0) {
+                            swal("Yorum düzenleme", response.errorMessage, "error", {
+                                button: "Tamam",
+                            });
+                        }
+                        else if (response.state == false && response.infoMessage.length > 0) {
+                            swal("Yorum düzenleme", response.infoMessage, "info", {
+                                button: "Tamam",
+                            });
+                        }
+                    });
+            }
         });
     </script>
 }

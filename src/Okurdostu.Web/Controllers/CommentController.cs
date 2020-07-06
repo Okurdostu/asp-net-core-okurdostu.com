@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Differencing;
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data.Model;
 using Okurdostu.Web.Models;
@@ -111,7 +112,17 @@ namespace Okurdostu.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<JsonResult> EditComment(Guid Id, string EditCommentInput)
         {
+            bool state = false;
+            string errorMessage = "";
+            string infoMessage = "";
+
+            if (EditCommentInput == null || EditCommentInput.Length < 5)
+            {
+                return Json(new { state, errorMessage = "En az 5 karakter" });
+            }
+
             var EditedComment = await Context.NeedComment.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
+
             if (EditedComment != null)
             {
                 if (EditedComment.Comment != EditCommentInput)
@@ -120,14 +131,41 @@ namespace Okurdostu.Web.Controllers
 
                     if (AuthUser.Id == EditedComment.User.Id)
                     {
-                        EditedComment.Comment = EditCommentInput;
-                        await Context.SaveChangesAsync();
-                        return Json(true);
+                        try
+                        {
+                            EditedComment.Comment = EditCommentInput;
+                            await Context.SaveChangesAsync();
+                            state = true;
+                            errorMessage = "";
+                            infoMessage = "";
+                        }
+                        catch (Exception)
+                        {
+                            if (EditedComment.Comment.Length > 100)
+                            {
+                                state = false;
+                                errorMessage = "En fazla 100 karakter";
+                                infoMessage = "";
+
+                            }
+                            else
+                            {
+                                state = false;
+                                infoMessage = "Ne olduğunu bilmiyoruz tekrar deneyin.";
+                                errorMessage = "";
+                            }
+                        }
                     }
                 }
-                return Json(new { error = "Aynı içeriği girmeye çalışıyorsunuz." });
+                else
+                {
+                    state = false;
+                    errorMessage = "Aynı içeriği giriyorsunuz.";
+                    infoMessage = "";
+                }
             }
-            return Json(false);
+
+            return Json(new { state, infoMessage, errorMessage });
         }
 
         [Route("/Comments")]
