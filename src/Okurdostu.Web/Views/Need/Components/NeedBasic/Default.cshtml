@@ -16,37 +16,14 @@
                         <img class="rounded-pill shadow-lg" src="~/svg/user.svg" style="width:50px; height:50px;" />
                     }
                 </div>
-                <div class="col pl-0">
-                    <div class="float-right">
-                        <span>@Model.User.FullName</span>
-                        <br />
-                        <span class="small font-weight-bold text-black-50">@Model.User.UserEducation.OrderByDescending(x => x.StartYear).Where(x => x.IsConfirmed == true && x.IsRemoved != true).FirstOrDefault().University.Name</span>
-                    </div>
-                </div>
+                <div class="col pl-0"><div class="float-right"><span>@Model.User.FullName</span><br /><span class="small font-weight-bold text-black-50">@Model.User.UserEducation.OrderByDescending(x => x.StartYear).Where(x => x.IsConfirmed == true && x.IsRemoved != true).FirstOrDefault().University.Name</span></div></div>
             </div>
         </a>
         <div class="card-body pt-3 pb-2 pr-1 pl-1">
-            <h5>
-                <span class="font-weight-bold">
-                    @Model.TotalCollectedMoney.ToString().NormalizePrice() &#8378
-                </span>
-                <span class="small text-black-50 font-weight-bold">
-                    toplandı, hedef
-                </span>
-                <span class="font-weight-bold">
-                    @Model.TotalCharge.ToString().NormalizePrice() &#8378
-                </span>
-            </h5>
-            <div class="progress rounded-custom">
-                <div class="progress-bar progress-bar-striped progress-bar-animated bg-od" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:@Html.Raw(Model.CompletedPercentage.ToString() + "%")"></div>
-            </div>
-            <button class="btn btn-outline-purple rounded-custom font-weight-bold fontrem1 btn-block mt-2" data-toggle="modal" data-target="#paymentmethods" style="cursor:pointer;">
-                <i class="fas fa-hands-helping"></i> Destekle
-            </button>
-            <hr class="mb-2 mt-2">
-            <a class="btn btn-outline-primary rounded-custom  font-weight-bold btn-block" href="" data-toggle="modal" data-target="#sharesocial" style="cursor:pointer;">
-                <i class="fas fa-share-alt"></i> Paylaş
-            </a>
+            <h5><span class="font-weight-bold">@Model.TotalCollectedMoney.ToString().NormalizePrice() &#8378 </span><span class="small text-black-50 font-weight-bold">toplandı, hedef </span><span class="font-weight-bold">@Model.TotalCharge.ToString().NormalizePrice() &#8378 </span></h5>
+            <div class="progress rounded-custom"><div class="progress-bar progress-bar-striped progress-bar-animated bg-od" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:@Html.Raw(Model.CompletedPercentage.ToString() + "%")"></div></div>
+            <button class="btn btn-outline-purple rounded-custom font-weight-bold fontrem1 btn-block mt-2" data-toggle="modal" data-target="#paymentmethods" style="cursor:pointer;"><i class="fas fa-hands-helping"></i> Destekle</button>
+            <hr class="mb-2 mt-2"><a class="btn btn-outline-primary rounded-custom  font-weight-bold btn-block" href="" data-toggle="modal" data-target="#sharesocial" style="cursor:pointer;"><i class="fas fa-share-alt"></i> Paylaş</a>
         </div>
         <div>
             @if (!HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)

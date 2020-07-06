@@ -6,30 +6,16 @@
     {
         string AuthenticatedUserId = HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
         if (AuthenticatedUserId == Model.UserId.ToString())
-        {
-            IsAuthenticatedUserEqualModelUser = true;
-        }
+        { IsAuthenticatedUserEqualModelUser = true; }
     }
 }
-@{
-    ViewData["Title"] = Model.Title + " @" + Model.User.Username + " | Okurdostu";
-    ViewData["OGDescription"] = "Bir öğrencinin ihtiyaç kampanyası: " + Model.Title;
-    ViewData["Description"] = "Bir öğrencinin ihtiyaç kampanyası: " + Model.Title;
-
-    Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";
-}
+@{ ViewData["Title"] = Model.Title + " @" + Model.User.Username + " | Okurdostu"; ViewData["OGDescription"] = "Bir öğrencinin ihtiyaç kampanyası: " + Model.Title; ViewData["Description"] = "Bir öğrencinin ihtiyaç kampanyası: " + Model.Title; Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml"; }
 
 @if (IsAuthenticatedUserEqualModelUser && !Model.IsCompleted)
 {
     <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
     @if (TempData["NeedMessage"] != null)
-    {
-        <div class="alert alert-secondary text-center font-weight-bold" role="alert">
-            <span>
-                @Html.Raw(TempData["NeedMessage"])
-            </span>
-        </div>
-    }
+    { <div class="alert alert-secondary text-center font-weight-bold" role="alert"> <span>@Html.Raw(TempData["NeedMessage"])</span> </div> }
 }
 
 @if (!Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUserEqualModelUser)
@@ -55,27 +41,15 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                 <center> <button class="btn btn-outline-purple rounded-custom w-75 mb-3 pt-1 pl-1 font-weight-bold" href="" data-toggle="modal" data-target="#edittitle" style="cursor:pointer;"> <i class="far fa-edit"></i> Başlığı düzenle </button> </center>
                 <div class="modal fade" id="edittitle" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-lg modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light" style="border-radius: 25px;"> <h3 class="font-weight-bold text-center text-black-50"> Başlığı düzenleme </h3> <hr /> @await Component.InvokeAsync("EditNeedTitle", new { Id = Model.Id }) </div></div></div></div>
             }
-            <h5 class="text-center text-black-50 text-break">
-                @Model.Title
-            </h5>
+            <h5 class="text-center text-black-50 text-break"> @Model.Title </h5>
         </div>
         <hr class="mb-1" />
         <div class="row">
             @if (Model.IsConfirmed == true)
-            {
-                <div class="col-xl-6 col-lg-6 col-md-6">
-                    @await Component.InvokeAsync("NeedItem", new { need = Model })
-                </div>
-            }
-            else
-            {
-                <div class="col-12">
-                    @await Component.InvokeAsync("NeedItem", new { need = Model })
-                </div>
-            }
-            <div class="col pl-xl-0 pl-lg-0 pl-md-0">
-                @await Component.InvokeAsync("NeedBasic", new { need = Model })
-            </div>
+            {<div class="col-xl-6 col-lg-6 col-md-6"> @await Component.InvokeAsync("NeedItem", new { need = Model }) </div> }
+        else
+        { <div class="col-12"> @await Component.InvokeAsync("NeedItem", new { need = Model }) </div>}
+            <div class="col pl-xl-0 pl-lg-0 pl-md-0"> @await Component.InvokeAsync("NeedBasic", new { need = Model }) </div>
         </div>
         @if (Model.IsConfirmed == true)
         {
@@ -108,10 +82,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                 });
         }; GetComments(); setInterval(function () { GetComments(); }, 5000);
 
-        $("#ShowLikers").on("click", function () {
-            $.post("/Like/Likers", { id: '@Model.Id', username: '@Model.User.Username', __RequestVerificationToken: validatetoken })
-                .done(function (likers) { $("#Likers").html(likers) });
-        });
+        $("#ShowLikers").on("click", function () {$.post("/Like/Likers", { id: '@Model.Id', username: '@Model.User.Username', __RequestVerificationToken: validatetoken }).done(function (likers) { $("#Likers").html(likers) }); });
     </script>
     @if (!HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
     {
@@ -123,7 +94,6 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
         <div class="modal fade" id="delete-comment" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-sm modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light text-center" style="border-radius: 25px;"> <p class="font-weight-bold text-black-50"> Sildiğiniz içerik sonsuza kadar yok olacak </p><button id="delete" class="btn btn-block btn-danger rounded-custom font-weight-bold mb-1 mt-1">Sil</button> <button class="btn btn-block btn-outline-secondary rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button> </div></div></div></div>
         <script type="text/javascript">
             $(document).ready(function () {
-
                 function LikeRefresh() {
                     $.ajax({
                         url: "/like/LikeState/@Model.Id",
