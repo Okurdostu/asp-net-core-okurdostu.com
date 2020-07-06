@@ -84,7 +84,7 @@
                             <span class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-comment-dots"></i> Cevapla</span>
                             @if (AuthenticatedUserId == item.UserId)
                             {
-                                <span class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-edit"></i> Düzenle</span>
+                                <span onclick="getEditDialog('@item.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-edit"></i> Düzenle</span>
                             }
                             @if (AuthenticatedUserId == item.UserId)
                             {

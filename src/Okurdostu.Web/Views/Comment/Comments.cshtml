@@ -39,7 +39,8 @@
                     <div class="small">
                         @if (mainComment.IsRemoved)
                         {
-                            <p class="font-weight-bold mb-1"><a class="od" style="cursor:pointer">[Silinmiş]</a>
+                            <p class="font-weight-bold mb-1">
+                                <a class="od" style="cursor:pointer">[Silinmiş]</a>
                             </p>
                         }
                         else
@@ -65,7 +66,7 @@
                             <span class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-comment-dots"></i> Cevapla</span>
                             @if (AuthenticatedUserId == mainComment.UserId)
                             {
-                                <span class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-edit"></i> Düzenle</span>
+                                <span onclick="getEditDialog('@mainComment.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-edit"></i> Düzenle</span>
                             }
                             @if (AuthenticatedUserId == mainComment.UserId)
                             {
@@ -80,19 +81,52 @@
         <br />
     }
 </div>
-<script>
-    var DeletingComment;
-    function getDeleteDialog(id) {
-        DeletingComment = id;
-        $('#delete-comment').modal('show');
-    };
-    $("#delete").click(function () {
-        $.post("/DeleteComment", { Id: DeletingComment, __RequestVerificationToken: validatetoken })
-            .done(function (bool) {
-                if (bool) {
-                    $('#delete-comment').modal('hide');
-                    GetComments(null);
+@if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+{
+    <script>
+        var DeletingCommentId;
+        function getDeleteDialog(id) {
+            DeletingCommentId = id;
+            $('#delete-comment').modal('show');
+        };
+
+        $("#delete").click(function () {
+            $.post("/DeleteComment", { Id: DeletingCommentId, __RequestVerificationToken: validatetoken })
+                .done(function (bool) {
+                    if (bool) {
+                        $('#delete-comment').modal('hide');
+                        GetComments(null);
+                    }
+                });
+        });
+
+        var EditingCommentId;
+        var EditingCommentContent;
+
+        function getEditDialog(id) {
+            EditingCommentContent = null;
+            EditingCommentId = id;
+            $.get("/GetCommentContent", { Id: EditingCommentId }).done(function (comment) {
+                if (comment != false) {
+                    EditingCommentContent = comment;
+                    $("#EditCommentInput").val(EditingCommentContent);
+                    $('#edit-comment').modal('show');
                 }
             });
-    });
-</script>
+        };
+        // check input validations.
+        $("#EditCommentButton").click(function () {
+            var NewComment = $('#EditCommentInput').val();
+            $.post("/EditComment", { Id: EditingCommentId, EditCommentInput: NewComment, __RequestVerificationToken: validatetoken })
+                .done(function (bool) {
+                    if (bool) {
+                        $('#edit-comment').modal('hide');
+                        GetComments(null);
+                    }
+                });
+        });
+    </script>
+}
+
+
+

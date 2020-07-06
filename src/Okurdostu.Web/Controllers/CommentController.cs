@@ -63,9 +63,9 @@ namespace Okurdostu.Web.Controllers
         [Authorize]
         [Route("~/DeleteComment")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<JsonResult> DeleteComment(Guid id)
+        public async Task<JsonResult> DeleteComment(Guid Id)
         {
-            var DeletedComment = await Context.NeedComment.FirstOrDefaultAsync(x => x.Id == id && !x.IsRemoved);
+            var DeletedComment = await Context.NeedComment.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
 
             if (DeletedComment != null)
             {
@@ -87,11 +87,54 @@ namespace Okurdostu.Web.Controllers
         }
 
 
+        [HttpGet]
+        [Route("~/GetCommentContent")]
+        public async Task<JsonResult> GetCommentContent(Guid Id) //it's for edit a comment
+        {
+            var EditingComment = await Context.NeedComment.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
+
+            if (EditingComment != null)
+            {
+                AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+
+                if (AuthUser.Id == EditingComment.User.Id)
+                {
+                    return Json(EditingComment.Comment);
+                }
+            }
+
+            return Json(false);
+        }
+
+        [Authorize]
+        [Route("~/EditComment")]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<JsonResult> EditComment(Guid Id, string EditCommentInput)
+        {
+            var EditedComment = await Context.NeedComment.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
+            if (EditedComment != null)
+            {
+                if (EditedComment.Comment != EditCommentInput)
+                {
+                    AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+
+                    if (AuthUser.Id == EditedComment.User.Id)
+                    {
+                        EditedComment.Comment = EditCommentInput;
+                        await Context.SaveChangesAsync();
+                        return Json(true);
+                    }
+                }
+                return Json(new { error = "Aynı içeriği girmeye çalışıyorsunuz." });
+            }
+            return Json(false);
+        }
+
         [Route("/Comments")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Comments(long id)
+        public async Task<IActionResult> Comments(long Id)
         {
-            var result = await Context.NeedComment.Where(x => x.NeedId == id).Include(x => x.User).OrderBy(x => x.CreatedOn).ToListAsync();
+            var result = await Context.NeedComment.Where(x => x.NeedId == Id).Include(x => x.User).OrderBy(x => x.CreatedOn).ToListAsync();
             return View(result);
         }
     }

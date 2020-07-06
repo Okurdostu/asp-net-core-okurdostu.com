@@ -1,0 +1,24 @@
+﻿@model CommentModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<div class="modal fade" id="edit-comment" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content" style="background: transparent;">
+            <div class="modal-body bg-light" style="border-radius: 25px;">
+                <h4 class="font-weight-bold text-center text-black-50">Yorumunu düzenleme</h4>
+                <form id="ReplyForm">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <textarea class="form-control" asp-for="Comment" name="EditCommentInput" id="EditCommentInput" style="height:100px;" autocomplete="off"></textarea>
+                            <span class="text-danger" asp-validation-for="Comment"></span>
+                        </div>
+                        <div class="modal-footer pb-0 pt-1"> <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button> <input id="EditCommentButton" type="submit" value="Düzenle" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" /> </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>$('#ReplyForm').submit(function () { return false; });</script>

@@ -15,7 +15,7 @@
 {
     <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
     @if (TempData["NeedMessage"] != null)
-    { <div class="alert alert-secondary text-center font-weight-bold" role="alert"> <span>@Html.Raw(TempData["NeedMessage"])</span> </div> }
+    {<div class="alert alert-secondary text-center font-weight-bold" role="alert"> <span>@Html.Raw(TempData["NeedMessage"])</span> </div>}
 }
 
 @if (!Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUserEqualModelUser)
@@ -61,12 +61,13 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
         }
         @await Component.InvokeAsync("NeedDescriptionSupporter", new { need = Model })
     </div>
+
     @Html.AntiForgeryToken()
     <script type="text/javascript">
         var validatetoken = $("input[name=__RequestVerificationToken]").val(); var oldDataFromComments = "oldDataFromComments"; var newDataFromComments = "newDataFromComments";
 
         function GetComments(scrollingTargetId) {
-            $.post("/Comments", { id: @Model.Id, __RequestVerificationToken: validatetoken })
+            $.post("/Comments", { Id: @Model.Id, __RequestVerificationToken: validatetoken })
                 .done(function (newDataFromComments) {
                     if (newDataFromComments != oldDataFromComments) {
                         $("#comments").html(newDataFromComments)
@@ -135,3 +136,5 @@ else
 {
     @: <p class="font-weight-bold text-warning mb-5 mt-5 text-center"> Bu ihtiyaç kampanyası onaylanmamış, onaylanana kadar sadece ihtiyaç kampanyasını oluşturan kişi görebilir. </p>
 }
+
+<partial name="~/Views/Comment/_EditCommentPartial.cshtml" model="null" />
