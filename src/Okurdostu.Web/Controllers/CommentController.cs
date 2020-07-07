@@ -6,7 +6,7 @@ using Okurdostu.Web.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Okurdostu.Web.Filters;
 namespace Okurdostu.Web.Controllers
 {
     public class CommentController : BaseController<CommentController>
@@ -16,6 +16,7 @@ namespace Okurdostu.Web.Controllers
         [Authorize]
         [Route("~/Comment")]
         [HttpPost, ValidateAntiForgeryToken]
+        [ConfirmedEmailFilter]
         public async Task<JsonResult> Comment(CommentModel Model) //main comment & reply a comment
         {
             //  flood ihtimalleri:
@@ -188,7 +189,8 @@ namespace Okurdostu.Web.Controllers
             }
 
             return Json(new { state, infoMessage, errorMessage });
-        }
+        } 
+
 
         [Route("/Comments")]
         [HttpPost, ValidateAntiForgeryToken]
