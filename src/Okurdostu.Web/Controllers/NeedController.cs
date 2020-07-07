@@ -28,7 +28,10 @@ namespace Okurdostu.Web.Controllers
             if (_ == "jquery")
                 TempData["Jquery"] = "Yes";
             else
+            {
+                ViewBag.Universities = Context.University.ToList().OrderBy(x => x.Name);
                 ViewData["NeedsActiveClass"] = "active";
+            }
 
             List<Need> NeedDefaultList =
                 await Context.Need

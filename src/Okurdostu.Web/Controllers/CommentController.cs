@@ -16,7 +16,7 @@ namespace Okurdostu.Web.Controllers
         [Authorize]
         [Route("~/Comment")]
         [HttpPost, ValidateAntiForgeryToken]
-        [ConfirmedEmailFilter]
+        [ServiceFilter(typeof(ConfirmedEmailFilter))]
         public async Task<JsonResult> Comment(CommentModel Model) //main comment & reply a comment
         {
             //  flood ihtimalleri:

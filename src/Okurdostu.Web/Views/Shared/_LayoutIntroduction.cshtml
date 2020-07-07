@@ -2,18 +2,6 @@
 @{
     bool IsAuthenticated = HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
 }
-@{
-    Okurdostu.Data.Model.User AuthUser = null;
-}
-
-@if (IsAuthenticated)
-{
-    long Id = long.Parse(HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value);
-    using (var Context = new Okurdostu.Data.OkurdostuContext())
-    {
-        AuthUser = Context.User.FirstOrDefault(x => x.Id == Id);
-    };
-}
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -93,8 +81,10 @@
                     }
                     else
                     {
+                        string username = (ViewBag.AuthUser as Okurdostu.Data.Model.User).Username;
+                        string picture = (ViewBag.AuthUser as Okurdostu.Data.Model.User).PictureUrl;
                         <li class="nav-item page-scroll">
-                            @if (AuthUser.PictureUrl == null)
+                            @if ((ViewBag.AuthUser as Okurdostu.Data.Model.User).PictureUrl == null)
                             {
                                 <div class="dropdown show">
                                     <a class="dropdown-toggle" href="" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -102,7 +92,7 @@
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="background-color:transparent">
                                         <a class="btn dropdown-item rounded-custom font-weight-bold" href="/beta">Beta</a>
-                                        <a class="btn dropdown-item rounded-custom font-weight-bold" href="/@AuthUser.Username">Profil</a>
+                                        <a class="btn dropdown-item rounded-custom font-weight-bold" href="/@username">Profil</a>
                                     </div>
                                 </div>
                             }
@@ -110,11 +100,11 @@
                             {
                                 <div class="dropdown show">
                                     <a class="dropdown-toggle" href="" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <img src="@AuthUser.PictureUrl" class="rounded-circle" style="width:60px;" alt="">
+                                        <img src="@picture" class="rounded-circle" style="width:60px;" alt="">
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="background-color:transparent">
                                         <a class="btn dropdown-item rounded-custom font-weight-bold" href="/beta">Beta</a>
-                                        <a class="btn dropdown-item rounded-custom font-weight-bold" href="/@AuthUser.Username">Profil</a>
+                                        <a class="btn dropdown-item rounded-custom font-weight-bold" href="/@username">Profil</a>
                                     </div>
                                 </div>
                             }

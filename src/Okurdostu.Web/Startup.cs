@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Okurdostu.Data;
+using Okurdostu.Web.Filters;
 using Okurdostu.Web.Services;
 using System.Linq;
 
@@ -40,6 +41,7 @@ namespace Okurdostu.Web
                 });
             services.AddMemoryCache();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<ConfirmedEmailFilter>();
             services.AddControllersWithViews();
             services.AddDbContext<OkurdostuContext>(option => option.UseSqlServer(Configuration.GetConnectionString("OkurdostuConnectionString")));
 

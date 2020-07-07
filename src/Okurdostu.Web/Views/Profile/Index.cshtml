@@ -82,10 +82,12 @@
     </h5>
     <span style="font-size:17px;" class="pl-1"> @Html.Raw("(@" + Model.Username + ")") </span>
     <div style="font-size:15.5px;" class="pl-1">
-        <span class="text-break">
-            @if (Model.Biography != null)
-            { Html.Raw(Model.Biography.Replace("\r\n", "<br/>"));  }
-        </span>
+        @if (Model.Biography != null)
+        { 
+            <span class="text-break">
+                @Html.Raw(Model.Biography.Replace("\r\n", "<br />"))
+            </span>
+            }
     </div>
     <div>
         @if (IsAuthenticatedUserEqualModelUser)
