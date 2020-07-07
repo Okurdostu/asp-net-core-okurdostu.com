@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.Differencing;
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data.Model;
 using Okurdostu.Web.Models;
@@ -17,47 +16,75 @@ namespace Okurdostu.Web.Controllers
         [Authorize]
         [Route("~/Comment")]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<JsonResult> Comment(CommentModel Model) //main comment
+        public async Task<JsonResult> Comment(CommentModel Model) //main comment & reply a comment
         {
             //  flood ihtimalleri:
             //  aynı veya benzer comment içeriğini girme,
             //  çok fazla ard arda giriş yapma.
 
-            if (Model.NeedId == null)
+            if (Model.Comment != null)
             {
-                return null;
-            }
-
-            var CommentedNeed = await Context.Need.FirstOrDefaultAsync(x => x.Id == Model.NeedId && x.IsConfirmed && !x.IsRemoved);
-
-            if (CommentedNeed != null)
-            {
-                AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-
-                var NewComment = new NeedComment()
+                if (Model.Comment.Length > 100)
                 {
-                    Comment = Model.Comment,
-                    UserId = AuthUser.Id,
-                    NeedId = (long)Model.NeedId
-                };
-
-                await Context.AddAsync(NewComment);
-                var result = await Context.SaveChangesAsync();
-
-                if (result > 0)
-                {
-                    return Json(new { id = NewComment.Id });
+                    return Json(new { errorMessage = "En fazla 100 karakter" });
                 }
-                else
+                else if (Model.Comment.Length < 5)
                 {
-                    return Json(new { error = "Başaramadık, ne olduğunu bilmiyoruz" });
+                    return Json(new { errorMessage = "En az 5 karakter" });
                 }
             }
             else
             {
-                return Json(new { error = "Böyle bir şey yok" });
+                return Json(null);
             }
 
+            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+
+            if (Model.NeedId != null)
+            {
+                var CommentedNeed = await Context.Need.FirstOrDefaultAsync(x => x.Id == Model.NeedId && !x.IsRemoved && x.IsConfirmed);
+                if (CommentedNeed != null)
+                {
+                    var NewComment = new NeedComment()
+                    {
+                        Comment = Model.Comment,
+                        UserId = AuthUser.Id,
+                        NeedId = (long)Model.NeedId
+                    };
+                    await Context.AddAsync(NewComment);
+                    await Context.SaveChangesAsync();
+                    return Json(new { id = NewComment.Id });
+                }
+                else
+                {
+                    return Json(new { infoMessage = "Bir şeylere ulaşamadık" });
+                }
+            }
+            else if (Model.RelatedCommentId != null)
+            {
+                var RepliedComment = await Context.NeedComment.Include(x => x.Need).
+                FirstOrDefaultAsync(x => x.Id == Model.RelatedCommentId && !x.IsRemoved && !x.Need.IsRemoved && x.Need.IsConfirmed);
+                if (RepliedComment != null)
+                {
+                    var NewReply = new NeedComment()
+                    {
+                        Comment = Model.Comment,
+                        UserId = AuthUser.Id,
+                        NeedId = RepliedComment.NeedId,
+                        RelatedCommentId = RepliedComment.Id
+                    };
+
+                    await Context.AddAsync(NewReply);
+                    await Context.SaveChangesAsync();
+                    return Json(new { id = NewReply.Id });
+                }
+                else
+                {
+                    return Json(new { infoMessage = "Bir şeylere ulaşamadık" });
+                }
+            }
+
+            return Json(null);
         }
 
 
@@ -72,7 +99,7 @@ namespace Okurdostu.Web.Controllers
             {
                 AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
 
-                if (AuthUser.Id == DeletedComment.User.Id)
+                if (AuthUser.Id == DeletedComment.UserId)
                 {
                     DeletedComment.IsRemoved = true;
                     DeletedComment.UserId = null;
@@ -90,22 +117,19 @@ namespace Okurdostu.Web.Controllers
 
         [HttpGet]
         [Route("~/GetCommentContent")]
-        public async Task<JsonResult> GetCommentContent(Guid Id) //it's for edit a comment
+        public async Task<JsonResult> GetComment(Guid Id) //it's for edit and doreply
         {
-            var EditingComment = await Context.NeedComment.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
+            var Comment = await Context.NeedComment.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
 
-            if (EditingComment != null)
+            if (Comment != null)
             {
                 AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-
-                if (AuthUser.Id == EditingComment.User.Id)
-                {
-                    return Json(EditingComment.Comment);
-                }
+                return Json(new { state = true, comment = Comment.Comment, username = Comment.User.Username, fullname = Comment.User.FullName });
             }
 
-            return Json(false);
+            return Json(new { state = false, comment = "" });
         }
+
 
         [Authorize]
         [Route("~/EditComment")]
@@ -129,7 +153,7 @@ namespace Okurdostu.Web.Controllers
                 {
                     AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
 
-                    if (AuthUser.Id == EditedComment.User.Id)
+                    if (AuthUser.Id == EditedComment.UserId)
                     {
                         try
                         {
@@ -141,16 +165,15 @@ namespace Okurdostu.Web.Controllers
                         }
                         catch (Exception)
                         {
+                            state = false;
+
                             if (EditedComment.Comment.Length > 100)
                             {
-                                state = false;
                                 errorMessage = "En fazla 100 karakter";
                                 infoMessage = "";
-
                             }
                             else
                             {
-                                state = false;
                                 infoMessage = "Ne olduğunu bilmiyoruz tekrar deneyin.";
                                 errorMessage = "";
                             }
@@ -159,7 +182,6 @@ namespace Okurdostu.Web.Controllers
                 }
                 else
                 {
-                    state = false;
                     errorMessage = "Aynı içeriği giriyorsunuz.";
                     infoMessage = "";
                 }

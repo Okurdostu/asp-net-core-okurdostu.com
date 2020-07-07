@@ -1,18 +1,1 @@
-﻿@model CommentModel
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-
-<div class="modal fade" id="edit-comment" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content" style="background: transparent;">
-            <div class="modal-body bg-light" style="border-radius: 25px;">
-                <h4 class="font-weight-bold text-center text-black-50">Yorumunu düzenleme</h4>
-                    <div class="form-horizontal">
-                        <div class="form-group">
-                            <textarea class="form-control" asp-for="Comment" name="EditCommentInput" id="EditCommentInput" style="height:100px;" autocomplete="off"></textarea>
-                        </div>
-                        <div class="modal-footer pb-0 pt-1"> <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button> <button id="EditCommentButton" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold">Düzenle</button> </div>
-                    </div>
-            </div>
-        </div>
-    </div>
-</div>
+﻿<div class="modal fade" id="edit-comment-modal" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-lg modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light" style="border-radius: 25px;"> <h4 class="font-weight-bold text-center text-black-50">Yorumunu düzenleme</h4> <div class="form-horizontal"> <div class="form-group"> <textarea class="form-control" id="edit-comment-input" name="edit-comment-input" style="height:100px;" autocomplete="off"></textarea> </div><div class="modal-footer pb-0 pt-1"> <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button> <button id="edit-comment" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold">Düzenle</button> </div></div></div></div></div></div>

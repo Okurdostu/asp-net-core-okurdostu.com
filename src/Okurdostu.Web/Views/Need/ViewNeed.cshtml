@@ -71,12 +71,10 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                 .done(function (newDataFromComments) {
                     if (newDataFromComments != oldDataFromComments) {
                         $("#comments").html(newDataFromComments)
-
                         if (scrollingTargetId != null) {
                             $('html, body').animate({
                                 scrollTop: $('#' + scrollingTargetId).offset().top
                             }, 2000);
-                            $("#Comment").val("");
                         }
                     }
                     oldDataFromComments = newDataFromComments;
@@ -92,6 +90,8 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
     }
     else
     {
+        <partial name="~/Views/Comment/_EditCommentPartial.cshtml" model="null" />
+        <partial name="~/Views/Comment/_DoReplyPartial.cshtml" model="null" />
         <div class="modal fade" id="delete-comment" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-sm modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light text-center" style="border-radius: 25px;"> <p class="font-weight-bold text-black-50"> Sildiğiniz içerik sonsuza kadar yok olacak </p><button id="delete" class="btn btn-block btn-danger rounded-custom font-weight-bold mb-1 mt-1">Sil</button> <button class="btn btn-block btn-outline-secondary rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button> </div></div></div></div>
         <script type="text/javascript">
             $(document).ready(function () {
@@ -108,15 +108,64 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                 }; LikeRefresh(); setInterval(function () { LikeRefresh(); }, 10000);
 
                 $("#DoComment").click(function () {
-                    $.post("/Comment", { NeedId: @Model.Id, Comment: $("#Comment").val(), __RequestVerificationToken: validatetoken })
+                    if ($("#Comment").val().length >= 5 && $("#Comment").val().length <= 100) {
+                        $.post("/Comment", { NeedId: @Model.Id, Comment: $("#Comment").val(), __RequestVerificationToken: validatetoken })
+                            .done(function (result) {
+                                if (result.id != null) {
+                                    GetComments(result.id);
+                                    $("#Comment").val("");
+                                }
+                                else if (result.errorMesage.length > 0) {
+                                    swal("Tartışma başlatma", result.errorMesage, "error", {
+                                        button: "Tamam",
+                                        timer: 5000
+                                    });
+                                }
+                                else if (result.infoMessage.length > 0) {
+                                    swal("Tartışma başlatma", result.infoMessage, "info", {
+                                        button: "Tamam",
+                                        timer: 5000
+                                    });
+                                }
+                            });
+                    }
+                    else {
+                        swal("Tartışma başlatma", "En fazla 100, en az 5 karakter", "info", {
+                            button: "Tamam",
+                            timer: 3000
+                        });
+                    }
+                });
+
+                $("#DoReply").click(function () {
+                    if ($("#ReplyComment").val().length >= 5 && $("#ReplyComment").val().length <= 100) {
+                    $.post("/Comment", { RelatedCommentId: ReplyingCommentId, Comment: $("#ReplyComment").val(), __RequestVerificationToken: validatetoken })
                         .done(function (result) {
                             if (result.id != null) {
                                 GetComments(result.id);
+                                $('#reply-comment-modal').modal('hide');
+                                $("#ReplyComment").val("");
                             }
-                            else {
-                                alert(result.error); //toast gelecek
+                            else if (result.errorMesage.length > 0) {
+                                swal("Cevaplama", result.errorMesage, "error", {
+                                    button: "Tamam",
+                                    timer: 5000
+                                });
+                            }
+                            else if (result.infoMessage.length > 0) {
+                                swal("Cevaplama", result.infoMessage, "info", {
+                                    button: "Tamam",
+                                    timer: 5000
+                                });
                             }
                         });
+                    }
+                    else {
+                        swal("Cevaplama", "En fazla 100, en az 5 karakter", "info", {
+                            button: "Tamam",
+                            timer: 3000
+                        });
+                    }
                 });
 
                 $("#Like").on("click", function () {
@@ -136,5 +185,3 @@ else
 {
     @: <p class="font-weight-bold text-warning mb-5 mt-5 text-center"> Bu ihtiyaç kampanyası onaylanmamış, onaylanana kadar sadece ihtiyaç kampanyasını oluşturan kişi görebilir. </p>
 }
-
-<partial name="~/Views/Comment/_EditCommentPartial.cshtml" model="null" />
