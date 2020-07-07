@@ -1,0 +1,101 @@
+﻿@model List<Okurdostu.Data.Model.NeedComment>
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
+@{long AuthenticatedUserId = 0;}
+@{
+    if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+    { AuthenticatedUserId = long.Parse(HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value); }
+}
+@{Layout = null;}
+<div class="container-fluid pr-1">
+    @foreach (var item in Model)
+    {
+        <div class="row pl-md-3 pl-1" id="@item.Id">
+            <div class="comments-vertical-line">
+                <!-- Profil fotoğrafı -->
+                <div>
+                    @if (item.IsRemoved)
+                    {
+                        <div class="col-auto"><img src="~/svg/user.svg" class="img-thumbnail p-0 rounded-pill" style="width:35px; height:35px" /></div>
+                    }
+                    else
+                    {
+                        <a href="/@item.User.Username">
+                            @if (item.User.PictureUrl != null)
+                            {
+                                <div class="col-auto"><img src="@item.User.PictureUrl" class="img-thumbnail p-0 rounded-pill" style="width:35px; height:35px" /></div>
+                            }
+                            else
+                            {
+                                <div class="col-auto"><img src="~/svg/user.svg" class="img-thumbnail p-0 rounded-pill" style="width:35px; height:35px" /></div>
+                            }
+                        </a>
+                    }
+                </div>
+                <div class="col-auto pl-1">
+                    <!-- Kullanıcı bilgileri -->
+                    <div class="small">
+                        <p class="font-weight-bold mb-0">
+                            @if (item.IsRemoved)
+                            {
+                                <a class="od" style="cursor:pointer">[Silinmiş]</a>
+                            }
+                            else
+                            {
+                                <a class="od" href="/@item.User.Username"> @item.User.FullName <span class="text-black-50 font-weight-bold">@Html.Raw("(@" + item.User.Username + ")")</span> </a>
+                            }
+                        </p>
+                    </div>
+                    <!-- Kime cevap yazıyor -->
+                    <div class="small">
+                        <p class="small font-weight-bold text-black-50 mb-1">
+                            @if (!item.RelatedComment.IsRemoved && !item.IsRemoved)
+                            {
+                                @if (!item.RelatedComment.IsRemoved && item.RelatedComment.User.Username == item.User.Username)
+                                {
+                                    @:Kendine ekleme yapıyor
+                                }
+                                else if (!item.RelatedComment.IsRemoved)
+                                {
+
+                                    @:Cevaplıyor: <a class="od" href="/@item.RelatedComment.User.Username"> @Html.Raw("@" + item.RelatedComment.User.Username + "")</a>
+                                }
+                            }
+                            else if (!item.IsRemoved)
+                            {
+                                @:Cevapladığı yorum silinmiş
+                            }
+                        </p>
+                    </div>
+                    <!-- Yorum -->
+                    <div>
+                        @if (item.IsRemoved)
+                        {
+                            <p class="mb-0" style="font-size:15.5px">[Silinmiş]</p>
+                        }
+                        else
+                        {
+                            <p class="mb-0" style="font-size:13.5px"> @item.Comment.ToString()</p>
+                        }
+                    </div>
+                    <!-- İşlemler -->
+                        @if (!item.IsRemoved)
+                        {
+                            <div class="mb-2">
+                                <span onclick="getReplyDialog('@item.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-comment-dots"></i> Cevapla</span>
+                                @if (AuthenticatedUserId == item.UserId)
+                                {
+                                    <span onclick="getEditDialog('@item.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-edit"></i> Düzenle</span>
+                                }
+                                @if (AuthenticatedUserId == item.UserId)
+                                {
+                                    <span onclick="getDeleteDialog('@item.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-trash-alt"></i> Sil</span>
+                                }
+                            </div>
+                        }
+                    @await Component.InvokeAsync("RelatedComment", item.Id)
+                </div>
+            </div>
+        </div>
+        <div class="mt-2"></div>
+    }
+</div>

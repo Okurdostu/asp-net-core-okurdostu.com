@@ -13,11 +13,8 @@ namespace Okurdostu.Web
     {
         private ILogger<T> _logger;
         protected ILogger<T> Logger => _logger ?? (_logger = HttpContext.RequestServices.GetService<ILogger<T>>());
+        public OkurdostuContext Context => (OkurdostuContext)HttpContext?.RequestServices.GetService(typeof(OkurdostuContext));
 
-        private OkurdostuContext _con;
-        public OkurdostuContext Context => _con ?? (OkurdostuContext)HttpContext?.RequestServices.GetService(typeof(OkurdostuContext));
-
-        [Authorize]
         public async Task<User> GetAuthenticatedUserFromDatabaseAsync()
         {
             var Id = User.Identity.GetUserId();

@@ -1,0 +1,4 @@
+﻿@model CommentModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{ Layout = null; }
+<h4 class="ml-2">Tartışma başlat</h4><form id="CommentForm"> <div class="form-horizontal"> <div class="form-group"><textarea class="form-control" asp-for="Comment" style="height:100px;" autocomplete="off"></textarea><span class="text-danger" asp-validation-for="Comment"></span></div><div class="form-group"><input id="DoComment" class="btn btn-outline-purple rounded-custom float-right font-weight-bold" type="submit" value="Başlat"/><br/></div></div></form><script>$('#CommentForm').submit(function (){return false;});</script>

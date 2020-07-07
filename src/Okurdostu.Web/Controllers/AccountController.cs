@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Okurdostu.Data;
 using Okurdostu.Data.Model;
 using Okurdostu.Web.Extensions;
+using Okurdostu.Web.Filters;
 using Okurdostu.Web.Models;
 using Okurdostu.Web.Services;
 using SixLabors.ImageSharp;
@@ -59,6 +59,25 @@ namespace Okurdostu.Web.Controllers
         #endregion
 
         #region account
+
+        [HttpPost, ValidateAntiForgeryToken]
+        [Route("/sendconfirmationemail")]
+        public async Task<IActionResult> SendConfirmationEmail()
+        {
+            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+            var _UserEmailConfirmation = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.UserId == AuthUser.Id && !x.IsUsed);
+
+            var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
+            {
+                SenderMail = "halil@okurdostu.com",
+                SenderName = "Halil İbrahim Kocaöz"
+            };
+
+            Email.Send(Email.NewUserMail(AuthUser.FullName, AuthUser.Email, _UserEmailConfirmation.GUID));
+            TempData["ProfileMessage"] = AuthUser.Email + " adresine yeni bir onay maili gönderildi";
+            return Redirect("/" + AuthUser.Username);
+        }
+
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> GetConfirmationToEmailChange(ProfileModel Model)
         {
@@ -201,7 +220,7 @@ namespace Okurdostu.Web.Controllers
                 {
                     if (e.InnerException != null && e.InnerException.Message.Contains("Unique_Key_Email"))
                     {
-                        TempData["ProfileMessage"] = "Değiştirme talebinde bulunduğunuz e-mail adresini kullanamazsınız, e-mail değiştirme isteğiniz geçersiz kılındı";
+                        TempData["ProfileMessage"] = "Değiştirme talebinde bulunduğunuz e-mail adresini kullanamazsınız.<br>E-mail değiştirme isteğiniz geçersiz kılındı";
                         AuthUser.Email = Email;
                         AuthUser.IsEmailConfirmed = EmailConfirmState;
                         ConfirmationRequest.IsUsed = true;
@@ -218,6 +237,7 @@ namespace Okurdostu.Web.Controllers
             Response.Redirect("/" + AuthUser.Username);
         }
 
+        [ConfirmedEmailFilter]
         [HttpPost, ValidateAntiForgeryToken]
         [Route("~/password")]
         public async Task EditPassword(ProfileModel Model)
@@ -251,6 +271,7 @@ namespace Okurdostu.Web.Controllers
             Response.Redirect("/" + AuthUser.Username);
         }
 
+        [ConfirmedEmailFilter]
         [HttpPost, ValidateAntiForgeryToken]
         [Route("~/username")]
         public async Task EditUsername(ProfileModel Model)
@@ -290,7 +311,8 @@ namespace Okurdostu.Web.Controllers
 
             Response.Redirect("/" + AuthUser.Username);
         }
-
+        
+        [ConfirmedEmailFilter]
         [HttpPost, ValidateAntiForgeryToken]
         [Route("~/contact")]
         public async Task Contact(ProfileModel Model) //editing, adding contacts
@@ -318,6 +340,7 @@ namespace Okurdostu.Web.Controllers
 
         }
 
+        [ConfirmedEmailFilter]
         [HttpPost, ValidateAntiForgeryToken]
         [Route("~/basic")]
         public async Task ProfileBasic(ProfileModel Model) //editing, adding bio and fullname
@@ -344,6 +367,7 @@ namespace Okurdostu.Web.Controllers
 
         }
 
+        [ConfirmedEmailFilter]
         [HttpPost, ValidateAntiForgeryToken]
         [Route("~/photo")]
         public async Task AddPhoto()
@@ -394,6 +418,7 @@ namespace Okurdostu.Web.Controllers
             Response.Redirect("/" + AuthUser.Username);
         }
 
+        [ConfirmedEmailFilter]
         [HttpPost, ValidateAntiForgeryToken]
         [Route("~/remove-photo")]
         public async Task RemovePhoto()
@@ -423,6 +448,7 @@ namespace Okurdostu.Web.Controllers
 
 
         #region Education
+        [ConfirmedEmailFilter]
         [HttpPost, ValidateAntiForgeryToken]
         [Route("~/education")]
         public async Task AddEducation(EducationModel Model)
@@ -468,6 +494,7 @@ namespace Okurdostu.Web.Controllers
             Response.Redirect("/" + AuthUser.Username);
         }
 
+        [ConfirmedEmailFilter]
         [HttpPost, ValidateAntiForgeryToken]
         [Route("~/edit-education")]
         public async Task EditEducation(EducationModel Model)
@@ -531,6 +558,7 @@ namespace Okurdostu.Web.Controllers
         _redirect: Response.Redirect("/" + AuthUser.Username);
         }
 
+        [ConfirmedEmailFilter]
         [HttpPost, ValidateAntiForgeryToken]
         [Route("~/remove-education")]
         public async Task RemoveEducation(long Id, string Username)
@@ -603,8 +631,7 @@ namespace Okurdostu.Web.Controllers
             Response.Redirect("/" + AuthUser.Username);
         }
 
-
-
+        [ConfirmedEmailFilter]
         [HttpPost, ValidateAntiForgeryToken]
         [Route("~/education-document")]
         public async Task SendEducationDocument(long Id, IFormFile File)

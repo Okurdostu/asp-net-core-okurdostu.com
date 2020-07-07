@@ -16,6 +16,7 @@ namespace Okurdostu.Data.Model
 
             NeedItem = new HashSet<NeedItem>();
             NeedLike = new HashSet<NeedLike>();
+            NeedComment = new HashSet<NeedComment>();
         }
 
         public long Id { get; set; }
@@ -34,9 +35,11 @@ namespace Okurdostu.Data.Model
         public DateTime? FinishedOn { get; set; }
         public bool IsWrong { get; set; }
 
+        
         public decimal? CompletedPercentage => 100 - (TotalCharge - TotalCollectedMoney) * 100 / TotalCharge;
 
         public virtual User User { get; set; }
+        public virtual ICollection<NeedComment> NeedComment { get; set; }
         public virtual ICollection<NeedItem> NeedItem { get; set; }
         public virtual ICollection<NeedLike> NeedLike { get; set; }
     }
