@@ -39,3 +39,4 @@ msbuild.wrn
 *.sln.docstates
 
 
+src/Okurdostu.Web/Properties/PublishProfiles/FolderProfile.pubxml

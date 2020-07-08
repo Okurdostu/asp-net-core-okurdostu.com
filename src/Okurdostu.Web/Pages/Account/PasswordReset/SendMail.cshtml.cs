@@ -67,7 +67,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                 SenderName = "Okurdostu"
             };
 
-            var preCreatedPaswordReset = await Context.UserPasswordReset.Include(x => x.User).FirstOrDefaultAsync(x => x.UserId == _User.Id && !x.IsUsed);
+            var preCreatedPaswordReset = Context.UserPasswordReset.Where(x => x.UserId == _User.Id && !x.IsUsed).Include(x => x.User).ToList().LastOrDefault();
             var elapsedTime = DateTime.Now - preCreatedPaswordReset?.CreatedOn;
 
             if (preCreatedPaswordReset != null && elapsedTime.Value.Hours < 11.5)

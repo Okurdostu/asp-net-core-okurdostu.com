@@ -80,13 +80,13 @@ namespace Okurdostu.Web.Controllers
             }
             else
             {
-                var newUserEmailConfimration = new UserEmailConfirmation()
+                var newUserEmailConfirmation = new UserEmailConfirmation()
                 {
                     UserId = AuthUser.Id,
                 };
-                await Context.AddAsync(newUserEmailConfimration);
+                await Context.AddAsync(newUserEmailConfirmation);
                 await Context.SaveChangesAsync();
-                confirmationGuid = newUserEmailConfimration.GUID;
+                confirmationGuid = newUserEmailConfirmation.GUID;
             }
 
             Email.Send(Email.NewUserMail(AuthUser.FullName, AuthUser.Email, confirmationGuid));
@@ -236,7 +236,7 @@ namespace Okurdostu.Web.Controllers
                 {
                     if (e.InnerException != null && e.InnerException.Message.Contains("Unique_Key_Email"))
                     {
-                        TempData["ProfileMessage"] = "Değiştirme talebinde bulunduğunuz e-mail adresini kullanamazsınız.<br>E-mail değiştirme isteğiniz geçersiz kılındı";
+                        TempData["ProfileMessage"] = "Değiştirme talebinde bulunduğunuz e-mail adresini kullanamazsınız.<br>E-mail değiştirme isteğiniz geçersiz kılındı<br>Yeni bir e-mail değiştirme isteğinde bulunun";
                         AuthUser.Email = Email;
                         AuthUser.IsEmailConfirmed = EmailConfirmState;
                         ConfirmationRequest.IsUsed = true;
@@ -295,30 +295,37 @@ namespace Okurdostu.Web.Controllers
         {
             if (await ConfirmIdentityWithPassword(Model.ConfirmPassword))
             {
-                Model.Username = Model.Username.ToLower();
-                if (AuthUser.Username != Model.Username)
+                if (!blockedUsernames.Any(x => Model.Username == x))
                 {
-                    string NowUsername = AuthUser.Username;
-                    AuthUser.Username = Model.Username;
-                    try
+                    Model.Username = Model.Username.ToLower();
+                    if (AuthUser.Username != Model.Username)
                     {
-                        await Context.SaveChangesAsync();
-                        TempData["ProfileMessage"] = "Yeni kullanıcı adınız: " + AuthUser.Username;
-                        Logger.LogInformation("User({Id}) changed their username, old: {old} new: {new}", AuthUser.Id, NowUsername, AuthUser.Username);
-                    }
-                    catch (Exception e)
-                    {
-                        if (e.InnerException.Message.Contains("Unique_Key_Username"))
+                        string NowUsername = AuthUser.Username;
+                        AuthUser.Username = Model.Username;
+                        try
                         {
-                            TempData["ProfileMessage"] = "Bu kullanıcı adını: " + AuthUser.Username + " kullanamazsınız";
+                            await Context.SaveChangesAsync();
+                            TempData["ProfileMessage"] = "Yeni kullanıcı adınız: " + AuthUser.Username;
+                            Logger.LogInformation("User({Id}) changed their username, old: {old} new: {new}", AuthUser.Id, NowUsername, AuthUser.Username);
                         }
-                        else
+                        catch (Exception e)
                         {
-                            Logger.LogError("Changing username failed, UserId: {Id} Ex message: {ExMessage}", AuthUser.Id, e.Message);
-                            TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
+                            if (e.InnerException.Message.Contains("Unique_Key_Username"))
+                            {
+                                TempData["ProfileMessage"] = "Bu kullanıcı adını: " + AuthUser.Username + " kullanamazsınız";
+                            }
+                            else
+                            {
+                                Logger.LogError("Changing username failed, UserId: {Id} Ex message: {ExMessage}", AuthUser.Id, e.Message);
+                                TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
+                            }
+                            AuthUser.Username = NowUsername;
                         }
-                        AuthUser.Username = NowUsername;
                     }
+                }
+                else
+                {
+                    TempData["ProfileMessage"] = "Bu kullanıcı adını: " + Model.Username + " kullanamazsınız";
                 }
             }
             else

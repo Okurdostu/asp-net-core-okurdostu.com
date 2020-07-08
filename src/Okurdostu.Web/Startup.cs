@@ -88,16 +88,36 @@ namespace Okurdostu.Web
         {
             public bool Match(HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection)
             {
-                using (var Context = new OkurdostuContext())
+
+                var ValueFromRoute = values["username"].ToString().ToLower();
+
+                string[] blockedRouteValues = { 
+                    "","comments","girisyap","kaydol","ihtiyaclar","beta","arama","comment",
+
+                    "account","gizlilik-politikasi","kullanici-sozlesmesi","sss","kvkk",
+
+                    "home", "like", "comment","deletecomment","getcommentcontent","logout",
+
+                    "editcomment","like","ihtiyac-olustur","ihtiyac", "universiteler"
+                };
+
+                bool IsComingValueEqualAnyBlockedRoute = blockedRouteValues.Any(x => x == ValueFromRoute || x.Contains(ValueFromRoute));
+
+                if (IsComingValueEqualAnyBlockedRoute)
                 {
-                    var Usernames = Context.User.Select(x => new
-                    {
-                        x.Username
-                    }).ToList();
-                    var ValueFromRoute = values["username"].ToString().ToLower();
-                    return Usernames.Any(x => x.Username.ToLower() == ValueFromRoute);
+                    return !IsComingValueEqualAnyBlockedRoute;
                 }
-                //her kayýt olan ve deðiþtirilen kullanýcýdan sonra bir xml'e usernames aktarýlabilir ve veriler oradan okunabilir performansý ilerleyen dönemde analiz et.
+                else
+                {
+                    using (var Context = new OkurdostuContext())
+                    {
+                        var Usernames = Context.User.Select(x => new
+                        {
+                            x.Username
+                        }).ToList();
+                        return Usernames.Any(x => x.Username.ToLower() == ValueFromRoute);
+                    }
+                }
             }
         }
     }
