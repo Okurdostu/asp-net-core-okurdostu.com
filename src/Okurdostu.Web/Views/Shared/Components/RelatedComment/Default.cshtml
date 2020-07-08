@@ -67,35 +67,8 @@
                         </p>
                     </div>
                     <div class="small">
-                        @{
-                            var value = DateTime.Now - item.CreatedOn;
-                            string date = "";
-                        }
-                        @if (value.Days > 30)
-                        {
-                            date = item.CreatedOn.Month + " " + item.CreatedOn.Year;
-                        }
-                        else if (value.Days > 1)
-                        {
-                            date = value.Days + " gün önce";
-                        }
-                        else if (value.Days < 1 && value.Hours > 1)
-                        {
-                            date = value.Hours + " saat önce";
-                        }
-                        else if (value.Days < 1 && value.Hours < 1)
-                        {
-                            if (value.Minutes == 0)
-                            {
-                                date = "Biraz önce";
-                            }
-                            else
-                            {
-                                date = value.Minutes + " dakika önce";
-                            }
-                        }
                         <p class="small font-weight-bold text-black-50 mb-1">
-                            @date.ToString() yazdı
+                            @item.HowLongPassed
                         </p>
                     </div>
                     <!-- Yorum -->
