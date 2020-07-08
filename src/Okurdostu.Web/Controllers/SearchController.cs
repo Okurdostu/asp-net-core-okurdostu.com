@@ -4,8 +4,8 @@ namespace Okurdostu.Web.Controllers
 {
     public class SearchController : BaseController<SearchController>
     {
-        [Route("~/arama")]
-        [Route("~/arama/{q}")]
+        [Route("arama")]
+        [Route("arama/{q}")]
         public IActionResult Index(string q)
         {
 

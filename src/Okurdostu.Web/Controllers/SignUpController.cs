@@ -17,14 +17,14 @@ namespace Okurdostu.Web.Controllers
 {
     public class SignUpController : BaseController<SignUpController>
     {
-        [Route("~/Kaydol")]
+        [Route("Kaydol")]
         public IActionResult Index(string ReturnUrl)
         {
             return HttpContext.User.Identity.IsAuthenticated ? (IActionResult)Redirect("/") : View();
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/Kaydol")]
+        [Route("Kaydol")]
         public async Task<IActionResult> Index(ProfileModel Model, string ReturnUrl)
         {
             if (blockedUsernames.Any(x => Model.Username == x))

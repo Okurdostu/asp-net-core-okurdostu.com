@@ -78,7 +78,7 @@ namespace Okurdostu.Web
         {
             using (var client = new SmtpClient())
             {
-                client.Connect(EmailConfigurations.Server, EmailConfigurations.Port, false);
+                client.Connect(EmailConfigurations.Server, EmailConfigurations.Port, MailKit.Security.SecureSocketOptions.None);
                 client.Authenticate(SenderMail, EmailConfigurations.Password);
                 client.Send(Mail);
                 client.Disconnect(true);

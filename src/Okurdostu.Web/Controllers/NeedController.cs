@@ -20,9 +20,9 @@ namespace Okurdostu.Web.Controllers
 
         private User AuthUser;
 
-        [Route("~/ihtiyaclar")]
-        [Route("~/ihtiyaclar/{filtreText}")]
-        [Route("~/ihtiyaclar/{filtreText}/{_}")]
+        [Route("ihtiyaclar")]
+        [Route("ihtiyaclar/{filtreText}")]
+        [Route("ihtiyaclar/{filtreText}/{_}")]
         public async Task<IActionResult> Index(string filtreText, string _)
         {
             if (_ == "jquery")
@@ -164,7 +164,7 @@ namespace Okurdostu.Web.Controllers
 
 
         [Authorize]
-        [Route("~/ihtiyac-olustur")]
+        [Route("ihtiyac-olustur")]
         public async Task<IActionResult> Create()
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
@@ -180,7 +180,7 @@ namespace Okurdostu.Web.Controllers
 
         [Authorize]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/ihtiyac-olustur")]
+        [Route("ihtiyac-olustur")]
         public async Task<IActionResult> Create(NeedModel Model)
         {
             if (ModelState.IsValid)
@@ -467,7 +467,7 @@ namespace Okurdostu.Web.Controllers
 
 
         #region view
-        [Route("~/ihtiyac/{Id}")]
+        [Route("ihtiyac/{Id}")]
         public async Task<IActionResult> ShortUrl(long Id)
         {
             var Need = await Context.Need.Include(needuser => needuser.User).FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
@@ -482,7 +482,7 @@ namespace Okurdostu.Web.Controllers
         }
 
 
-        [Route("~/{username}/ihtiyac/{friendlytitle}/{id}")]
+        [Route("{username}/ihtiyac/{friendlytitle}/{id}")]
         public async Task<IActionResult> ViewNeed(string username, string friendlytitle, long id)
         {
             ViewData["NeedsActiveClass"] = "active";

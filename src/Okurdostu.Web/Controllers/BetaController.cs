@@ -7,6 +7,7 @@ namespace Okurdostu.Web.Controllers
 {
     public class BetaController : BaseController<BetaController>
     {
+        [Route("beta")]
         public async Task<IActionResult> Index()
         {
             ViewData["BetaActiveClass"] = "active";

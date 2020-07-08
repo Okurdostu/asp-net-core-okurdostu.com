@@ -14,7 +14,7 @@ namespace Okurdostu.Web.Controllers
         public User AuthUser;
 
         [Authorize]
-        [Route("~/Comment")]
+        [Route("Comment")]
         [HttpPost, ValidateAntiForgeryToken]
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         public async Task<JsonResult> Comment(CommentModel Model) //main comment & reply a comment
@@ -90,7 +90,7 @@ namespace Okurdostu.Web.Controllers
 
 
         [Authorize]
-        [Route("~/DeleteComment")]
+        [Route("DeleteComment")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<JsonResult> DeleteComment(Guid Id)
         {
@@ -117,7 +117,7 @@ namespace Okurdostu.Web.Controllers
 
 
         [HttpGet]
-        [Route("~/GetCommentContent")]
+        [Route("GetCommentContent")]
         public async Task<JsonResult> GetComment(Guid Id) //it's for edit and doreply
         {
             var Comment = await Context.NeedComment.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
@@ -133,7 +133,7 @@ namespace Okurdostu.Web.Controllers
 
 
         [Authorize]
-        [Route("~/EditComment")]
+        [Route("EditComment")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<JsonResult> EditComment(Guid Id, string EditCommentInput)
         {
@@ -192,7 +192,7 @@ namespace Okurdostu.Web.Controllers
         } 
 
 
-        [Route("/Comments")]
+        [Route("Comments")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Comments(long Id)
         {

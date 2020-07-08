@@ -6,32 +6,32 @@ namespace Okurdostu.Web.Controllers
     public class HomeController : BaseController<HomeController>
     {
         //viewbag.authuser i onactionexecuting e al.
-        [Route("~/")]
+        [Route("")]
         public async Task<IActionResult> Index()
         {
             ViewBag.AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             return View();
         }
-        [Route("~/gizlilik-politikasi")]
+        [Route("gizlilik-politikasi")]
         public async Task<IActionResult> PrivacyPolicy()
         {
             ViewBag.AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             return View();
         }
-        [Route("~/kullanici-sozlesmesi")]
+        [Route("kullanici-sozlesmesi")]
         public async Task<IActionResult> UserAgreement()
         {
             ViewBag.AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             return View();
         }
-        [Route("~/sss")]
+        [Route("sss")]
         public async Task<IActionResult> FAQ()
         {
             ViewBag.AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
 
             return View();
         }
-        [Route("~/kvkk")]
+        [Route("kvkk")]
         public async Task<IActionResult> KVKK()
         {
             ViewBag.AuthUser = await GetAuthenticatedUserFromDatabaseAsync();

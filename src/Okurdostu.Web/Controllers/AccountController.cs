@@ -111,7 +111,7 @@ namespace Okurdostu.Web.Controllers
 
         }
 
-        [Route("~/account/changeemail")]
+        [Route("account/changeemail")]
         public IActionResult CreateEmailChangeRequest()
         {
             //EmailChangingUserId is coming from GetConfirmationToEmailChange IActionResult.
@@ -129,7 +129,7 @@ namespace Okurdostu.Web.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/account/changeemail")]
+        [Route("account/changeemail")]
         public async Task<IActionResult> CreateEmailChangeRequest(ProfileModel Model)
         {
             Model.Email = Model.Email.ToLower();
@@ -200,7 +200,7 @@ namespace Okurdostu.Web.Controllers
             return Redirect("/" + AuthUser.Username);
         }
 
-        [Route("~/confirmemail/{guid}")]
+        [Route("confirmemail/{guid}")]
         public async Task ConfirmEmail(Guid guid)
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
@@ -255,7 +255,7 @@ namespace Okurdostu.Web.Controllers
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/password")]
+        [Route("password")]
         public async Task EditPassword(ProfileModel Model)
         {
             if (await ConfirmIdentityWithPassword(Model.ConfirmPassword))
@@ -290,7 +290,7 @@ namespace Okurdostu.Web.Controllers
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
 
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/username")]
+        [Route("username")]
         public async Task EditUsername(ProfileModel Model)
         {
             if (await ConfirmIdentityWithPassword(Model.ConfirmPassword))
@@ -338,7 +338,7 @@ namespace Okurdostu.Web.Controllers
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/contact")]
+        [Route("contact")]
         public async Task Contact(ProfileModel Model) //editing, adding contacts
         {
 
@@ -367,7 +367,7 @@ namespace Okurdostu.Web.Controllers
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
 
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/basic")]
+        [Route("basic")]
         public async Task ProfileBasic(ProfileModel Model) //editing, adding bio and fullname
         {
 
@@ -394,7 +394,7 @@ namespace Okurdostu.Web.Controllers
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/photo")]
+        [Route("photo")]
         public async Task AddPhoto()
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
@@ -445,7 +445,7 @@ namespace Okurdostu.Web.Controllers
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/remove-photo")]
+        [Route("remove-photo")]
         public async Task RemovePhoto()
         {
 
@@ -475,7 +475,7 @@ namespace Okurdostu.Web.Controllers
         #region Education
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/education")]
+        [Route("education")]
         public async Task AddEducation(EducationModel Model)
         {
             var University = await Context.University.FirstOrDefaultAsync(x => x.Id == Model.UniversityId);
@@ -521,7 +521,7 @@ namespace Okurdostu.Web.Controllers
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/edit-education")]
+        [Route("edit-education")]
         public async Task EditEducation(EducationModel Model)
         {
             var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Model.EducationId && !x.IsRemoved);
@@ -585,7 +585,7 @@ namespace Okurdostu.Web.Controllers
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/remove-education")]
+        [Route("remove-education")]
         public async Task RemoveEducation(long Id, string Username)
         {
             var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && x.User.Username == Username && !x.IsRemoved);
@@ -658,7 +658,7 @@ namespace Okurdostu.Web.Controllers
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/education-document")]
+        [Route("education-document")]
         public async Task SendEducationDocument(long Id, IFormFile File)
         {
             var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && !x.IsSentToConfirmation); //bir belge yollayabilir.
