@@ -13,7 +13,7 @@
                         <hr />
                         <div class="text-center">
                             <p><span class="text-dark">@TempData["email"]</span> adresi bana ait</p>
-                            <form method="post" action="/sendconfirmationemail">
+                            <form method="post" action="/account/sendconfirmationemail">
                                 @Html.AntiForgeryToken()
                                 <input type="submit" value="Tekrar mail gönder" class="btn btn-block btn-outline-purple rounded-custom font-weight-bold" />
                             </form>

@@ -17,14 +17,10 @@ namespace Okurdostu.Web
 
 
         public string[] blockedUsernames = {
-                    "","comments","girisyap","kaydol","ihtiyaclar","beta","arama","comment",
-
-                    "account","gizlilik-politikasi","kullanici-sozlesmesi","sss","kvkk",
-
-                    "home", "like", "comment","deletecomment","getcommentcontent","logout",
-
-                    "editcomment","like","ihtiyac-olustur","ihtiyac", "universiteler"
-                };
+            "","comment","account","confirmemail","girisyap","kaydol","ihtiyaclar","beta","arama",
+            "gizlilik-politikasi","kullanici-sozlesmesi","sss","kvkk",
+            "home", "like","logout", "ihtiyac-olustur","ihtiyac", "universiteler"
+        };
 
         public async Task<User> GetAuthenticatedUserFromDatabaseAsync()
         {

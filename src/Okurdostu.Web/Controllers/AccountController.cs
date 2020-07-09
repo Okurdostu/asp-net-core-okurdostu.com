@@ -58,10 +58,10 @@ namespace Okurdostu.Web.Controllers
         }
         #endregion
 
-        #region account
 
+        #region account
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("/sendconfirmationemail")]
+        [Route("account/sendconfirmationemail")]
         public async Task<IActionResult> SendConfirmationEmail()
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
@@ -255,7 +255,7 @@ namespace Okurdostu.Web.Controllers
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("password")]
+        [Route("account/password")]
         public async Task EditPassword(ProfileModel Model)
         {
             if (await ConfirmIdentityWithPassword(Model.ConfirmPassword))
@@ -288,9 +288,8 @@ namespace Okurdostu.Web.Controllers
         }
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
-
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("username")]
+        [Route("account/username")]
         public async Task EditUsername(ProfileModel Model)
         {
             if (await ConfirmIdentityWithPassword(Model.ConfirmPassword))
@@ -338,7 +337,7 @@ namespace Okurdostu.Web.Controllers
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("contact")]
+        [Route("account/contact")]
         public async Task Contact(ProfileModel Model) //editing, adding contacts
         {
 
@@ -367,7 +366,7 @@ namespace Okurdostu.Web.Controllers
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
 
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("basic")]
+        [Route("account/basic")]
         public async Task ProfileBasic(ProfileModel Model) //editing, adding bio and fullname
         {
 
@@ -394,7 +393,7 @@ namespace Okurdostu.Web.Controllers
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("photo")]
+        [Route("account/photo")]
         public async Task AddPhoto()
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
@@ -445,7 +444,7 @@ namespace Okurdostu.Web.Controllers
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("remove-photo")]
+        [Route("account/remove-photo")]
         public async Task RemovePhoto()
         {
 
@@ -475,7 +474,7 @@ namespace Okurdostu.Web.Controllers
         #region Education
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("education")]
+        [Route("account/education")]
         public async Task AddEducation(EducationModel Model)
         {
             var University = await Context.University.FirstOrDefaultAsync(x => x.Id == Model.UniversityId);
@@ -521,7 +520,7 @@ namespace Okurdostu.Web.Controllers
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("edit-education")]
+        [Route("account/edit-education")]
         public async Task EditEducation(EducationModel Model)
         {
             var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Model.EducationId && !x.IsRemoved);
@@ -585,7 +584,7 @@ namespace Okurdostu.Web.Controllers
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("remove-education")]
+        [Route("account/remove-education")]
         public async Task RemoveEducation(long Id, string Username)
         {
             var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && x.User.Username == Username && !x.IsRemoved);
@@ -658,7 +657,7 @@ namespace Okurdostu.Web.Controllers
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("education-document")]
+        [Route("account/education-document")]
         public async Task SendEducationDocument(long Id, IFormFile File)
         {
             var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && !x.IsSentToConfirmation); //bir belge yollayabilir.
