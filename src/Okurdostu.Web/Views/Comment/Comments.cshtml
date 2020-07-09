@@ -102,7 +102,7 @@
         var EditingCommentOld;
         function getEditDialog(id) {
             EditingCommentId = id;
-            $.get("/GetCommentContent", { Id: EditingCommentId }).done(function (data) {
+            $.get("/Comment/GetContent", { Id: EditingCommentId }).done(function (data) {
                 if (data.state) {
                     $("#edit-comment-input").val(data.comment);
                     EditingCommentOld = data.comment;
@@ -131,7 +131,7 @@
                 });
             }
             else {
-                $.post("/EditComment", { Id: EditingCommentId, EditCommentInput: NewComment, __RequestVerificationToken: validatetoken })
+                $.post("/Comment/EditComment", { Id: EditingCommentId, EditCommentInput: NewComment, __RequestVerificationToken: validatetoken })
                     .done(function (response) {
                         if (response.state == true) {
                             $('#edit-comment-modal').modal('hide');
@@ -159,7 +159,7 @@
             $('#delete-comment').modal('show');
         };
         $("#delete").click(function () {
-            $.post("/DeleteComment", { Id: DeletingCommentId, __RequestVerificationToken: validatetoken })
+            $.post("/Comment/DeleteComment", { Id: DeletingCommentId, __RequestVerificationToken: validatetoken })
                 .done(function (bool) {
                     if (bool) {
                         GetComments(null);
@@ -171,7 +171,7 @@
         var ReplyingCommentId;
         function getReplyDialog(id) {
             ReplyingCommentId = id;
-            $.get("/GetCommentContent", { Id: ReplyingCommentId }).done(function (_data) {
+            $.get("/Comment/GetContent", { Id: ReplyingCommentId }).done(function (_data) {
                 if (_data.state) {
                     $("#replying-comment").html(_data.comment);
                     $("#replying-user-fullname").html(_data.fullname);

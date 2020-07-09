@@ -21,21 +21,22 @@ namespace Okurdostu.Data.Model
         public long? UserId { get; set; }
         public bool IsRemoved { get; set; }
         public DateTime CreatedOn { get; set; }
-
         public string HowLongPassed
         {
             get
             {
                 var PassedTime = DateTime.Now - CreatedOn;
-                if (PassedTime.Days > 30)
+                if (PassedTime.Days >= 30)
                 {
-                    return CreatedOn.Month + "/" + CreatedOn.Year; // ayı sayı yerine ad olarak yazdır. Temmuz 2020
+                    string[] MonthNames = { "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık" };
+
+                    return MonthNames[CreatedOn.Month] + " " + CreatedOn.Year; 
                 }
-                else if (PassedTime.Days > 1)
+                else if (PassedTime.Days >= 1)
                 {
                     return PassedTime.Days + " gün önce yazdı";
                 }
-                else if (PassedTime.Days < 1 && PassedTime.Hours > 1)
+                else if (PassedTime.Hours >= 1)
                 {
                     return PassedTime.Hours + " saat önce yazdı";
                 }
@@ -50,11 +51,9 @@ namespace Okurdostu.Data.Model
                         return PassedTime.Minutes + " dakika önce yazdı";
                     }
                 }
-
                 return "";
             }
         }
-
         public virtual Need Need { get; set; }
         public virtual NeedComment RelatedComment { get; set; }
         public virtual User User { get; set; }

@@ -67,7 +67,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
         var validatetoken = $("input[name=__RequestVerificationToken]").val(); var oldDataFromComments = "oldDataFromComments"; var newDataFromComments = "newDataFromComments";
 
         function GetComments(scrollingTargetId) {
-            $.post("/Comments", { Id: @Model.Id, __RequestVerificationToken: validatetoken })
+            $.post("/Comment/Comments", { Id: @Model.Id, __RequestVerificationToken: validatetoken })
                 .done(function (newDataFromComments) {
                     if (newDataFromComments != oldDataFromComments) {
                         $("#comments").html(newDataFromComments)
@@ -124,7 +124,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
 
                 $("#DoComment").click(function () {
                     if ($("#Comment").val().length >= 5 && $("#Comment").val().length <= 100) {
-                        $.post("/Comment", { NeedId: @Model.Id, Comment: $("#Comment").val(), __RequestVerificationToken: validatetoken })
+                        $.post("/Comment/Comment", { NeedId: @Model.Id, Comment: $("#Comment").val(), __RequestVerificationToken: validatetoken })
                             .done(function (result) {
                                 if (result.id != null) {
                                     GetComments(result.id);
@@ -154,7 +154,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
 
                 $("#DoReply").click(function () {
                     if ($("#ReplyComment").val().length >= 5 && $("#ReplyComment").val().length <= 100) {
-                    $.post("/Comment", { RelatedCommentId: ReplyingCommentId, Comment: $("#ReplyComment").val(), __RequestVerificationToken: validatetoken })
+                    $.post("/Comment/Comment", { RelatedCommentId: ReplyingCommentId, Comment: $("#ReplyComment").val(), __RequestVerificationToken: validatetoken })
                         .done(function (result) {
                             if (result.id != null) {
                                 GetComments(result.id);
