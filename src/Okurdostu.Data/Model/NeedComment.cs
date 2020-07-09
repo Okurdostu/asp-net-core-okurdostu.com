@@ -30,7 +30,7 @@ namespace Okurdostu.Data.Model
                 {
                     string[] MonthNames = { "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık" };
 
-                    return MonthNames[CreatedOn.Month] + " " + CreatedOn.Year; 
+                    return MonthNames[CreatedOn.Month - 1] + " " + CreatedOn.Year;
                 }
                 else if (PassedTime.Days >= 1)
                 {
