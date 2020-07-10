@@ -1,6 +1,6 @@
 ﻿@model Okurdostu.Data.Model.Need
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
-@{ bool IsAuthenticatedUserEqualModelUser = false; }
+@{ bool IsAuthenticatedUserEqualModelUser = false; ViewData["NeedsActiveClass"] = "active";}
 @{
     if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
     {

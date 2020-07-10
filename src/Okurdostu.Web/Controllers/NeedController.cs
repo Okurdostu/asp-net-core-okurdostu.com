@@ -74,7 +74,6 @@ namespace Okurdostu.Web.Controllers
             else
             {
                 ViewBag.Universities = Context.University.ToList().OrderBy(x => x.Name);
-                ViewData["NeedsActiveClass"] = "active";
             }
 
             List<Need> NeedDefaultList =
@@ -483,7 +482,6 @@ namespace Okurdostu.Web.Controllers
         [Route("{username}/ihtiyac/{friendlytitle}/{id}")]
         public async Task<IActionResult> ViewNeed(string username, string friendlytitle, long id)
         {
-            ViewData["NeedsActiveClass"] = "active";
             var Need = await Context.Need
                 .Include(need => need.User)
                         .ThenInclude(needuser => needuser.UserEducation)

@@ -1,187 +1,190 @@
 ﻿@model List<Okurdostu.Data.Model.NeedComment>
-@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
-@{long AuthenticatedUserId = 0;}
-@{
+@{ Layout = null; }
+
+@if (Model != null)
+{
+    @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
+    long AuthenticatedUserId = 0;
     if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
     {
         AuthenticatedUserId = long.Parse(HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value);
     }
-}
-@{ Layout = null; }
-<style>
-    .comments-vertical-line {
-        font-weight: 700;
-        color: rgba(0,0,0,.5) !important;
-        display: block;
-        border-left: 1px solid;
-        height: 100% !important
-    }
-</style>
-<div class="container pr-1">
-    @foreach (var mainComment in Model.Where(x => x.RelatedCommentId == null).OrderByDescending(x => x.InverseRelatedComment.Count()).ToList())
-    {
-        <div class="row" id="@mainComment.Id">
-            <div class="comments-vertical-line">
-                <!-- Profil fotoğraf -->
-                <div class="mb-1">
-                    @if (mainComment.IsRemoved)
-                    {
-                        <div class="col-auto"><img src="~/svg/user.svg" class="img-thumbnail p-0 rounded-pill" style="width:35px; height:35px" /></div>
-                    }
-                    else
-                    {
-                        <a href="/@mainComment.User.Username">
-                            @if (mainComment.User.PictureUrl != null)
-                            {
-                                <div class="col-auto"><img src="@mainComment.User.PictureUrl" class="img-thumbnail p-0 rounded-pill" style="width:35px; height:35px" /></div>
-                            }
-                            else
-                            {
-                                <div class="col-auto"><img src="~/svg/user.svg" class="img-thumbnail p-0 rounded-pill" style="width:35px; height:35px" /></div>
-                            }
-                        </a>
-                    }
-                </div>
-                <div class="col-auto pl-1 pr-0">
-                    <!-- Kullanıcı bilgileri -->
-                    <div class="small">
-                        @if (mainComment.IsRemoved)
-                        {
-                            <p class="font-weight-bold mb-1">
-                                <a class="od" style="cursor:pointer">[Silinmiş]</a>
-                            </p>
-                        }
-                        else
-                        {
-                            <p class="font-weight-bold mb-1"><a class="od" href="/@mainComment.User.Username">@mainComment.User.FullName <span class="text-black-50 font-weight-bold">@Html.Raw("(@" + mainComment.User.Username + ")")</span> </a></p>
-                        }
-                    </div>
-                    <div class="small">
-                        <p class="small font-weight-bold text-black-50 mb-1">
-                            @mainComment.HowLongPassed
-                        </p>
-                    </div>
-                    <!-- Yorum -->
+    <style>
+        .comments-vertical-line {
+            font-weight: 700;
+            color: rgba(0,0,0,.5) !important;
+            display: block;
+            border-left: 1px solid;
+            height: 100% !important
+        }
+    </style>
+    <div class="container pr-1">
+        @foreach (var mainComment in Model.Where(x => x.RelatedCommentId == null).OrderByDescending(x => x.InverseRelatedComment.Count()).ToList())
+        {
+            <div class="row" id="@mainComment.Id">
+                <div class="comments-vertical-line">
+                    <!-- Profil fotoğraf -->
                     <div class="mb-1">
                         @if (mainComment.IsRemoved)
                         {
-                            <p class="mb-0" style="font-size:15.5px">[Silinmiş]</p>
+                            <div class="col-auto"><img src="~/svg/user.svg" class="img-thumbnail p-0 rounded-pill" style="width:35px; height:35px" /></div>
                         }
                         else
                         {
-                            <p class="mb-0" style="font-size:13.5px">@mainComment.Comment.ToString()</p>
+                            <a href="/@mainComment.User.Username">
+                                @if (mainComment.User.PictureUrl != null)
+                                {
+                                    <div class="col-auto"><img src="@mainComment.User.PictureUrl" class="img-thumbnail p-0 rounded-pill" style="width:35px; height:35px" /></div>
+                                }
+                                else
+                                {
+                                    <div class="col-auto"><img src="~/svg/user.svg" class="img-thumbnail p-0 rounded-pill" style="width:35px; height:35px" /></div>
+                                }
+                            </a>
                         }
                     </div>
-                    <!-- İşlemler -->
-                    @if (!mainComment.IsRemoved)
-                    {
-                        <div class="mb-2">
-                            <span onclick="getReplyDialog('@mainComment.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-comment-dots"></i> Cevapla</span>
-                            @if (AuthenticatedUserId == mainComment.UserId)
+                    <div class="col-auto pl-1 pr-0">
+                        <!-- Kullanıcı bilgileri -->
+                        <div class="small">
+                            @if (mainComment.IsRemoved)
                             {
-                                <span onclick="getEditDialog('@mainComment.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-edit"></i> Düzenle</span>
+                                <p class="font-weight-bold mb-1">
+                                    <a class="od" style="cursor:pointer">[Silinmiş]</a>
+                                </p>
                             }
-                            @if (AuthenticatedUserId == mainComment.UserId)
+                            else
                             {
-                                <span onclick="getDeleteDialog('@mainComment.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-trash-alt"></i> Sil</span>
+                                <p class="font-weight-bold mb-1"><a class="od" href="/@mainComment.User.Username">@mainComment.User.FullName <span class="text-black-50 font-weight-bold">@Html.Raw("(@" + mainComment.User.Username + ")")</span> </a></p>
                             }
                         </div>
-                    }
-                    @await Component.InvokeAsync("RelatedComment", mainComment.Id)
+                        <div class="small">
+                            <p class="small font-weight-bold text-black-50 mb-1">
+                                @mainComment.HowLongPassed
+                            </p>
+                        </div>
+                        <!-- Yorum -->
+                        <div class="mb-1">
+                            @if (mainComment.IsRemoved)
+                            {
+                                <p class="mb-0" style="font-size:15.5px">[Silinmiş]</p>
+                            }
+                            else
+                            {
+                                <p class="mb-0" style="font-size:13.5px">@mainComment.Comment.ToString()</p>
+                            }
+                        </div>
+                        <!-- İşlemler -->
+                        @if (!mainComment.IsRemoved)
+                        {
+                            <div class="mb-2">
+                                <span onclick="getReplyDialog('@mainComment.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-comment-dots"></i> Cevapla</span>
+                                @if (AuthenticatedUserId == mainComment.UserId)
+                                {
+                                    <span onclick="getEditDialog('@mainComment.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-edit"></i> Düzenle</span>
+                                }
+                                @if (AuthenticatedUserId == mainComment.UserId)
+                                {
+                                    <span onclick="getDeleteDialog('@mainComment.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-trash-alt"></i> Sil</span>
+                                }
+                            </div>
+                        }
+                        @await Component.InvokeAsync("RelatedComment", mainComment.Id)
+                    </div>
                 </div>
             </div>
-        </div>
-        <br />
-    }
-</div>
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-@if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
-{
-    <script>
-        var EditingCommentId;
-        var EditingCommentOld;
-        function getEditDialog(id) {
-            EditingCommentId = id;
-            $.get("/Comment/GetContent", { Id: EditingCommentId }).done(function (data) {
-                if (data.state) {
-                    $("#edit-comment-input").val(data.comment);
-                    EditingCommentOld = data.comment;
-                    $('#edit-comment-modal').modal('show');
+            <br />
+        }
+    </div>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    @if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+    {
+        <script>
+            var EditingCommentId;
+            var EditingCommentOld;
+            function getEditDialog(id) {
+                EditingCommentId = id;
+                $.get("/Comment/GetContent", { Id: EditingCommentId }).done(function (data) {
+                    if (data.state) {
+                        $("#edit-comment-input").val(data.comment);
+                        EditingCommentOld = data.comment;
+                        $('#edit-comment-modal').modal('show');
+                    }
+                });
+            };
+            $("#edit-comment").click(function () {
+                var NewComment = $('#edit-comment-input').val();
+                if (NewComment.length < 5) {
+                    swal("Yorum düzenleme", "En az 5 karakter", "error", {
+                        button: "Tamam",
+                        timer: 3000
+                    });
+                }
+                else if (NewComment.length > 100) {
+                    swal("Yorum düzenleme", "En fazla 100 karakter", "error", {
+                        button: "Tamam",
+                        timer: 3000
+                    });
+                }
+                else if (NewComment == EditingCommentOld) {
+                    swal("Yorum düzenleme", "Aynı içeriği giriyorsunuz", "info", {
+                        button: "Tamam",
+                        timer: 3000
+                    });
+                }
+                else {
+                    $.post("/Comment/EditComment", { Id: EditingCommentId, EditCommentInput: NewComment, __RequestVerificationToken: validatetoken })
+                        .done(function (response) {
+                            if (response.state == true) {
+                                $('#edit-comment-modal').modal('hide');
+                                GetComments(null);
+                            }
+                            else if (response.state == false && response.errorMessage.length > 0) {
+                                swal("Yorum düzenleme", response.errorMessage, "error", {
+                                    button: "Tamam",
+                                    timer: 5000
+                                });
+                            }
+                            else if (response.state == false && response.infoMessage.length > 0) {
+                                swal("Yorum düzenleme", response.infoMessage, "info", {
+                                    button: "Tamam",
+                                    timer: 5000
+                                });
+                            }
+                        });
                 }
             });
-        };
-        $("#edit-comment").click(function () {
-            var NewComment = $('#edit-comment-input').val();
-            if (NewComment.length < 5) {
-                swal("Yorum düzenleme", "En az 5 karakter", "error", {
-                    button: "Tamam",
-                    timer: 3000
-                });
-            }
-            else if (NewComment.length > 100) {
-                swal("Yorum düzenleme", "En fazla 100 karakter", "error", {
-                    button: "Tamam",
-                    timer: 3000
-                });
-            }
-            else if (NewComment == EditingCommentOld) {
-                swal("Yorum düzenleme", "Aynı içeriği giriyorsunuz", "info", {
-                    button: "Tamam",
-                    timer: 3000
-                });
-            }
-            else {
-                $.post("/Comment/EditComment", { Id: EditingCommentId, EditCommentInput: NewComment, __RequestVerificationToken: validatetoken })
-                    .done(function (response) {
-                        if (response.state == true) {
-                            $('#edit-comment-modal').modal('hide');
+
+            var DeletingCommentId;
+            function getDeleteDialog(id) {
+                DeletingCommentId = id;
+                $('#delete-comment').modal('show');
+            };
+            $("#delete").click(function () {
+                $.post("/Comment/DeleteComment", { Id: DeletingCommentId, __RequestVerificationToken: validatetoken })
+                    .done(function (bool) {
+                        if (bool) {
                             GetComments(null);
                         }
-                        else if (response.state == false && response.errorMessage.length > 0) {
-                            swal("Yorum düzenleme", response.errorMessage, "error", {
-                                button: "Tamam",
-                                timer: 5000
-                            });
-                        }
-                        else if (response.state == false && response.infoMessage.length > 0) {
-                            swal("Yorum düzenleme", response.infoMessage, "info", {
-                                button: "Tamam",
-                                timer: 5000
-                            });
-                        }
+                        $('#delete-comment').modal('hide');
                     });
-            }
-        });
-
-        var DeletingCommentId;
-        function getDeleteDialog(id) {
-            DeletingCommentId = id;
-            $('#delete-comment').modal('show');
-        };
-        $("#delete").click(function () {
-            $.post("/Comment/DeleteComment", { Id: DeletingCommentId, __RequestVerificationToken: validatetoken })
-                .done(function (bool) {
-                    if (bool) {
-                        GetComments(null);
-                    }
-                    $('#delete-comment').modal('hide');
-                });
-        });
-
-        var ReplyingCommentId;
-        function getReplyDialog(id) {
-            ReplyingCommentId = id;
-            $.get("/Comment/GetContent", { Id: ReplyingCommentId }).done(function (_data) {
-                if (_data.state) {
-                    $("#replying-comment").html(_data.comment);
-                    $("#replying-user-fullname").html(_data.fullname);
-                    $("#repyling-user-username").html('(\u0040' + _data.username + ')');
-                    $('#reply-comment-modal').modal('show');
-                }
             });
-        };
-    </script>
+
+            var ReplyingCommentId;
+            function getReplyDialog(id) {
+                ReplyingCommentId = id;
+                $.get("/Comment/GetContent", { Id: ReplyingCommentId }).done(function (_data) {
+                    if (_data.state) {
+                        $("#replying-comment").html(_data.comment);
+                        $("#replying-user-fullname").html(_data.fullname);
+                        $("#repyling-user-username").html('(\u0040' + _data.username + ')');
+                        $('#reply-comment-modal').modal('show');
+                    }
+                });
+            };
+        </script>
+    }
 }
-
-
-
+else
+{
+    <h5 class="text-center">Bu kampanyada hiç tartışma olmamış</h5>
+}

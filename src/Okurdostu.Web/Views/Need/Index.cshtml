@@ -1,6 +1,6 @@
 ﻿@model List<Okurdostu.Data.Model.Need>
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
-@{ bool isRequestComingFromUniversityPage; }
+@{ bool isRequestComingFromUniversityPage; ViewData["NeedsActiveClass"] = "active"; }
 @if (HttpContextAccessor.HttpContext.Request.Path.Value.ToLower().Contains("need"))
 { HttpContextAccessor.HttpContext.Response.Redirect("/ihtiyaclar"); }
 <!--

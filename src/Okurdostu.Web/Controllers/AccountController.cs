@@ -61,46 +61,53 @@ namespace Okurdostu.Web.Controllers
 
         #region account
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("account/sendconfirmationemail")]
-        public async Task<IActionResult> SendConfirmationEmail()
+        public async Task<IActionResult> SendConfirmationEmail() //it's used on /beta/index page
         {
+            //if user doesn't confirm their email, user will see a warning on beta/index page.
+            //and this httppost coming there.
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-            var _UserEmailConfirmation = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.UserId == AuthUser.Id && !x.IsUsed);
 
-            var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
+            if (!AuthUser.IsEmailConfirmed)
             {
-                SenderMail = "halil@okurdostu.com",
-                SenderName = "Halil İbrahim Kocaöz"
-            };
+                var _UserEmailConfirmation = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.UserId == AuthUser.Id && !x.IsUsed);
 
-            Guid confirmationGuid = Guid.Empty;
-            if (_UserEmailConfirmation != null)
-            {
-                confirmationGuid = _UserEmailConfirmation.GUID;
-            }
-            else
-            {
-                var newUserEmailConfirmation = new UserEmailConfirmation()
+                var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
                 {
-                    UserId = AuthUser.Id,
+                    SenderMail = "halil@okurdostu.com",
+                    SenderName = "Halil İbrahim Kocaöz"
                 };
-                await Context.AddAsync(newUserEmailConfirmation);
-                await Context.SaveChangesAsync();
-                confirmationGuid = newUserEmailConfirmation.GUID;
+
+                Guid confirmationGuid = Guid.Empty;
+                if (_UserEmailConfirmation != null)
+                {
+                    confirmationGuid = _UserEmailConfirmation.GUID;
+                }
+                else
+                {
+                    var newUserEmailConfirmation = new UserEmailConfirmation()
+                    {
+                        UserId = AuthUser.Id,
+                    };
+                    await Context.AddAsync(newUserEmailConfirmation);
+                    await Context.SaveChangesAsync();
+                    confirmationGuid = newUserEmailConfirmation.GUID;
+                }
+
+                Email.Send(Email.NewUserMail(AuthUser.FullName, AuthUser.Email, confirmationGuid));
+                TempData["ProfileMessage"] = AuthUser.Email + " adresine yeni bir onay maili gönderildi";
             }
 
-            Email.Send(Email.NewUserMail(AuthUser.FullName, AuthUser.Email, confirmationGuid));
-            TempData["ProfileMessage"] = AuthUser.Email + " adresine yeni bir onay maili gönderildi";
             return Redirect("/" + AuthUser.Username);
         }
 
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> GetConfirmationToEmailChange(ProfileModel Model)
         {
-
+            //authuser must confirm their identity with password if user doesn't this, 
+            //user can't show 'CreateEmailChangeRequest' and can't do httppost to 'CreateEmailChangeRequest'.
             if (await ConfirmIdentityWithPassword(Model.ConfirmPassword))
             {
-                TempData.Set("EmailChangingUserId", AuthUser.Id.ToString());
+                TempData.Set("IsEmailChangingConfirmedwithPassword", true);
                 return Redirect("/account/changeemail");
             }
             else
@@ -114,15 +121,18 @@ namespace Okurdostu.Web.Controllers
         [Route("account/changeemail")]
         public IActionResult CreateEmailChangeRequest()
         {
-            //EmailChangingUserId is coming from GetConfirmationToEmailChange IActionResult.
-            var UserId = TempData.Get<string>("EmailChangingUserId");
+            //IsEmailChangingConfirmedwithPassword is coming from GetConfirmationToEmailChange IActionResult.
+            //tek seferlik kullanım hakkı var, bu sayfayı gördükten sonra 
+            //yeni bir e-mail isteği girmezse ve bu sayfadan çıkarsa tekrar bu sayfaya password ile identity confirm edemeden giremez.
 
-            if (UserId != null)
+            if (TempData.Get<bool>("IsEmailChangingConfirmedwithPassword"))
             {
+                TempData.Set("IsEmailChangingConfirmedwithPasswordForPost", true);
                 return View();
             }
             else
             {
+                TempData.Clear();
                 return Unauthorized();
             }
 
@@ -132,69 +142,73 @@ namespace Okurdostu.Web.Controllers
         [Route("account/changeemail")]
         public async Task<IActionResult> CreateEmailChangeRequest(ProfileModel Model)
         {
-            Model.Email = Model.Email.ToLower();
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
 
-            bool IsThereAnyUserWithThatEmailAdress = false;
-            if (await Context.User.FirstOrDefaultAsync(x => x.Email == Model.Email) != null)
-                IsThereAnyUserWithThatEmailAdress = true;
-
-            if (!IsThereAnyUserWithThatEmailAdress)
+            if (TempData.Get<bool>("IsEmailChangingConfirmedwithPasswordForPost"))
             {
-                if (AuthUser.Email != Model.Email)
+                TempData.Clear();
+
+                Model.Email = Model.Email.ToLower();
+
+                bool IsThereAnyUserWithThatEmailAdress = await Context.User.AnyAsync(x => x.Email == Model.Email);
+
+                if (!IsThereAnyUserWithThatEmailAdress)
                 {
-
-                    var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
-                    {
-                        SenderMail = "noreply@okurdostu.com",
-                        SenderName = "Okurdostu"
-                    };
-
-                    var RequestWithSameEmailandUser = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.NewEmail == Model.Email && x.UserId == AuthUser.Id && !x.IsUsed);
-
-                    if (RequestWithSameEmailandUser == null)
+                    if (AuthUser.Email != Model.Email)
                     {
 
-                        var UserEmailConfirmation = new UserEmailConfirmation() //UserEmailConfirmation'u oluştur
+                        var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
                         {
-                            UserId = AuthUser.Id,
-                            NewEmail = Model.Email, //değiştirilmesini istediği email newemail olarak kolona al
-
-                            //bu veri kolonu emailconfirmation/guid ile geldiği zaman
-                            //newemail kolonu yakalanıp veri varsa kullanıcıya direkt olarak o e-maili atayıp
-                            //onay mailini de yeni e-maile yolladığımız için e-mail adresini onaylayacak.
-                            //yani aslında buralarda e-mailini değiştirmiyoruz confirmemail aşamasında e-mail adresi değişiyor.
+                            SenderMail = "noreply@okurdostu.com",
+                            SenderName = "Okurdostu"
                         };
 
-                        await Context.AddAsync(UserEmailConfirmation);
-                        var result = await Context.SaveChangesAsync();
-                        if (result > 0)
+                        var RequestWithSameEmailandUser = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.NewEmail == Model.Email && x.UserId == AuthUser.Id && !x.IsUsed);
+
+                        if (RequestWithSameEmailandUser == null)
                         {
-                            Email.Send(Email.EmailAddressChangeMail(AuthUser.FullName, UserEmailConfirmation.NewEmail, UserEmailConfirmation.GUID));
-                            TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + UserEmailConfirmation.NewEmail + ") onaylamanız için bir e-mail gönderildi";
+
+                            var UserEmailConfirmation = new UserEmailConfirmation() //UserEmailConfirmation'u oluştur
+                            {
+                                UserId = AuthUser.Id,
+                                NewEmail = Model.Email, //değiştirilmesini istediği email newemail olarak kolona al
+
+                                //bu veri kolonu emailconfirmation/guid ile geldiği zaman
+                                //newemail kolonu yakalanıp veri varsa kullanıcıya direkt olarak o e-maili atayıp
+                                //onay mailini de yeni e-maile yolladığımız için e-mail adresini onaylayacak.
+                                //yani aslında buralarda e-mailini değiştirmiyoruz confirmemail aşamasında e-mail adresi değişiyor.
+                            };
+
+                            await Context.AddAsync(UserEmailConfirmation);
+                            var result = await Context.SaveChangesAsync();
+                            if (result > 0)
+                            {
+                                Email.Send(Email.EmailAddressChangeMail(AuthUser.FullName, UserEmailConfirmation.NewEmail, UserEmailConfirmation.GUID));
+                                TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + UserEmailConfirmation.NewEmail + ") onaylamanız için bir e-mail gönderildi";
+                            }
+                            else
+                            {
+                                TempData["ProfileMessage"] = "Bir değişiklik yapılamadı";
+                            }
+
                         }
                         else
                         {
-                            TempData["ProfileMessage"] = "Bir değişiklik yapılamadı";
+                            Email.Send(Email.EmailAddressChangeMail(AuthUser.FullName, RequestWithSameEmailandUser.NewEmail, RequestWithSameEmailandUser.GUID));
+                            TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + RequestWithSameEmailandUser.NewEmail + ") onaylamanız için bir e-mail gönderildi";
                         }
 
                     }
                     else
                     {
-                        Email.Send(Email.EmailAddressChangeMail(AuthUser.FullName, RequestWithSameEmailandUser.NewEmail, RequestWithSameEmailandUser.GUID));
-                        TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + RequestWithSameEmailandUser.NewEmail + ") onaylamanız için bir e-mail gönderildi";
+                        TempData["ProfileMessage"] = "Şuan ki e-mail adresiniz ile aynı değeri giriyorsunuz";
                     }
 
                 }
                 else
                 {
-                    TempData["ProfileMessage"] = "Şuan ki e-mail adresiniz ile aynı değeri giriyorsunuz";
+                    TempData["ProfileMessage"] = "Bu email adresini kullanamazsınız";
                 }
-
-            }
-            else
-            {
-                TempData["ProfileMessage"] = "Bu email adresini kullanamazsınız";
             }
 
             return Redirect("/" + AuthUser.Username);
