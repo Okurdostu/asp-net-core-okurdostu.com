@@ -3,7 +3,7 @@
     Layout = "~/Views/Shared/BtstrapModalLayouts/_LayoutLg.cshtml";
 }
 <h3 class="font-weight-bold text-center text-black-50">Eğitim ekleme</h3><hr />
-@using (Html.BeginForm("AddEducation", "Account", FormMethod.Post))
+@using (Html.BeginForm("AddEducation", "Education", FormMethod.Post))
 {
     <div class="form-horizontal">
         <div class="form-group"> <span class="control-label pl-2 pr-0 font-weight-bold text-black-50">Üniversiteniz</span> <div> @Html.DropDownListFor(model => model.UniversityId, Model.Universities, new { @class = "form-control font-weight-bold" }) @Html.ValidationMessageFor(model => model.UniversityId, "", new { @class = "text-danger font-weight-bold" })</div></div>

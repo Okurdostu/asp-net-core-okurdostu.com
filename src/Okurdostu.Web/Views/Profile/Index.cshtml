@@ -147,7 +147,7 @@ else
                                         <p>
                                             açıklama yapılacak
                                         </p>
-                                        @using (Html.BeginForm("SendEducationDocument", "Account", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                                        @using (Html.BeginForm("SendEducationDocument", "Education", FormMethod.Post, new { enctype = "multipart/form-data" }))
                                         {
                                             @Html.Hidden("Id", item.Id)
                                             <input type="file" id="file" name="file" required class="form-control mb-1"> <div class="modal-footer pb-0 pt-1"> <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button> <input type="submit" value="Dökümanı yolla" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" /> </div>
@@ -173,7 +173,7 @@ else
                                         @item.University.Name okulunda varolan eğitiminiz kaldıralacak
                                     </p>
                                     <hr />
-                                    @using (Html.BeginForm("RemoveEducation", "Account", FormMethod.Post))
+                                    @using (Html.BeginForm("RemoveEducation", "Education", FormMethod.Post))
                                     {
                                         <input type="hidden" id="Username" name="Username" value="@item.User.Username" /> 
                                         <input type="hidden" id="Id" name="Id" value="@item.Id" /> <button type="submit" class="btn btn-danger btn-block font-weight-bold rounded-custom"> Kaldır </button>
