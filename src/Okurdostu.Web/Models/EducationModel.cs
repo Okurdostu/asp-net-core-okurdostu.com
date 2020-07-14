@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Okurdostu.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 
 public class EducationModel
 {
@@ -45,17 +42,5 @@ public class EducationModel
 
         this.StartYears = _StartYears;
         this.FinishYears = _FinishYears;
-    }
-
-    public async Task ListUniversitiesAsync()
-    {
-        using (var Context = new OkurdostuContext())
-        {
-            var _Universities = new List<SelectListItem>();
-            foreach (var item in await Context.University.ToListAsync())
-                _Universities.Add(new SelectListItem() { Text = item.Name, Value = item.Id.ToString() });
-            this.Universities = _Universities;
-
-        };
     }
 }

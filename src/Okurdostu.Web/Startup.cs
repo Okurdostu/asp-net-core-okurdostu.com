@@ -88,10 +88,11 @@ namespace Okurdostu.Web
         {
             public bool Match(HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection)
             {
-
                 var ValueFromRoute = values["username"].ToString().ToLower();
 
-                string[] blockedRouteValues = { 
+                var Context = (OkurdostuContext)httpContext?.RequestServices.GetService(typeof(OkurdostuContext));
+
+                string[] blockedRouteValues = {
                     "","comment","account","confirmemail","girisyap","kaydol","ihtiyaclar","beta","arama",
                     "gizlilik-politikasi","kullanici-sozlesmesi","sss","kvkk",
                     "home", "like","logout", "ihtiyac-olustur","ihtiyac", "universiteler"
@@ -105,14 +106,11 @@ namespace Okurdostu.Web
                 }
                 else
                 {
-                    using (var Context = new OkurdostuContext())
+                    var Usernames = Context.User.Select(x => new
                     {
-                        var Usernames = Context.User.Select(x => new
-                        {
-                            x.Username
-                        }).ToList();
-                        return Usernames.Any(x => x.Username.ToLower() == ValueFromRoute);
-                    }
+                        x.Username
+                    }).ToList();
+                    return Usernames.Any(x => x.Username.ToLower() == ValueFromRoute);
                 }
             }
         }

@@ -6,15 +6,10 @@ namespace Okurdostu.Data
 {
     public partial class OkurdostuContext : DbContext
     {
-        public OkurdostuContext()
-        {
-        }
-
         public OkurdostuContext(DbContextOptions<OkurdostuContext> options)
             : base(options)
         {
         }
-
         public virtual DbSet<Need> Need { get; set; }
         public virtual DbSet<NeedItem> NeedItem { get; set; }
         public virtual DbSet<NeedLike> NeedLike { get; set; }
@@ -25,14 +20,6 @@ namespace Okurdostu.Data
         public virtual DbSet<UserEmailConfirmation> UserEmailConfirmation { get; set; }
         public virtual DbSet<UserPasswordReset> UserPasswordReset { get; set; }
         public virtual DbSet<NeedComment> NeedComment { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=okurdostu;Trusted_Connection=True;");
-            }
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
