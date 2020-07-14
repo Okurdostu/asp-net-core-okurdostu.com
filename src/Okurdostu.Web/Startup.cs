@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Okurdostu.Data;
+using Okurdostu.Web.Filters;
 using Okurdostu.Web.Services;
 using System.Linq;
 
@@ -40,6 +41,7 @@ namespace Okurdostu.Web
                 });
             services.AddMemoryCache();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<ConfirmedEmailFilter>();
             services.AddControllersWithViews();
             services.AddDbContext<OkurdostuContext>(option => option.UseSqlServer(Configuration.GetConnectionString("OkurdostuConnectionString")));
 
@@ -86,16 +88,30 @@ namespace Okurdostu.Web
         {
             public bool Match(HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection)
             {
-                using (var Context = new OkurdostuContext())
+                var ValueFromRoute = values["username"].ToString().ToLower();
+
+                var Context = (OkurdostuContext)httpContext?.RequestServices.GetService(typeof(OkurdostuContext));
+
+                string[] blockedRouteValues = {
+                    "","comment","account","confirmemail","girisyap","kaydol","ihtiyaclar","beta","arama",
+                    "gizlilik-politikasi","kullanici-sozlesmesi","sss","kvkk",
+                    "home", "like","logout", "ihtiyac-olustur","ihtiyac", "universiteler"
+                };
+
+                bool IsComingValueEqualAnyBlockedRoute = blockedRouteValues.Any(x => x == ValueFromRoute || x.Contains(ValueFromRoute));
+
+                if (IsComingValueEqualAnyBlockedRoute)
+                {
+                    return !IsComingValueEqualAnyBlockedRoute;
+                }
+                else
                 {
                     var Usernames = Context.User.Select(x => new
                     {
                         x.Username
                     }).ToList();
-                    var ValueFromRoute = values["username"].ToString().ToLower();
                     return Usernames.Any(x => x.Username.ToLower() == ValueFromRoute);
                 }
-                //her kayýt olan ve deðiþtirilen kullanýcýdan sonra bir xml'e usernames aktarýlabilir ve veriler oradan okunabilir performansý ilerleyen dönemde analiz et.
             }
         }
     }

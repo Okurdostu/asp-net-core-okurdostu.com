@@ -3,7 +3,7 @@
     Layout = "~/Views/Shared/BtstrapModalLayouts/_LayoutLg.cshtml";
 }
 <h3 class="font-weight-bold text-center font-weight-bold text-black-50">Eğitim düzenleme</h3><hr />
-@using (Html.BeginForm("EditEducation", "Account", FormMethod.Post))
+@using (Html.BeginForm("EditEducation", "Education", FormMethod.Post))
 {
     @Html.HiddenFor(model => model.EducationId)
     <div class="form-horizontal">

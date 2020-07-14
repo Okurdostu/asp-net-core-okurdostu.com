@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using Okurdostu.Data.Model;
 using Okurdostu.Web.Extensions;
@@ -8,6 +9,7 @@ using Okurdostu.Web.Models;
 using Okurdostu.Web.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -15,16 +17,22 @@ namespace Okurdostu.Web.Controllers
 {
     public class SignUpController : BaseController<SignUpController>
     {
-        [Route("~/Kaydol")]
+        [Route("Kaydol")]
         public IActionResult Index(string ReturnUrl)
         {
             return HttpContext.User.Identity.IsAuthenticated ? (IActionResult)Redirect("/") : View();
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/Kaydol")]
+        [Route("Kaydol")]
         public async Task<IActionResult> Index(ProfileModel Model, string ReturnUrl)
         {
+            if (blockedUsernames.Any(x => Model.Username == x))
+            {
+                TempData["SignUpMessage"] = "Bu kullanıcı adını: " + Model.Username + " kullanamazsınız";
+                return Redirect("/kaydol");
+            }
+
             if (HttpContext.User.Identity.IsAuthenticated)
             {
                 return Redirect("/");

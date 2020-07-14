@@ -1,32 +1,40 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController<HomeController>
     {
-        [Route("~/")]
-        public IActionResult Index()
+        //viewbag.authuser i onactionexecuting e al.
+        [Route("")]
+        public async Task<IActionResult> Index()
         {
+            ViewBag.AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             return View();
         }
-        [Route("~/gizlilik-politikasi")]
-        public IActionResult PrivacyPolicy()
+        [Route("gizlilik-politikasi")]
+        public async Task<IActionResult> PrivacyPolicy()
         {
+            ViewBag.AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             return View();
         }
-        [Route("~/kullanici-sozlesmesi")]
-        public IActionResult UserAgreement()
+        [Route("kullanici-sozlesmesi")]
+        public async Task<IActionResult> UserAgreement()
         {
+            ViewBag.AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             return View();
         }
-        [Route("~/sss")]
-        public IActionResult FAQ()
+        [Route("sss")]
+        public async Task<IActionResult> FAQ()
         {
+            ViewBag.AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+
             return View();
         }
-        [Route("~/kvkk")]
-        public IActionResult KVKK()
+        [Route("kvkk")]
+        public async Task<IActionResult> KVKK()
         {
+            ViewBag.AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             return View();
         }
     }

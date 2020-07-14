@@ -66,6 +66,11 @@
                             }
                         </p>
                     </div>
+                    <div class="small">
+                        <p class="small font-weight-bold text-black-50 mb-1">
+                            @item.HowLongPassed
+                        </p>
+                    </div>
                     <!-- Yorum -->
                     <div>
                         @if (item.IsRemoved)
@@ -78,20 +83,20 @@
                         }
                     </div>
                     <!-- İşlemler -->
-                        @if (!item.IsRemoved)
-                        {
-                            <div class="mb-2">
-                                <span onclick="getReplyDialog('@item.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-comment-dots"></i> Cevapla</span>
-                                @if (AuthenticatedUserId == item.UserId)
-                                {
-                                    <span onclick="getEditDialog('@item.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-edit"></i> Düzenle</span>
-                                }
-                                @if (AuthenticatedUserId == item.UserId)
-                                {
-                                    <span onclick="getDeleteDialog('@item.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-trash-alt"></i> Sil</span>
-                                }
-                            </div>
-                        }
+                    @if (!item.IsRemoved)
+                    {
+                        <div class="mb-2">
+                            <span onclick="getReplyDialog('@item.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-comment-dots"></i> Cevapla</span>
+                            @if (AuthenticatedUserId == item.UserId)
+                            {
+                                <span onclick="getEditDialog('@item.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-edit"></i> Düzenle</span>
+                            }
+                            @if (AuthenticatedUserId == item.UserId)
+                            {
+                                <span onclick="getDeleteDialog('@item.Id')" class="btn btn-link p-0 font-weight-bold od" style="font-size:12.5px"><i class="fas fa-trash-alt"></i> Sil</span>
+                            }
+                        </div>
+                    }
                     @await Component.InvokeAsync("RelatedComment", item.Id)
                 </div>
             </div>

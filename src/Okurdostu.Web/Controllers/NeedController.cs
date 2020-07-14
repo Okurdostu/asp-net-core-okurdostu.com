@@ -17,18 +17,64 @@ namespace Okurdostu.Web.Controllers
 {
     public class NeedController : BaseController<NeedController>
     {
+        [NonAction]
+        public async Task<bool> IsThereAnyProblemtoCreateNeed()
+        {
+            var AuthUserAnyActiveEducation = await Context.UserEducation.FirstOrDefaultAsync(x => !x.IsRemoved && x.UserId == AuthUser.Id && x.IsActiveEducation && x.IsConfirmed);
+
+            if (AuthUserAnyActiveEducation != null)
+            {
+                Need ErrorNeed = null;
+                var UserNotRemovedCompletedNeeds = await Context.Need.Where(x => x.UserId == AuthUser.Id && !x.IsRemoved && !x.IsCompleted).ToListAsync();
+                if (UserNotRemovedCompletedNeeds.Count > 0) //User'in önceden oluşturduğu ve silmediği bir kampanya varsa
+                {
+
+                    if (UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == false).FirstOrDefault() != null)
+                    {
+                        //Onaylama için gönderilmemiş bir kampanya varsa
+                        ErrorNeed = UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == false).FirstOrDefault();
+                        TempData["CreateNeedError"] = "Oluşturduğunuz ama onay için gönderilmemiş bir kampanyanız var <br/> Onu tamamlayıp, onaylanması için gönderin";
+                    }
+                    else if (UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == true).FirstOrDefault() != null)
+                    {
+                        //Onaylanmamış fakat onaylanması için gönderilmiş bir kampanya varsa
+                        ErrorNeed = UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == true).FirstOrDefault();
+                        TempData["CreateNeedError"] = "Onaylanmamış bir kampanyanız var onun onaylanmasını bekleyin";
+                    }
+                    else if (UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == true && x.IsCompleted == false).FirstOrDefault() != null)
+                    {
+                        //Onaylanmış fakat tamamlanmamış bir kampanya varsa
+                        ErrorNeed = UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == true && x.IsCompleted == false).FirstOrDefault();
+                        TempData["CreateNeedError"] = "Hedefine ulaşmamış bir kampanyanız var <br/> Aynı anda iki kampanya sergiletemezsiniz";
+                    }
+
+                    TempData["CausingErrorNeedLink"] = "/" + ErrorNeed.User.Username + "/ihtiyac/" + ErrorNeed.FriendlyTitle + "/" + ErrorNeed.Id;
+                    return true;
+                }
+            }
+            else
+            {
+                TempData["CreateNeedError"] = "Active education";
+                return true;
+            }
+
+            return false;
+        }
+
 
         private User AuthUser;
 
-        [Route("~/ihtiyaclar")]
-        [Route("~/ihtiyaclar/{filtreText}")]
-        [Route("~/ihtiyaclar/{filtreText}/{_}")]
+        [Route("ihtiyaclar")]
+        [Route("ihtiyaclar/{filtreText}")]
+        [Route("ihtiyaclar/{filtreText}/{_}")]
         public async Task<IActionResult> Index(string filtreText, string _)
         {
             if (_ == "jquery")
                 TempData["Jquery"] = "Yes";
             else
-                ViewData["NeedsActiveClass"] = "active";
+            {
+                ViewBag.Universities = Context.University.ToList().OrderBy(x => x.Name);
+            }
 
             List<Need> NeedDefaultList =
                 await Context.Need
@@ -114,54 +160,8 @@ namespace Okurdostu.Web.Controllers
             }
         }
 
-
-        [NonAction]
-        public async Task<bool> IsThereAnyProblemtoCreateNeed()
-        {
-            var AuthUserAnyActiveEducation = await Context.UserEducation.FirstOrDefaultAsync(x => !x.IsRemoved && x.UserId == AuthUser.Id && x.IsActiveEducation && x.IsConfirmed);
-
-            if (AuthUserAnyActiveEducation != null)
-            {
-                Need ErrorNeed = null;
-                var UserNotRemovedCompletedNeeds = await Context.Need.Where(x => x.UserId == AuthUser.Id && !x.IsRemoved && !x.IsCompleted).ToListAsync();
-                if (UserNotRemovedCompletedNeeds.Count > 0) //User'in önceden oluşturduğu ve silmediği bir kampanya varsa
-                {
-
-                    if (UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == false).FirstOrDefault() != null)
-                    {
-                        //Onaylama için gönderilmemiş bir kampanya varsa
-                        ErrorNeed = UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == false).FirstOrDefault();
-                        TempData["CreateNeedError"] = "Oluşturduğunuz ama onay için gönderilmemiş bir kampanyanız var <br/> Onu tamamlayıp, onaylanması için gönderin";
-                    }
-                    else if (UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == true).FirstOrDefault() != null)
-                    {
-                        //Onaylanmamış fakat onaylanması için gönderilmiş bir kampanya varsa
-                        ErrorNeed = UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == true).FirstOrDefault();
-                        TempData["CreateNeedError"] = "Onaylanmamış bir kampanyanız var onun onaylanmasını bekleyin";
-                    }
-                    else if (UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == true && x.IsCompleted == false).FirstOrDefault() != null)
-                    {
-                        //Onaylanmış fakat tamamlanmamış bir kampanya varsa
-                        ErrorNeed = UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == true && x.IsCompleted == false).FirstOrDefault();
-                        TempData["CreateNeedError"] = "Hedefine ulaşmamış bir kampanyanız var <br/> Aynı anda iki kampanya sergiletemezsiniz";
-                    }
-
-                    TempData["CausingErrorNeedLink"] = "/" + ErrorNeed.User.Username + "/ihtiyac/" + ErrorNeed.FriendlyTitle + "/" + ErrorNeed.Id;
-                    return true;
-                }
-            }
-            else
-            {
-                TempData["CreateNeedError"] = "Active education";
-                return true;
-            }
-
-            return false;
-        }
-
-
         [Authorize]
-        [Route("~/ihtiyac-olustur")]
+        [Route("ihtiyac-olustur")]
         public async Task<IActionResult> Create()
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
@@ -177,7 +177,7 @@ namespace Okurdostu.Web.Controllers
 
         [Authorize]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/ihtiyac-olustur")]
+        [Route("ihtiyac-olustur")]
         public async Task<IActionResult> Create(NeedModel Model)
         {
             if (ModelState.IsValid)
@@ -464,7 +464,7 @@ namespace Okurdostu.Web.Controllers
 
 
         #region view
-        [Route("~/ihtiyac/{Id}")]
+        [Route("ihtiyac/{Id}")]
         public async Task<IActionResult> ShortUrl(long Id)
         {
             var Need = await Context.Need.Include(needuser => needuser.User).FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
@@ -479,10 +479,9 @@ namespace Okurdostu.Web.Controllers
         }
 
 
-        [Route("~/{username}/ihtiyac/{friendlytitle}/{id}")]
+        [Route("{username}/ihtiyac/{friendlytitle}/{id}")]
         public async Task<IActionResult> ViewNeed(string username, string friendlytitle, long id)
         {
-            ViewData["NeedsActiveClass"] = "active";
             var Need = await Context.Need
                 .Include(need => need.User)
                         .ThenInclude(needuser => needuser.UserEducation)

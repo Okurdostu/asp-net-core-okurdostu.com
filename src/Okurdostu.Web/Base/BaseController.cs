@@ -15,11 +15,25 @@ namespace Okurdostu.Web
         protected ILogger<T> Logger => _logger ?? (_logger = HttpContext.RequestServices.GetService<ILogger<T>>());
         public OkurdostuContext Context => (OkurdostuContext)HttpContext?.RequestServices.GetService(typeof(OkurdostuContext));
 
+
+        public string[] blockedUsernames = {
+            "","comment","account","confirmemail","girisyap","kaydol","ihtiyaclar","beta","arama",
+            "gizlilik-politikasi","kullanici-sozlesmesi","sss","kvkk",
+            "home", "like","logout", "ihtiyac-olustur","ihtiyac", "universiteler"
+        };
+
         public async Task<User> GetAuthenticatedUserFromDatabaseAsync()
         {
-            var Id = User.Identity.GetUserId();
-            var _User = await Context.User.FirstOrDefaultAsync(x => x.Id == long.Parse(Id) && x.IsActive);
-            return _User != null ? _User : null;
+            var Id = User?.Identity?.GetUserId();
+            if (Id != null)
+            {
+                var _User = await Context.User.FirstOrDefaultAsync(x => x.Id == long.Parse(Id) && x.IsActive);
+                return _User != null ? _User : null;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

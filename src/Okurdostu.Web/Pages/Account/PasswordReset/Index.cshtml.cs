@@ -20,10 +20,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
             [MaxLength(25, ErrorMessage = "Çok uzun, en fazla 25 karakter")]
             public string IdentificationValue { get; set; }
         }
-
-        private OkurdostuContext _con;
-        public OkurdostuContext Context => _con ?? (OkurdostuContext)HttpContext?.RequestServices.GetService(typeof(OkurdostuContext));
-
+        public OkurdostuContext Context => (OkurdostuContext)HttpContext?.RequestServices.GetService(typeof(OkurdostuContext));
         public void OnGet()
         {
             if (HttpContext.User.Identity.IsAuthenticated)

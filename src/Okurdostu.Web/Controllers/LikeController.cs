@@ -12,6 +12,7 @@ namespace Okurdostu.Web.Controllers
     public class LikeController : BaseController<LikeController>
     {
         [HttpPost, Authorize]
+        [Route("Like")]
         public async Task<JsonResult> Index(int id, string username)
         {
             var Need = await Context.Need.FirstOrDefaultAsync(x =>
@@ -47,14 +48,14 @@ namespace Okurdostu.Web.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("/Like/Likers")]
+        [Route("Like/Likers")]
         public async Task<ActionResult> LikersAsync(int id, string username) => View(await Context.NeedLike.Where(x => x.IsCurrentLiked && x.NeedId == id && x.Need.User.Username == username).Select(a => a.User).ToListAsync());
         
-        [Route("/Like/Count/{id}")]
+        [Route("Like/Count/{id}")]
         public async Task<int> CountAsync(long id) => await Context.NeedLike.CountAsync(x => x.IsCurrentLiked && x.NeedId == id);
         
         [Authorize]
-        [Route("/Like/LikeState/{id}")]
+        [Route("Like/LikeState/{id}")]
         public async Task<bool> LikeStateAsync(long id) => await Context.NeedLike.AnyAsync(x => x.IsCurrentLiked && x.NeedId == id && x.UserId == long.Parse(User.Identity.GetUserId()));
     }
 }

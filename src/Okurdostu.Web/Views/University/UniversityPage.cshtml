@@ -1,6 +1,6 @@
 ﻿@model Okurdostu.Data.Model.University
 @{
-    ViewData["Title"] = Model.Name + " | Okurdostu"; Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml"; ViewBag.Description = Model.Name + " öğrencilerinin ihtiyaçları, öğrencileri ve sayfası";
+    ViewData["Title"] = Model.Name + " | Okurdostu"; Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml"; ViewBag.Description = Model.Name + " öğrencilerinin ihtiyaçları, öğrencileri ve sayfası"; ViewData["UniversityActiveClass"] = "active";
     if (Model.LogoUrl != null)
     {
         ViewBag.OGImage = "https://okurdostu.com" + Model.LogoUrl;

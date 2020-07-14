@@ -1,4 +1,5 @@
-﻿@{ ViewData["Title"] = "Beta | Okurdostu"; Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml"; }
+﻿@{ ViewData["Title"] = "Beta | Okurdostu"; Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml"; ViewData["BetaActiveClass"] = "active"; }
+
 @if (TempData["emailstate"] != null && !(bool)TempData["emailstate"])
 {
     <div class="modal fade" id="emailconfirm" tabindex="-1" role="dialog" aria-hidden="true">
@@ -13,7 +14,7 @@
                         <hr />
                         <div class="text-center">
                             <p><span class="text-dark">@TempData["email"]</span> adresi bana ait</p>
-                            <form method="post" action="/sendconfirmationemail">
+                            <form method="post" action="/account/sendconfirmationemail">
                                 @Html.AntiForgeryToken()
                                 <input type="submit" value="Tekrar mail gönder" class="btn btn-block btn-outline-purple rounded-custom font-weight-bold" />
                             </form>

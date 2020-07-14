@@ -58,33 +58,56 @@ namespace Okurdostu.Web.Controllers
         }
         #endregion
 
+
         #region account
-
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("/sendconfirmationemail")]
-        public async Task<IActionResult> SendConfirmationEmail()
+        public async Task<IActionResult> SendConfirmationEmail() //it's used on /beta/index page
         {
+            //if user doesn't confirm their email, user will see a warning on beta/index page.
+            //and this httppost coming there.
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-            var _UserEmailConfirmation = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.UserId == AuthUser.Id && !x.IsUsed);
 
-            var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
+            if (!AuthUser.IsEmailConfirmed)
             {
-                SenderMail = "halil@okurdostu.com",
-                SenderName = "Halil İbrahim Kocaöz"
-            };
+                var _UserEmailConfirmation = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.UserId == AuthUser.Id && !x.IsUsed);
 
-            Email.Send(Email.NewUserMail(AuthUser.FullName, AuthUser.Email, _UserEmailConfirmation.GUID));
-            TempData["ProfileMessage"] = AuthUser.Email + " adresine yeni bir onay maili gönderildi";
+                var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
+                {
+                    SenderMail = "halil@okurdostu.com",
+                    SenderName = "Halil İbrahim Kocaöz"
+                };
+
+                Guid confirmationGuid = Guid.Empty;
+                if (_UserEmailConfirmation != null)
+                {
+                    confirmationGuid = _UserEmailConfirmation.GUID;
+                }
+                else
+                {
+                    var newUserEmailConfirmation = new UserEmailConfirmation()
+                    {
+                        UserId = AuthUser.Id,
+                    };
+                    await Context.AddAsync(newUserEmailConfirmation);
+                    await Context.SaveChangesAsync();
+                    confirmationGuid = newUserEmailConfirmation.GUID;
+                }
+
+                Email.Send(Email.NewUserMail(AuthUser.FullName, AuthUser.Email, confirmationGuid));
+                TempData["ProfileMessage"] = AuthUser.Email + " adresine yeni bir onay maili gönderildi";
+            }
+
             return Redirect("/" + AuthUser.Username);
         }
 
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> GetConfirmationToEmailChange(ProfileModel Model)
         {
-
+            //authuser must confirm their identity with password if user doesn't this, 
+            //user can't show 'CreateEmailChangeRequest' and can't do httppost to 'CreateEmailChangeRequest'.
             if (await ConfirmIdentityWithPassword(Model.ConfirmPassword))
             {
-                TempData.Set("EmailChangingUserId", AuthUser.Id.ToString());
+                TempData.Set("IsEmailChangingConfirmedwithPassword", true);
                 return Redirect("/account/changeemail");
             }
             else
@@ -95,96 +118,103 @@ namespace Okurdostu.Web.Controllers
 
         }
 
-        [Route("~/account/changeemail")]
+        [Route("account/changeemail")]
         public IActionResult CreateEmailChangeRequest()
         {
-            //EmailChangingUserId is coming from GetConfirmationToEmailChange IActionResult.
-            var UserId = TempData.Get<string>("EmailChangingUserId");
+            //IsEmailChangingConfirmedwithPassword is coming from GetConfirmationToEmailChange IActionResult.
+            //tek seferlik kullanım hakkı var, bu sayfayı gördükten sonra 
+            //yeni bir e-mail isteği girmezse ve bu sayfadan çıkarsa tekrar bu sayfaya password ile identity confirm edemeden giremez.
 
-            if (UserId != null)
+            if (TempData.Get<bool>("IsEmailChangingConfirmedwithPassword"))
             {
+                TempData.Set("IsEmailChangingConfirmedwithPasswordForPost", true);
                 return View();
             }
             else
             {
+                TempData.Clear();
                 return Unauthorized();
             }
 
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/account/changeemail")]
+        [Route("account/changeemail")]
         public async Task<IActionResult> CreateEmailChangeRequest(ProfileModel Model)
         {
-            Model.Email = Model.Email.ToLower();
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
 
-            bool IsThereAnyUserWithThatEmailAdress = false;
-            if (await Context.User.FirstOrDefaultAsync(x => x.Email == Model.Email) != null)
-                IsThereAnyUserWithThatEmailAdress = true;
-
-            if (!IsThereAnyUserWithThatEmailAdress)
+            if (TempData.Get<bool>("IsEmailChangingConfirmedwithPasswordForPost"))
             {
-                if (AuthUser.Email != Model.Email)
+                TempData.Clear();
+
+                Model.Email = Model.Email.ToLower();
+
+                bool IsThereAnyUserWithThatEmailAdress = await Context.User.AnyAsync(x => x.Email == Model.Email);
+
+                if (!IsThereAnyUserWithThatEmailAdress)
                 {
-
-                    var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
-                    {
-                        SenderMail = "noreply@okurdostu.com",
-                        SenderName = "Okurdostu"
-                    };
-
-                    var RequestWithSameEmailandUser = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.NewEmail == Model.Email && x.UserId == AuthUser.Id && !x.IsUsed);
-
-                    if (RequestWithSameEmailandUser == null)
+                    if (AuthUser.Email != Model.Email)
                     {
 
-                        var UserEmailConfirmation = new UserEmailConfirmation() //UserEmailConfirmation'u oluştur
+                        var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
                         {
-                            UserId = AuthUser.Id,
-                            NewEmail = Model.Email, //değiştirilmesini istediği email newemail olarak kolona al
-
-                            //bu veri kolonu emailconfirmation/guid ile geldiği zaman
-                            //newemail kolonu yakalanıp veri varsa kullanıcıya direkt olarak o e-maili atayıp
-                            //onay mailini de yeni e-maile yolladığımız için e-mail adresini onaylayacak.
-                            //yani aslında buralarda e-mailini değiştirmiyoruz confirmemail aşamasında e-mail adresi değişiyor.
+                            SenderMail = "noreply@okurdostu.com",
+                            SenderName = "Okurdostu"
                         };
 
-                        await Context.AddAsync(UserEmailConfirmation);
-                        var result = await Context.SaveChangesAsync();
-                        if (result > 0)
+                        var RequestWithSameEmailandUser = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.NewEmail == Model.Email && x.UserId == AuthUser.Id && !x.IsUsed);
+
+                        if (RequestWithSameEmailandUser == null)
                         {
-                            Email.Send(Email.EmailAddressChangeMail(AuthUser.FullName, UserEmailConfirmation.NewEmail, UserEmailConfirmation.GUID));
-                            TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + UserEmailConfirmation.NewEmail + ") onaylamanız için bir e-mail gönderildi";
+
+                            var UserEmailConfirmation = new UserEmailConfirmation() //UserEmailConfirmation'u oluştur
+                            {
+                                UserId = AuthUser.Id,
+                                NewEmail = Model.Email, //değiştirilmesini istediği email newemail olarak kolona al
+
+                                //bu veri kolonu emailconfirmation/guid ile geldiği zaman
+                                //newemail kolonu yakalanıp veri varsa kullanıcıya direkt olarak o e-maili atayıp
+                                //onay mailini de yeni e-maile yolladığımız için e-mail adresini onaylayacak.
+                                //yani aslında buralarda e-mailini değiştirmiyoruz confirmemail aşamasında e-mail adresi değişiyor.
+                            };
+
+                            await Context.AddAsync(UserEmailConfirmation);
+                            var result = await Context.SaveChangesAsync();
+                            if (result > 0)
+                            {
+                                Email.Send(Email.EmailAddressChangeMail(AuthUser.FullName, UserEmailConfirmation.NewEmail, UserEmailConfirmation.GUID));
+                                TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + UserEmailConfirmation.NewEmail + ") onaylamanız için bir e-mail gönderildi";
+                            }
+                            else
+                            {
+                                TempData["ProfileMessage"] = "Bir değişiklik yapılamadı";
+                            }
+
                         }
                         else
                         {
-                            TempData["ProfileMessage"] = "Bir değişiklik yapılamadı";
+                            Email.Send(Email.EmailAddressChangeMail(AuthUser.FullName, RequestWithSameEmailandUser.NewEmail, RequestWithSameEmailandUser.GUID));
+                            TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + RequestWithSameEmailandUser.NewEmail + ") onaylamanız için bir e-mail gönderildi";
                         }
 
                     }
                     else
                     {
-                        Email.Send(Email.EmailAddressChangeMail(AuthUser.FullName, RequestWithSameEmailandUser.NewEmail, RequestWithSameEmailandUser.GUID));
-                        TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + RequestWithSameEmailandUser.NewEmail + ") onaylamanız için bir e-mail gönderildi";
+                        TempData["ProfileMessage"] = "Şuan ki e-mail adresiniz ile aynı değeri giriyorsunuz";
                     }
 
                 }
                 else
                 {
-                    TempData["ProfileMessage"] = "Şuan ki e-mail adresiniz ile aynı değeri giriyorsunuz";
+                    TempData["ProfileMessage"] = "Bu email adresini kullanamazsınız";
                 }
-
-            }
-            else
-            {
-                TempData["ProfileMessage"] = "Bu email adresini kullanamazsınız";
             }
 
             return Redirect("/" + AuthUser.Username);
         }
 
-        [Route("~/confirmemail/{guid}")]
+        [Route("confirmemail/{guid}")]
         public async Task ConfirmEmail(Guid guid)
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
@@ -220,7 +250,7 @@ namespace Okurdostu.Web.Controllers
                 {
                     if (e.InnerException != null && e.InnerException.Message.Contains("Unique_Key_Email"))
                     {
-                        TempData["ProfileMessage"] = "Değiştirme talebinde bulunduğunuz e-mail adresini kullanamazsınız.<br>E-mail değiştirme isteğiniz geçersiz kılındı";
+                        TempData["ProfileMessage"] = "Değiştirme talebinde bulunduğunuz e-mail adresini kullanamazsınız.<br>E-mail değiştirme isteğiniz geçersiz kılındı<br>Yeni bir e-mail değiştirme isteğinde bulunun";
                         AuthUser.Email = Email;
                         AuthUser.IsEmailConfirmed = EmailConfirmState;
                         ConfirmationRequest.IsUsed = true;
@@ -237,9 +267,9 @@ namespace Okurdostu.Web.Controllers
             Response.Redirect("/" + AuthUser.Username);
         }
 
-        [ConfirmedEmailFilter]
+        [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/password")]
+        [Route("account/password")]
         public async Task EditPassword(ProfileModel Model)
         {
             if (await ConfirmIdentityWithPassword(Model.ConfirmPassword))
@@ -271,37 +301,44 @@ namespace Okurdostu.Web.Controllers
             Response.Redirect("/" + AuthUser.Username);
         }
 
-        [ConfirmedEmailFilter]
+        [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/username")]
+        [Route("account/username")]
         public async Task EditUsername(ProfileModel Model)
         {
             if (await ConfirmIdentityWithPassword(Model.ConfirmPassword))
             {
-                Model.Username = Model.Username.ToLower();
-                if (AuthUser.Username != Model.Username)
+                if (!blockedUsernames.Any(x => Model.Username == x))
                 {
-                    string NowUsername = AuthUser.Username;
-                    AuthUser.Username = Model.Username;
-                    try
+                    Model.Username = Model.Username.ToLower();
+                    if (AuthUser.Username != Model.Username)
                     {
-                        await Context.SaveChangesAsync();
-                        TempData["ProfileMessage"] = "Yeni kullanıcı adınız: " + AuthUser.Username;
-                        Logger.LogInformation("User({Id}) changed their username, old: {old} new: {new}", AuthUser.Id, NowUsername, AuthUser.Username);
-                    }
-                    catch (Exception e)
-                    {
-                        if (e.InnerException.Message.Contains("Unique_Key_Username"))
+                        string NowUsername = AuthUser.Username;
+                        AuthUser.Username = Model.Username;
+                        try
                         {
-                            TempData["ProfileMessage"] = "Bu kullanıcı adını: " + AuthUser.Username + " kullanamazsınız";
+                            await Context.SaveChangesAsync();
+                            TempData["ProfileMessage"] = "Yeni kullanıcı adınız: " + AuthUser.Username;
+                            Logger.LogInformation("User({Id}) changed their username, old: {old} new: {new}", AuthUser.Id, NowUsername, AuthUser.Username);
                         }
-                        else
+                        catch (Exception e)
                         {
-                            Logger.LogError("Changing username failed, UserId: {Id} Ex message: {ExMessage}", AuthUser.Id, e.Message);
-                            TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
+                            if (e.InnerException.Message.Contains("Unique_Key_Username"))
+                            {
+                                TempData["ProfileMessage"] = "Bu kullanıcı adını: " + AuthUser.Username + " kullanamazsınız";
+                            }
+                            else
+                            {
+                                Logger.LogError("Changing username failed, UserId: {Id} Ex message: {ExMessage}", AuthUser.Id, e.Message);
+                                TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
+                            }
+                            AuthUser.Username = NowUsername;
                         }
-                        AuthUser.Username = NowUsername;
                     }
+                }
+                else
+                {
+                    TempData["ProfileMessage"] = "Bu kullanıcı adını: " + Model.Username + " kullanamazsınız";
                 }
             }
             else
@@ -311,10 +348,10 @@ namespace Okurdostu.Web.Controllers
 
             Response.Redirect("/" + AuthUser.Username);
         }
-        
-        [ConfirmedEmailFilter]
+
+        [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/contact")]
+        [Route("account/contact")]
         public async Task Contact(ProfileModel Model) //editing, adding contacts
         {
 
@@ -340,9 +377,10 @@ namespace Okurdostu.Web.Controllers
 
         }
 
-        [ConfirmedEmailFilter]
+        [ServiceFilter(typeof(ConfirmedEmailFilter))]
+
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/basic")]
+        [Route("account/basic")]
         public async Task ProfileBasic(ProfileModel Model) //editing, adding bio and fullname
         {
 
@@ -367,9 +405,9 @@ namespace Okurdostu.Web.Controllers
 
         }
 
-        [ConfirmedEmailFilter]
+        [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/photo")]
+        [Route("account/photo")]
         public async Task AddPhoto()
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
@@ -418,9 +456,9 @@ namespace Okurdostu.Web.Controllers
             Response.Redirect("/" + AuthUser.Username);
         }
 
-        [ConfirmedEmailFilter]
+        [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/remove-photo")]
+        [Route("account/remove-photo")]
         public async Task RemovePhoto()
         {
 
@@ -445,260 +483,5 @@ namespace Okurdostu.Web.Controllers
             Response.Redirect("/" + AuthUser.Username);
         }
         #endregion
-
-
-        #region Education
-        [ConfirmedEmailFilter]
-        [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/education")]
-        public async Task AddEducation(EducationModel Model)
-        {
-            var University = await Context.University.FirstOrDefaultAsync(x => x.Id == Model.UniversityId);
-            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-
-            if (University != null)
-            {
-                if (Model.Startyear <= Model.Finishyear)
-                {
-                    var Education = new UserEducation
-                    {
-                        UserId = AuthUser.Id,
-                        UniversityId = University.Id,
-                        Department = Model.Department,
-                        StartYear = Model.Startyear.ToString(),
-                        EndYear = Model.Finishyear.ToString(),
-                        ActivitiesSocieties = Model.ActivitiesSocieties
-                    };
-
-                    await Context.UserEducation.AddAsync(Education);
-                    var result = await Context.SaveChangesAsync();
-
-                    if (result > 0)
-                    {
-                        Logger.LogInformation("User({Id}) added a new education information", AuthUser.Id);
-                        TempData["ProfileMessage"] = "Eğitim bilginiz eklendi<br />Onaylanması için belge yollamayı unutmayın.";
-                    }
-                    else
-                    {
-                        Logger.LogError("Changes aren't save, User({Id}) take error when trying add a new education information", AuthUser.Id);
-                        TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
-                    }
-
-                }
-                else
-                    TempData["ProfileMessage"] = "Başlangıç yılınız, bitiriş yılınızdan büyük olmamalı";
-            }
-            else
-                TempData["ProfileMessage"] = "Böyle bir üniversite yok";
-
-            Response.Redirect("/" + AuthUser.Username);
-        }
-
-        [ConfirmedEmailFilter]
-        [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/edit-education")]
-        public async Task EditEducation(EducationModel Model)
-        {
-            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Model.EducationId && !x.IsRemoved);
-            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-
-            if (Education != null)
-            {
-                if (Education.UserId == AuthUser.Id)
-                {
-                    if (Education.IsUniversityInformationsCanEditable())
-                    {
-                        if (await Context.University.FirstOrDefaultAsync(x => x.Id == Model.UniversityId) != null)
-                        {
-                            Education.UniversityId = Model.UniversityId;
-                            Education.Department = Model.Department;
-                        }
-                        else
-                        {
-                            TempData["ProfileMessage"] = "Böyle bir üniversite yok";
-                            goto _redirect;
-                        }
-                    }
-
-
-                    if (Model.Startyear <= Model.Finishyear)
-                    {
-                        Education.StartYear = Model.Startyear.ToString();
-                        Education.EndYear = Model.Finishyear.ToString();
-                    }
-                    else
-                    {
-                        TempData["ProfileMessage"] = "Başlangıç yılınız, bitiriş yılınızdan büyük olmamalı";
-                    }
-
-                    Education.ActivitiesSocieties = Model.ActivitiesSocieties;
-                    var result = await Context.SaveChangesAsync();
-                    if (result > 0)
-                    {
-                        Logger.LogInformation("User({Id}) edited an education information", AuthUser.Id);
-
-                        if (!(Model.Startyear <= Model.Finishyear))
-                        {
-                            TempData["ProfileMessage"] = "Başlangıç yılınız, bitiriş yılınızdan büyük olmamalı" +
-                            "<br />" + "Bunlar dışında ki eğitim bilgileriniz düzenlendi";
-                        }
-                        else
-                        {
-                            TempData["ProfileMessage"] = "Eğitim bilgileriniz düzenlendi";
-                        }
-                    }
-                }
-                else
-                {
-                    Logger.LogWarning(401, "User({Id}) tried change another user data[Education: {EducationId}]", AuthUser.Id, Education.Id);
-                    TempData["ProfileMessage"] = "MC Hammer: You can't touch this";
-                }
-
-            }
-        _redirect: Response.Redirect("/" + AuthUser.Username);
-        }
-
-        [ConfirmedEmailFilter]
-        [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/remove-education")]
-        public async Task RemoveEducation(long Id, string Username)
-        {
-            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && x.User.Username == Username && !x.IsRemoved);
-            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-
-            if (Education != null)
-            {
-                if (AuthUser.Id == Education.UserId)
-                {
-                    var AuthUserActiveNeedCount = Context.Need.Where(x => !x.IsRemoved && x.UserId == AuthUser.Id).Count();
-                    if (Education.IsActiveEducation && AuthUserActiveNeedCount > 0)
-                    {
-                        Logger.LogInformation("User({Id}) has tried deleted an active education", AuthUser.Id);
-
-                        TempData["ProfileMessage"] = "İhtiyaç kampanyanız olduğu için" +
-                            "<br />" +
-                            "Aktif olan eğitim bilginizi silemezsiniz." +
-                            "<br />" +
-                            "Aktif olan eğitim bilgisi, belge yollayarak hala burada okuduğunuzu iddia ettiğiniz bir eğitim bilgisidir." +
-                            "<br/>" +
-                            "Daha fazla ayrıntı ve işlem için: info@okurdostu.com";
-                    }
-                    else
-                    {
-
-                        Education.IsRemoved = true;
-                        var result = await Context.SaveChangesAsync();
-                        if (result > 0)
-                        {
-                            TempData["ProfileMessage"] = "Eğitiminiz kaldırıldı";
-                            Logger.LogInformation("User({Id}) deleted an education information", AuthUser.Id);
-
-                            try
-                            {
-                                if (Education.IsSentToConfirmation)
-                                {
-                                    var EducationDocuments = await Context.UserEducationDoc.Where(x => x.UserEducationId == Education.Id).ToListAsync();
-                                    foreach (var item in EducationDocuments)
-                                    {
-                                        if (DeleteFileFromServer(item.PathAfterRoot))
-                                        {
-                                            Context.Remove(item);
-                                        }
-                                    }
-                                    await Context.SaveChangesAsync();
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Logger.LogError("Deleting education documents failed, UserId: {Id}, EducationId {EduId} Ex message: {ExMessage}", AuthUser.Id, Education.Id, e.Message);
-                            }
-
-                        }
-                        else
-                        {
-                            Logger.LogError("Changes aren't save, User({Id}) take error when trying delete Education:{EducationId}", AuthUser.Id, Education.Id);
-                            TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
-                        }
-                    }
-                }
-                else
-                {
-                    Logger.LogWarning(401, "User({Id}) tried remove another user data[Education: {EducationId}]", AuthUser.Id, Education.Id);
-                    TempData["ProfileMessage"] = "MC Hammer: You can't touch this";
-                }
-            }
-
-            Response.Redirect("/" + AuthUser.Username);
-        }
-
-        [ConfirmedEmailFilter]
-        [HttpPost, ValidateAntiForgeryToken]
-        [Route("~/education-document")]
-        public async Task SendEducationDocument(long Id, IFormFile File)
-        {
-            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && !x.IsSentToConfirmation); //bir belge yollayabilir.
-            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-            if (Education != null && AuthUser.Id == Education.UserId)
-            {
-                if (File != null && File.Length <= 1048576 && File.Length > 0)
-                {
-
-                    if (File.ContentType == "document/pdf" || File.ContentType == "image/png" || File.ContentType == "image/jpg" || File.ContentType == "image/jpeg")
-                    {
-
-                        string Name = Guid.NewGuid().ToString() + Path.GetExtension(File.FileName);
-                        string FilePathWithName = Environment.WebRootPath + "/documents/" + Name;
-
-                        using (var Stream = System.IO.File.Create(FilePathWithName))
-                        {
-                            await File.CopyToAsync(Stream);
-                        };
-                        Logger.LogInformation("User({Id}) uploaded a education document({File}) on server", AuthUser.Id, Name);
-
-                        if (System.IO.File.Exists(FilePathWithName))
-                        {
-
-                            var EducationDocument = new UserEducationDoc
-                            {
-                                CreatedOn = DateTime.Now,
-                                UserEducationId = Id,
-                                FullPath = FilePathWithName,
-                                PathAfterRoot = "/documents/" + Name,
-                            };
-                            Education.IsSentToConfirmation = true;
-
-                            await Context.AddAsync(EducationDocument);
-                            var result = await Context.SaveChangesAsync();
-
-                            if (result > 0)
-                            {
-                                Logger.LogInformation("Database seeded for a education document({File}).", Name);
-                                TempData["ProfileMessage"] = "Eğitim dökümanınız yollandı, en geç 6 saat içinde geri dönüş yapılacak";
-                            }
-                            else
-                            {
-                                TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
-                                Logger.LogError("Changes aren't save, User({Id}) take error when trying add a document Education:{EducationId}", AuthUser.Id, Education.Id);
-
-                                DeleteFileFromServer(EducationDocument.PathAfterRoot);
-                            }
-
-                        }
-
-                    }
-                    else
-                        TempData["ProfileMessage"] = "PDF, PNG, JPG veya JPEG türünde belge yükleyiniz";
-
-                }
-                else if (File.Length > 1048576)
-                    TempData["ProfileMessage"] = "Seçtiğiniz dosya 1 megabyte'dan fazla olmamalı";
-                else
-                    TempData["ProfileMessage"] = "Seçtiğiniz dosya ile alakalı problemler var";
-
-            }
-
-            Response.Redirect("/" + AuthUser.Username);
-        }
     }
 }
-#endregion

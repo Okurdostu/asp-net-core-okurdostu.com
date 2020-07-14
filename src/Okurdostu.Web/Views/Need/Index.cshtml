@@ -1,6 +1,6 @@
 ﻿@model List<Okurdostu.Data.Model.Need>
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
-@{ bool isRequestComingFromUniversityPage; }
+@{ bool isRequestComingFromUniversityPage; ViewData["NeedsActiveClass"] = "active"; }
 @if (HttpContextAccessor.HttpContext.Request.Path.Value.ToLower().Contains("need"))
 { HttpContextAccessor.HttpContext.Response.Redirect("/ihtiyaclar"); }
 <!--
@@ -10,7 +10,7 @@
 @if (TempData["Jquery"] != null && TempData["Jquery"].ToString() == "Yes")
 { isRequestComingFromUniversityPage = true; }
 else
-{ isRequestComingFromUniversityPage = false;}
+{ isRequestComingFromUniversityPage = false; }
 @{
     int i = 0; //üniversite sayfasında geliyorsa istek en fazla 6 tane kaydı görüntülemek için aşağıda ki bir foreach'da kullanılıyor
 
@@ -113,11 +113,7 @@ else
                     <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
                     <hr />
                     <button class="btn btn-outline-purple btn-block mb-1 font-weight-bold" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false">Üniversiteler</button>
-                    @{
-                        Okurdostu.Data.OkurdostuContext Context = new Okurdostu.Data.OkurdostuContext();
-                        var allSchools = Context.University.ToList().OrderBy(x => x.Name);
-                    }
-                    @foreach (var item in allSchools)
+                    @foreach (var item in (IEnumerable<Okurdostu.Data.Model.University>)ViewBag.Universities)
                     {
                         <div class="collapse multi-collapse" id="@item.FriendlyName"><a class="od font-weight-bold" href="/ihtiyaclar/@item.FriendlyName"><div class="card card-body bg-transparent p-2 pt-1 pb-1">@Html.Raw(item.Name)</div></a></div>
                     }

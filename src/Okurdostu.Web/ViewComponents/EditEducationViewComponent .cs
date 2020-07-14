@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data;
 using Okurdostu.Web.Extensions;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Okurdostu.Web.ViewComponents
@@ -11,7 +13,6 @@ namespace Okurdostu.Web.ViewComponents
     {
         private readonly OkurdostuContext Context;
         public EditEducationViewComponent(OkurdostuContext _context) => Context = _context;
-
         public async Task<IViewComponentResult> InvokeAsync(long EducationdId)
         {
             var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == EducationdId);
@@ -30,7 +31,7 @@ namespace Okurdostu.Web.ViewComponents
                     Model.UniversityId = Education.UniversityId;
                     Model.Department = Education.Department;
 
-                    await Model.ListUniversitiesAsync();
+                    Model.Universities = await Context.University.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
                 }
                 return View(Model);
             }

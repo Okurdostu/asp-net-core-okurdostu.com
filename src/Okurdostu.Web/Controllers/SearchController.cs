@@ -4,8 +4,8 @@ namespace Okurdostu.Web.Controllers
 {
     public class SearchController : BaseController<SearchController>
     {
-        [Route("~/arama")]
-        [Route("~/arama/{q}")]
+        [Route("arama")]
+        [Route("arama/{q}")]
         public IActionResult Index(string q)
         {
 
@@ -17,7 +17,6 @@ namespace Okurdostu.Web.Controllers
             else
                 TempData["SearchPageTitle"] = "Arama, keşfetme | Okurdostu";
 
-            ViewData["SearchActiveClass"] = "active";
             return View();
 
         }
