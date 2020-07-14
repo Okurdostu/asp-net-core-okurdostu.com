@@ -43,7 +43,7 @@ namespace Okurdostu.Web
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<ConfirmedEmailFilter>();
             services.AddControllersWithViews();
-            services.AddDbContext<OkurdostuContext>(option => option.UseSqlServer(Configuration.GetConnectionString("OkurdostuConnectionString")));
+            services.AddDbContext<OkurdostuContext>(option => option.UseSqlServer(Configuration.GetConnectionString("OkurdostuLocal")));
 
 
         }

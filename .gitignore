@@ -3,8 +3,9 @@ universite-logo/
 profil-fotograf/
 documents/
 notes.txt
-src/Okurdostu.Web/appsettings.json
 Mailtemplates/
+src/Okurdostu.Web/Properties/PublishProfiles/FolderProfile.pubxml
+
 
 #vscode
 .vscode/*
@@ -39,4 +40,4 @@ msbuild.wrn
 *.sln.docstates
 
 
-src/Okurdostu.Web/Properties/PublishProfiles/FolderProfile.pubxml
+
