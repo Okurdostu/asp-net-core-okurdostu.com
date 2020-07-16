@@ -1,40 +1,33 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
 {
-    public class HomeController : BaseController<HomeController>
+    public class HomeController : Controller
     {
         //viewbag.authuser i onactionexecuting e al.
         [Route("")]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            ViewBag.AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             return View();
         }
         [Route("gizlilik-politikasi")]
-        public async Task<IActionResult> PrivacyPolicy()
+        public IActionResult PrivacyPolicy()
         {
-            ViewBag.AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             return View();
         }
         [Route("kullanici-sozlesmesi")]
-        public async Task<IActionResult> UserAgreement()
+        public IActionResult UserAgreement()
         {
-            ViewBag.AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             return View();
         }
         [Route("sss")]
-        public async Task<IActionResult> FAQ()
+        public IActionResult FAQ()
         {
-            ViewBag.AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-
             return View();
         }
         [Route("kvkk")]
-        public async Task<IActionResult> KVKK()
+        public IActionResult KVKK()
         {
-            ViewBag.AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             return View();
         }
     }

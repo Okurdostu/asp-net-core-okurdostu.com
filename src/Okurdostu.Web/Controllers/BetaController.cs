@@ -8,16 +8,12 @@ namespace Okurdostu.Web.Controllers
     public class BetaController : BaseController<BetaController>
     {
         [Route("beta")]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             if (User.Identity.IsAuthenticated)
             {
-                var AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-                if (!AuthUser.IsEmailConfirmed) //bu bilgileri claimslerden al.
-                {
-                    TempData["emailstate"] = AuthUser.IsEmailConfirmed;
-                    TempData["email"] = AuthUser.Email;
-                }
+                TempData["emailstate"] = User.Identity.GetEmailConfirmedState();
+                TempData["email"] = User.Identity.GetEmail();
             }
 
             return View();

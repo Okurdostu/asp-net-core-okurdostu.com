@@ -81,10 +81,10 @@
                     }
                     else
                     {
-                        string username = (ViewBag.AuthUser as Okurdostu.Data.Model.User).Username;
-                        string picture = (ViewBag.AuthUser as Okurdostu.Data.Model.User).PictureUrl;
+                        string username = HttpContextAccessor.HttpContext.User.Identity.GetUsername();
+                        string picture = HttpContextAccessor.HttpContext.User.Identity.GetPhoto();
                         <li class="nav-item page-scroll">
-                            @if ((ViewBag.AuthUser as Okurdostu.Data.Model.User).PictureUrl == null)
+                            @if (picture == "")
                             {
                                 <div class="dropdown show">
                                     <a class="dropdown-toggle" href="" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
