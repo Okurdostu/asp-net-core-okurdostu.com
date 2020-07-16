@@ -117,15 +117,15 @@ namespace Okurdostu.Web.Controllers
         [HttpGet]
         public async Task<JsonResult> GetContent(Guid Id) //it's for edit and doreply
         {
-            var Comment = await Context.NeedComment.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
+            var RequestedComment = await Context.NeedComment.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
 
-            if (Comment != null)
+            if (RequestedComment != null)
             {
                 AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-                return Json(new { state = true, comment = Comment.Comment, username = Comment.User.Username, fullname = Comment.User.FullName });
+                return Json(new { state = true, comment = RequestedComment.Comment, username = RequestedComment.User.Username, fullname = RequestedComment.User.FullName });
             }
 
-            return Json(new { state = false, comment = "" });
+            return Json(new { state = false});
         }
 
 

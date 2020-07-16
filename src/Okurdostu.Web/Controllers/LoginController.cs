@@ -35,19 +35,7 @@ namespace Okurdostu.Web.Controllers
             var User = await AuthenticateAsync(Model);
             if (User != null)
             {
-                var ClaimList = new List<Claim>();
-                ClaimList.Add(new Claim("Id", User.Id.ToString()));
-                var ClaimsIdentity = new ClaimsIdentity(ClaimList, CookieAuthenticationDefaults.AuthenticationScheme);
-                var AuthProperties = new AuthenticationProperties
-                {
-                    AllowRefresh = true,
-                    IsPersistent = true
-                };
-
-                await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(ClaimsIdentity),
-                    AuthProperties);
+                await DoAuth(User);
 
                 Logger.LogInformation(User.Username + " logged in at " + DateTime.Now);
 

@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Okurdostu.Data;
 using Okurdostu.Data.Model;
+using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Okurdostu.Web
 {
@@ -21,6 +24,36 @@ namespace Okurdostu.Web
             "gizlilik-politikasi","kullanici-sozlesmesi","sss","kvkk",
             "home", "like","logout", "ihtiyac-olustur","ihtiyac", "universiteler"
         };
+
+        public async Task DoAuth(User user)
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var ClaimList = new List<Claim>();
+            ClaimList.Add(new Claim("Id", user.Id.ToString()));
+            ClaimList.Add(new Claim("Username", user.Username));
+            ClaimList.Add(new Claim("Email", user.Email));
+            ClaimList.Add(new Claim("EmailState", user.IsEmailConfirmed.ToString()));
+            if (user.PictureUrl != null)
+            {
+                ClaimList.Add(new Claim("Photo", user.PictureUrl));
+            }
+            else
+            {
+                ClaimList.Add(new Claim("Photo", ""));
+            }
+
+            var ClaimsIdentity = new ClaimsIdentity(ClaimList, CookieAuthenticationDefaults.AuthenticationScheme);
+            var AuthProperties = new AuthenticationProperties
+            {
+                AllowRefresh = true,
+                IsPersistent = true
+            };
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(ClaimsIdentity),
+                AuthProperties);
+        }
 
         public async Task<User> GetAuthenticatedUserFromDatabaseAsync()
         {

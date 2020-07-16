@@ -67,18 +67,7 @@ namespace Okurdostu.Web.Controllers
             }
             if (result > 0)
             {
-                var ClaimList = new List<Claim>();
-                ClaimList.Add(new Claim("Id", User.Id.ToString()));
-                var ClaimsIdentity = new ClaimsIdentity(ClaimList, CookieAuthenticationDefaults.AuthenticationScheme);
-                var AuthProperties = new AuthenticationProperties
-                {
-                    AllowRefresh = true,
-                    IsPersistent = true
-                };
-                await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(ClaimsIdentity),
-                    AuthProperties);
+                await DoAuth(User);
 
                 var _UserEmailConfirmation = new UserEmailConfirmation()
                 {
