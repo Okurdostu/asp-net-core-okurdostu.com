@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -8,9 +6,7 @@ using Okurdostu.Data.Model;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
@@ -35,7 +31,7 @@ namespace Okurdostu.Web.Controllers
             var User = await AuthenticateAsync(Model);
             if (User != null)
             {
-                await DoAuth(User);
+                await SignInWithCookie(User);
 
                 Logger.LogInformation(User.Username + " logged in at " + DateTime.Now);
 

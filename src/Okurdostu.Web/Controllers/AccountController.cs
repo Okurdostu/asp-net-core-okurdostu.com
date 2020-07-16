@@ -244,7 +244,7 @@ namespace Okurdostu.Web.Controllers
                         TempData["ProfileMessage"] = "E-mail adresiniz onaylandı, teşekkürler";
                     }
                     await Context.SaveChangesAsync();
-                    await DoAuth(AuthUser);
+                    await SignInWithCookie(AuthUser);
                 }
                 catch (Exception e)
                 {
@@ -318,7 +318,7 @@ namespace Okurdostu.Web.Controllers
                         try
                         {
                             await Context.SaveChangesAsync();
-                            await DoAuth(AuthUser);
+                            await SignInWithCookie(AuthUser);
                             TempData["ProfileMessage"] = "Yeni kullanıcı adınız: " + AuthUser.Username;
                             Logger.LogInformation("User({Id}) changed their username, old: {old} new: {new}", AuthUser.Id, NowUsername, AuthUser.Username);
                         }
@@ -434,7 +434,7 @@ namespace Okurdostu.Web.Controllers
 
                     if (result > 0)
                     {
-                        await DoAuth(AuthUser);
+                        await SignInWithCookie(AuthUser);
                         Logger.LogInformation("User({Id}) changed profile photo", AuthUser.Id);
                         if (OldPhoto != null)
                         {
@@ -472,7 +472,7 @@ namespace Okurdostu.Web.Controllers
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
                 {
-                    await DoAuth(AuthUser);
+                    await SignInWithCookie(AuthUser);
                     Logger.LogInformation("User({Id}) removed their photo", AuthUser.Id);
                     DeleteFileFromServer(OldPhoto);
                 }

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using Okurdostu.Data.Model;
@@ -8,9 +6,7 @@ using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 using Okurdostu.Web.Services;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
@@ -67,7 +63,7 @@ namespace Okurdostu.Web.Controllers
             }
             if (result > 0)
             {
-                await DoAuth(User);
+                await SignInWithCookie(User);
 
                 var _UserEmailConfirmation = new UserEmailConfirmation()
                 {

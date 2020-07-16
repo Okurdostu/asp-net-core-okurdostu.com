@@ -25,7 +25,7 @@ namespace Okurdostu.Web
             "home", "like","logout", "ihtiyac-olustur","ihtiyac", "universiteler"
         };
 
-        public async Task DoAuth(User user)
+        public async Task SignInWithCookie(User user)
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
