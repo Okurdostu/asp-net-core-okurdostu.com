@@ -84,7 +84,7 @@
                         string username = HttpContextAccessor.HttpContext.User.Identity.GetUsername();
                         string picture = HttpContextAccessor.HttpContext.User.Identity.GetPhoto();
                         <li class="nav-item page-scroll">
-                            @if (picture == "")
+                            @if (picture == null)
                             {
                                 <div class="dropdown show">
                                     <a class="dropdown-toggle" href="" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

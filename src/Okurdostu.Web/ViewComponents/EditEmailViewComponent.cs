@@ -10,8 +10,10 @@ namespace Okurdostu.Web.ViewComponents
 
         public IViewComponentResult Invoke(string Email)
         {
-            ProfileModel Model = new ProfileModel();
-            Model.Email = Email;
+            ProfileModel Model = new ProfileModel
+            {
+                Email = Email
+            };
             return View(Model);
         }
     }

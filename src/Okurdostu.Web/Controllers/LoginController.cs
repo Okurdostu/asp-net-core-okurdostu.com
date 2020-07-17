@@ -14,7 +14,7 @@ namespace Okurdostu.Web.Controllers
     public class LoginController : BaseController<LoginController>
     {
         [Route("Girisyap")]
-        public IActionResult Index(string ReturnUrl)
+        public IActionResult Index()
         {
             return HttpContext.User.Identity.IsAuthenticated ? (IActionResult)Redirect("/") : View();
         }

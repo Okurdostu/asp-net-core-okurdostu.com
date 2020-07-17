@@ -80,8 +80,8 @@ namespace Okurdostu.Web.Extensions
             if (charArray[0] == ' ')
                 charArray[0] = '_';
 
-            if (charArray[charArray.Length - 1] == ' ')
-                charArray[charArray.Length - 1] = '_';
+            if (charArray[^1] == ' ')
+                charArray[^1] = '_';
 
             //last output: "asd asd asd"
             return new string(charArray).Replace("_", ""); // delete '_' [space] characters and return
@@ -140,7 +140,7 @@ namespace Okurdostu.Web.Extensions
             //      1.500,00 olarak döndürmek için kullanılıyor
             price = price.Replace(".", ",");
 
-            string DeletedLast2Digit = price.Substring(0, price.Length - 2);
+            string DeletedLast2Digit = price[0..^2];
             return DeletedLast2Digit.Length >= 7 ? AddDot(DeletedLast2Digit) : DeletedLast2Digit;
         }
         private static string AddDot(string price)

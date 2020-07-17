@@ -24,7 +24,7 @@ namespace Okurdostu.Web.Controllers
         private User AuthUser;
 
 #pragma warning disable CS0618 // Type or member is obsolete
-        private IHostingEnvironment Environment;
+        private readonly IHostingEnvironment Environment;
 #pragma warning restore CS0618 // Type or member is obsolete
 
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -37,7 +37,7 @@ namespace Okurdostu.Web.Controllers
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             ConfirmPassword = ConfirmPassword.SHA512();
-            return ConfirmPassword == AuthUser.Password ? true : false;
+            return ConfirmPassword == AuthUser.Password;
         }
 
         [NonAction]

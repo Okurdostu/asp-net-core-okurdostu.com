@@ -14,7 +14,7 @@ namespace Okurdostu.Web.Controllers
     public class SignUpController : BaseController<SignUpController>
     {
         [Route("Kaydol")]
-        public IActionResult Index(string ReturnUrl)
+        public IActionResult Index()
         {
             return HttpContext.User.Identity.IsAuthenticated ? (IActionResult)Redirect("/") : View();
         }

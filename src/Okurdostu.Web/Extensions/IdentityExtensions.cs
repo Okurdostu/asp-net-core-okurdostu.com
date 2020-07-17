@@ -11,21 +11,21 @@ namespace Okurdostu.Web
         {
             ClaimsIdentity CI = identity as ClaimsIdentity;
             Claim claim = CI?.FindFirst("Id");
-            return claim != null ? claim.Value : null;
+            return claim?.Value;
         }
 
         public static string GetUsername(this IIdentity identity)
         {
             ClaimsIdentity CI = identity as ClaimsIdentity;
             Claim claim = CI?.FindFirst("Username");
-            return claim != null ? claim.Value : null;
+            return claim?.Value;
         }
 
         public static string GetEmail(this IIdentity identity)
         {
             ClaimsIdentity CI = identity as ClaimsIdentity;
             Claim claim = CI?.FindFirst("Email");
-            return claim != null ? claim.Value : null;
+            return claim?.Value;
         }
         public static bool GetEmailConfirmedState(this IIdentity identity)
         {
@@ -38,7 +38,7 @@ namespace Okurdostu.Web
         {
             ClaimsIdentity CI = identity as ClaimsIdentity;
             Claim claim = CI?.FindFirst("Photo");
-            return claim != null ? claim.Value : null;
+            return claim?.Value;
         }
     }
 }

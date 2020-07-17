@@ -16,12 +16,10 @@ namespace Okurdostu.Web.Extensions
         {
             if (!tempData.ContainsKey(key))
             {
-                return default(T);
+                return default;
             }
 
-            var value = tempData[key] as string;
-
-            return value == null ? default(T) : JsonConvert.DeserializeObject<T>(value);
+            return !(tempData[key] is string value) ? default : JsonConvert.DeserializeObject<T>(value);
         }
     }
 }

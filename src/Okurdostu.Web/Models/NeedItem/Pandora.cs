@@ -5,8 +5,6 @@ namespace Okurdostu.Web.Models.NeedItem
 {
     public class Pandora
     {
-        const int pandoraUcretsizKargo = 0; // 200 TL altı ücretli 200 tl üstü ücretsiz kargo
-        const int pandoraKargoUcreti = 0;  // kargo ücreti maksimum 15 tl
         public string Name { get; set; }
         public string Link { get; set; }
         public decimal Price { get; private set; }
@@ -75,7 +73,7 @@ namespace Okurdostu.Web.Models.NeedItem
 
         public Pandora SelectPrice(Pandora Product)
         {
-            decimal _Price = 0;
+            decimal _Price;
             /// <summary>
             /// Product.NormalPrice ve Product.DiscountedPrice var
             /// Eğer ki NormalPrice varsa bunu alıp İndirimli fiyata uğramıyoruz

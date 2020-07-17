@@ -38,7 +38,7 @@ namespace Okurdostu.Web.Controllers
         User AuthUser;
 
 #pragma warning disable CS0618 // Type or member is obsolete
-        private IHostingEnvironment Environment;
+        private readonly IHostingEnvironment Environment;
 #pragma warning restore CS0618 // Type or member is obsolete
 
 #pragma warning disable CS0618 // Type or member is obsolete

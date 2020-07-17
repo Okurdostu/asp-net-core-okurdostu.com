@@ -29,11 +29,13 @@ namespace Okurdostu.Web.ViewComponents
 
                 if (StudentList.Where(x => x.ID == Education.UserId).FirstOrDefault() != null)
                     continue;
-                var Student = new UniversityStudentsModel();
-                Student.ID = Education.UserId;
-                Student.FullName = Education.User.FullName;
-                Student.Username = Education.User.Username;
-                Student.ProfilePicture = Education.User.PictureUrl;
+                var Student = new UniversityStudentsModel
+                {
+                    ID = Education.UserId,
+                    FullName = Education.User.FullName,
+                    Username = Education.User.Username,
+                    ProfilePicture = Education.User.PictureUrl
+                };
 
                 StudentList.Add(Student);
             }

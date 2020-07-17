@@ -15,7 +15,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
     public class SendMailModel : PageModel
     {
         public OkurdostuContext Context => (OkurdostuContext)HttpContext?.RequestServices.GetService(typeof(OkurdostuContext));
-        public User _User { get; set; }
+        public User AppUser { get; set; }
 
         public IActionResult OnGet()
         {
@@ -30,11 +30,11 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                 return Redirect("/account/passwordreset");
             }
 
-            _User = Context.User.FirstOrDefault(x => x.Id == long.Parse(UserId) && x.IsActive);
+            AppUser = Context.User.FirstOrDefault(x => x.Id == long.Parse(UserId) && x.IsActive);
 
-            if (_User != null)
+            if (User != null)
             {
-                TempData.Set("resetPasswordUserId", _User.Id.ToString());
+                TempData.Set("resetPasswordUserId", AppUser.Id.ToString());
                 return Page();
             }
             else
@@ -49,13 +49,13 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
         {
             var UserId = TempData.Get<string>("resetPasswordUserId");
             TempData.Remove("resetPasswordUserId");
-            _User = Context.User.FirstOrDefault(x => x.Id == long.Parse(UserId) && x.IsActive);
+            AppUser = Context.User.FirstOrDefault(x => x.Id == long.Parse(UserId) && x.IsActive);
 
             if (HttpContext.User.Identity.IsAuthenticated)
             {
                 return Redirect("/");
             }
-            else if (_User == null)
+            else if (AppUser == null)
             {
                 TempData["PasswordResetMessage"] = "Kullanıcıya ulaşılamadı";
                 return Redirect("/account/passwordreset");
@@ -67,7 +67,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                 SenderName = "Okurdostu"
             };
 
-            var preCreatedPaswordReset = Context.UserPasswordReset.Where(x => x.UserId == _User.Id && !x.IsUsed).Include(x => x.User).ToList().LastOrDefault();
+            var preCreatedPaswordReset = Context.UserPasswordReset.Where(x => x.UserId == AppUser.Id && !x.IsUsed).Include(x => x.User).ToList().LastOrDefault();
             var elapsedTime = DateTime.Now - preCreatedPaswordReset?.CreatedOn;
 
             if (preCreatedPaswordReset != null && elapsedTime.Value.Hours < 11.5)
@@ -78,13 +78,13 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
             {
                 var UserPaswordReset = new UserPasswordReset()
                 {
-                    UserId = _User.Id
+                    UserId = AppUser.Id
                 };
                 await Context.AddAsync(UserPaswordReset);
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
                 {
-                    Email.Send(Email.PasswordResetMail(_User.FullName, _User.Email, UserPaswordReset.GUID));
+                    Email.Send(Email.PasswordResetMail(AppUser.FullName, AppUser.Email, UserPaswordReset.GUID));
                 }
             }
             return Redirect("/account/passwordreset/successent");

@@ -15,7 +15,7 @@ namespace Okurdostu.Web
     public class BaseController<T> : Controller where T : BaseController<T>
     {
         private ILogger<T> _logger;
-        protected ILogger<T> Logger => _logger ?? (_logger = HttpContext.RequestServices.GetService<ILogger<T>>());
+        protected ILogger<T> Logger => _logger ??= HttpContext.RequestServices.GetService<ILogger<T>>();
         public OkurdostuContext Context => (OkurdostuContext)HttpContext?.RequestServices.GetService(typeof(OkurdostuContext));
 
 
@@ -24,23 +24,20 @@ namespace Okurdostu.Web
             "gizlilik-politikasi","kullanici-sozlesmesi","sss","kvkk",
             "home", "like","logout", "ihtiyac-olustur","ihtiyac", "universiteler"
         };
-
         public async Task SignInWithCookie(User user)
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            var ClaimList = new List<Claim>();
-            ClaimList.Add(new Claim("Id", user.Id.ToString()));
-            ClaimList.Add(new Claim("Username", user.Username));
-            ClaimList.Add(new Claim("Email", user.Email));
-            ClaimList.Add(new Claim("EmailState", user.IsEmailConfirmed.ToString()));
+            var ClaimList = new List<Claim>
+            {
+                new Claim("Id", user.Id.ToString()),
+                new Claim("Username", user.Username),
+                new Claim("Email", user.Email),
+                new Claim("EmailState", user.IsEmailConfirmed.ToString())
+            };
             if (user.PictureUrl != null)
             {
                 ClaimList.Add(new Claim("Photo", user.PictureUrl));
-            }
-            else
-            {
-                ClaimList.Add(new Claim("Photo", ""));
             }
 
             var ClaimsIdentity = new ClaimsIdentity(ClaimList, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -61,7 +58,7 @@ namespace Okurdostu.Web
             if (Id != null)
             {
                 var _User = await Context.User.FirstOrDefaultAsync(x => x.Id == long.Parse(Id) && x.IsActive);
-                return _User != null ? _User : null;
+                return _User ?? null;
             }
             else
             {

@@ -62,7 +62,7 @@
             @if (IsAuthenticated)
             {
                 <div>
-                    @if (@HttpContextAccessor.HttpContext.User.Identity.GetPhoto() != "")
+                    @if (@HttpContextAccessor.HttpContext.User.Identity.GetPhoto() != null)
                     {
                         <a href="/@HttpContextAccessor.HttpContext.User.Identity.GetUsername()" id="profil"><i><img src="@HttpContextAccessor.HttpContext.User.Identity.GetPhoto()" class="rounded-pill" style="width:35px; height:35px;" /></i> <span>Profil</span></a>
                     }

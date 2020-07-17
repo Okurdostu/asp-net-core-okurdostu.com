@@ -1,15 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Okurdostu.Data;
-using System.Linq;
 
 namespace Okurdostu.Web.Filters
 {
     public class ConfirmedEmailFilter : ActionFilterAttribute
     {
-        private readonly OkurdostuContext dbContext;
-        public ConfirmedEmailFilter(OkurdostuContext _context) => dbContext = _context;
-
         public override void OnActionExecuting(ActionExecutingContext actionContext)
         {
             Controller controller = actionContext.Controller as Controller;
