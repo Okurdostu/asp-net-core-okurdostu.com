@@ -23,7 +23,7 @@ namespace Okurdostu.Web.Tests
             amazon = amazon.Product(customUrl);
 
             Assert.Equal(customExpectedName, amazon.Name);
-            Assert.Equal(customExpectedPrice, (double)amazon.Price);
+            Assert.Equal(customExpectedPrice, amazon.Price);
             Assert.Null(amazon.Error);
 
         }
@@ -39,7 +39,7 @@ namespace Okurdostu.Web.Tests
             pandora = pandora.Product(customUrl);
 
             Assert.Equal(customExpectedName, pandora.Name);
-            Assert.Equal(customExpectedPrice, (double)pandora.Price);
+            Assert.Equal(customExpectedPrice, pandora.Price);
             Assert.Null(pandora.Error);
         }
 
@@ -48,13 +48,13 @@ namespace Okurdostu.Web.Tests
         {
             customUrl = "https://www.udemy.com/course/writing-with-flair-how-to-become-an-exceptional-writer/";
             customExpectedName = "Writing With Flair: How To Become An Exceptional Writer"; //it's coming from <meta> og:title
-            customExpectedPrice = 28.99; //sale price
+            customExpectedPrice = 0;
 
             var udemy = new Udemy();
             udemy = udemy.Product(customUrl);
 
             Assert.Equal(customExpectedName, udemy.Name);
-            Assert.Equal(customExpectedPrice, (double)udemy.Price);
+            Assert.Equal(customExpectedPrice, udemy.Price);
             Assert.Null(udemy.Error);
         }
     }

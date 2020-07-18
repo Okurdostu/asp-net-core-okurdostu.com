@@ -7,7 +7,7 @@ namespace Okurdostu.Web.Models.NeedItem
     {
         public string Name { get; set; }
         public string Link { get; set; }
-        public decimal Price { get; private set; }
+        public double Price { get; private set; }
         public string Picture { get; set; }
         public string Error { get; private set; }
         public string DiscountedPrice { get; set; }
@@ -89,7 +89,7 @@ namespace Okurdostu.Web.Models.NeedItem
             //if (_Price < pandoraUcretsizKargo)
             //    _Price += pandoraKargoUcreti;
 
-            Product.Price = _Price;
+            Product.Price = (double)_Price;
             return Product;
         }
     }

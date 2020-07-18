@@ -7,7 +7,7 @@ namespace Okurdostu.Web.Models.NeedItem
     {
         public string Name { get; set; }
         public string Link { get; set; }
-        public decimal Price { get; private set; }
+        public double Price { get; private set; }
         public string Error { get; private set; }
         public Amazon Product(string url)
         {
@@ -27,9 +27,9 @@ namespace Okurdostu.Web.Models.NeedItem
                 }
 
                 if (htmlDocument.DocumentNode.SelectSingleNode("//span[@class='priceBlockStrikePriceString a-text-strike']") != null)
-                    Product.Price = decimal.Parse(htmlDocument.DocumentNode.SelectSingleNode("//span[@class='priceBlockStrikePriceString a-text-strike']").InnerText.Replace(".", "").Replace(",", ".").Replace("₺", "").Replace(" ", ""));
+                    Product.Price = double.Parse(htmlDocument.DocumentNode.SelectSingleNode("//span[@class='priceBlockStrikePriceString a-text-strike']").InnerText.Replace(".", "").Replace(",", ".").Replace("₺", "").Replace(" ", ""));
                 else if (htmlDocument.DocumentNode.SelectSingleNode("//span[@id='priceblock_ourprice']") != null)
-                    Product.Price = decimal.Parse(htmlDocument.DocumentNode.SelectSingleNode("//span[@id='priceblock_ourprice']").InnerText.Replace(".", "").Replace(",", ".").Replace("₺", "").Replace(" ", ""));
+                    Product.Price = double.Parse(htmlDocument.DocumentNode.SelectSingleNode("//span[@id='priceblock_ourprice']").InnerText.Replace(".", "").Replace(",", ".").Replace("₺", "").Replace(" ", ""));
                 else
                     Product.Error = "Fiyatına ulaşılamadı";
 

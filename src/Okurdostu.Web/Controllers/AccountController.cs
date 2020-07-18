@@ -121,8 +121,8 @@ namespace Okurdostu.Web.Controllers
         public IActionResult CreateEmailChangeRequest()
         {
             //IsEmailChangingConfirmedwithPassword is coming from GetConfirmationToEmailChange IActionResult.
-            //tek seferlik kullanım hakkı var, bu sayfayı gördükten sonra 
-            //yeni bir e-mail isteği girmezse ve bu sayfadan çıkarsa tekrar bu sayfaya password ile identity confirm edemeden giremez.
+            //user has one chance to input new e-mail adress
+            //if this page renewed or user left it, can't see again
 
             if (TempData.Get<bool>("IsEmailChangingConfirmedwithPassword"))
             {

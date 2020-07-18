@@ -11,18 +11,18 @@
 <h4 class="text-black-50 text-center text-md-left">Okurdostu hesabınızı bulduk</h4>
 @if (IdType == "Username")
 {
-    <partial name="~/Pages/Account/PasswordReset/_PartialProfile.cshtml" model="@Model._User" />
+    <partial name="~/Pages/Account/PasswordReset/_PartialProfile.cshtml" model="@Model.AppUser" />
 }
 @if (IdType == "Email")
 {
     <p class="font-weight-bold text-black-50 mt-2">
-        E-mail: @Model._User.Email <br />
+        E-mail: @Model.AppUser.Email <br />
     </p>
 }
 else
 {
     <p class="font-weight-bold text-black-50 mt-2">
-        E-mail: @Model._User.Email.StarsToEmail() <br />
+        E-mail: @Model.AppUser.Email.StarsToEmail() <br />
     </p>
 }
 <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />

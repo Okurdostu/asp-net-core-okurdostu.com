@@ -294,7 +294,7 @@ namespace Okurdostu.Web.Controllers
                                 Link = Udemy.Link,
                                 Picture = "udemy",
                                 Name = Udemy.Name,
-                                Price = Udemy.Price,
+                                Price = (decimal)Udemy.Price,
                                 PlatformName = "Udemy",
                                 IsRemoved = false,
                             };
@@ -324,7 +324,7 @@ namespace Okurdostu.Web.Controllers
                                     Link = Pandora.Link,
                                     Picture = Pandora.Picture,
                                     Name = Pandora.Name,
-                                    Price = Pandora.Price,
+                                    Price = (decimal)Pandora.Price,
                                     PlatformName = "Pandora",
                                     IsRemoved = false,
                                     IsWrong = false
@@ -356,7 +356,7 @@ namespace Okurdostu.Web.Controllers
                                 Link = Amazon.Link,
                                 Picture = "Amazon",
                                 Name = Amazon.Name,
-                                Price = Amazon.Price,
+                                Price = (decimal)Amazon.Price,
                                 PlatformName = "Amazon",
                                 IsRemoved = false,
                             };
