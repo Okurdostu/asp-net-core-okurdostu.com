@@ -249,22 +249,23 @@ namespace Okurdostu.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task RemoveItem(long NeedItemId)
         {
-            var item = await Context.NeedItem.Include(needitem => needitem.Need).FirstOrDefaultAsync(x => x.Id == NeedItemId && !x.Need.IsRemoved && !x.Need.IsSentForConfirmation);
+            var item = await Context.NeedItem.Include(needitem => needitem.Need).FirstOrDefaultAsync(x => x.Id == NeedItemId 
+            && !x.Need.IsRemoved 
+            && !x.Need.IsSentForConfirmation);
             // Kampanya(need) onaylanma için yollandıysa bir item silemeyecek: onaylanma için gönderdiyse 
             //(completed ve confirmed kontrol etmeye gerek yok çünkü onaylandıysa veya bittiyse de isSentForConfirmation hep true kalacak.)
-            if (item != null)
+            if (item != null) 
             {
                 AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-                if (AuthUser.Id == item.Need.UserId)
+                if (AuthUser.Id == item.Need.UserId) //item(ihtiyaç)'ı silmeye çalıştığı kampanya Authenticated olmuş üzere aitse..
                 {
                     item.IsRemoved = true;
+                    item.Need.TotalCharge -= item.Price;
                     await Context.SaveChangesAsync();
                     Response.Redirect("/" + item.Need.User.Username.ToLower() + "/ihtiyac/" + item.Need.FriendlyTitle + "/" + item.Need.Id);
                 }
             }
         }
-
-
         [Authorize]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task AddItem(string ItemLink, long NeedId)
@@ -272,36 +273,22 @@ namespace Okurdostu.Web.Controllers
             var Need = await Context.Need.Where(x => x.Id == NeedId
             && !x.IsRemoved
             && !x.IsSentForConfirmation
-            && x.NeedItem.Where(a => a.IsRemoved != true).Count() < 3)
+            && x.NeedItem.Where(a => a.IsRemoved != true).Count() < 3) // en fazla 3 tane item(ihtiyaç) ekleyebilir.
                 .FirstOrDefaultAsync();
             // Kampanya(need) onaylanma için yollandıysa bir item ekleyemecek: onaylanma için gönderdiyse 
             //(completed ve confirmed kontrol etmeye gerek yok çünkü onaylandıysa veya bittiyse de isSentForConfirmation hep true kalacak.)
             if (Need != null)
             {
                 AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-                if (Need.UserId == AuthUser.Id)
+                if (Need.UserId == AuthUser.Id) //item(ihtiyaç) eklemeye çalıştığı kampanya Authenticated olmuş üzere aitse..
                 {
                     if (ItemLink.ToLower().Contains("udemy.com"))
                     {
-
                         Udemy Udemy = new Udemy();
                         Udemy = Udemy.Product(ItemLink);
                         if (Udemy.Error == null)
                         {
-                            var NeedItem = new NeedItem
-                            {
-                                NeedId = Need.Id,
-                                Link = Udemy.Link,
-                                Picture = "udemy",
-                                Name = Udemy.Name,
-                                Price = (decimal)Udemy.Price,
-                                PlatformName = "Udemy",
-                                IsRemoved = false,
-                            };
-
-                            await Context.AddAsync(NeedItem);
-                            Need.TotalCharge += NeedItem.Price;
-                            await Context.SaveChangesAsync();
+                            await AddItemOnDBAndFixTotalCharge(Need.Id, Udemy.Link, Udemy.Name, (decimal)Udemy.Price, "/image/udemy.png", "Udemy");
                         }
                         else
                         {
@@ -313,26 +300,11 @@ namespace Okurdostu.Web.Controllers
                     {
                         if (ItemLink.ToLower().Contains("/kitap/"))
                         {
-
                             Pandora Pandora = new Pandora();
                             Pandora = Pandora.Product(ItemLink);
                             if (Pandora.Error == null)
                             {
-                                var NeedItem = new NeedItem
-                                {
-                                    NeedId = Need.Id,
-                                    Link = Pandora.Link,
-                                    Picture = Pandora.Picture,
-                                    Name = Pandora.Name,
-                                    Price = (decimal)Pandora.Price,
-                                    PlatformName = "Pandora",
-                                    IsRemoved = false,
-                                    IsWrong = false
-                                };
-
-                                await Context.AddAsync(NeedItem);
-                                Need.TotalCharge += NeedItem.Price;
-                                await Context.SaveChangesAsync();
+                                await AddItemOnDBAndFixTotalCharge(Need.Id, Pandora.Link, Pandora.Name, (decimal)Pandora.Price, Pandora.Picture, "Pandora");
                             }
                             else
                             {
@@ -349,21 +321,7 @@ namespace Okurdostu.Web.Controllers
                         Amazon = Amazon.Product(ItemLink);
                         if (Amazon.Error == null)
                         {
-
-                            var NeedItem = new NeedItem
-                            {
-                                NeedId = Need.Id,
-                                Link = Amazon.Link,
-                                Picture = "Amazon",
-                                Name = Amazon.Name,
-                                Price = (decimal)Amazon.Price,
-                                PlatformName = "Amazon",
-                                IsRemoved = false,
-                            };
-
-                            await Context.AddAsync(NeedItem);
-                            Need.TotalCharge += NeedItem.Price;
-                            await Context.SaveChangesAsync();
+                            await AddItemOnDBAndFixTotalCharge(Need.Id, Amazon.Link, Amazon.Name, (decimal)Amazon.Price, "/image/amazon.png", "Amazon");
                         }
                         else
                         {
@@ -372,11 +330,31 @@ namespace Okurdostu.Web.Controllers
                         }
                     }
                     else
+                    {
                         TempData["MesajHata"] = "İhtiyacınızın linkini verirken desteklenen platformları kullanın";
-
+                    }
                     Response.Redirect("/" + Need.User.Username.ToLower() + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id);
                 }
             }
+        }
+
+        public async Task AddItemOnDBAndFixTotalCharge(long needId, string link, string name, decimal price, string picture, string platformName)
+        {
+            var NeedItem = new NeedItem
+            {
+                NeedId = needId,
+                Link = link,
+                Name = name,
+                Price = price,
+                Picture = picture,
+                PlatformName = platformName,
+                IsRemoved = false,
+                IsWrong = false
+            };
+
+            await Context.AddAsync(NeedItem);
+            NeedItem.Need.TotalCharge += NeedItem.Price;
+            await Context.SaveChangesAsync();
         }
         #endregion
 
