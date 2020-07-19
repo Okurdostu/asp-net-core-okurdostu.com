@@ -3,18 +3,13 @@ using System.Net;
 
 namespace Okurdostu.Web.Models.NeedItem
 {
-    public class Pandora
+    public class Pandora : NeedItemModel
     {
-        public string Name { get; set; }
-        public string Link { get; set; }
-        public double Price { get; private set; }
         public string Picture { get; set; }
-        public string Error { get; private set; }
         public string DiscountedPrice { get; set; }
         public string NormalPrice { get; set; }
         public Pandora Product(string url)
         {
-            Pandora Product = new Pandora();
             try
             {
                 var link = @url;
@@ -22,16 +17,21 @@ namespace Okurdostu.Web.Models.NeedItem
                 HtmlDocument htmlDocument = web.Load(link);
                 if (htmlDocument.DocumentNode.SelectSingleNode("//img[@src='/images/hata.png']") != null)
                 {
-                    Product.Error = "Sayfa bulunamadı";
-                    return Product;
+                    Error = "Sayfa bulunamadı";
+                    return this;
                 }
-                if (htmlDocument.DocumentNode.SelectSingleNode(".//div[@id='urun-detay']/h1") != null)
-                    Product.Name = WebUtility.HtmlDecode(htmlDocument.DocumentNode.SelectSingleNode(".//div[@id='urun-detay']/h1").InnerText);
+
+                var BookNameNode = htmlDocument.DocumentNode.SelectSingleNode(".//div[@id='urun-detay']/h1");
+                if (BookNameNode != null)
+                {
+                    Name = BookNameNode.InnerText;
+                }
                 else
                 {
-                    Product.Error = "Kitap adına ulaşılamadı";
-                    return Product;
+                    Error = "Kitap adına ulaşılamadı";
+                    return this;
                 }
+
                 /// <summary>
                 /// indirimli üründe iki tip geri dönüş var: strong[@class='indirimliFiyat'] ve span[@class='eskiFiyat']
                 /// indirimsiz üründe bir tip geri dönüş var strong[@class='indirimliFiyat'] (ürün indirimli olmasa bile): strong[@class='indirimliFiyat'] buradan geri dönüş alıyoruz.
@@ -46,51 +46,71 @@ namespace Okurdostu.Web.Models.NeedItem
                 /// 
                 /// Durum 3: zaten açık
                 /// </summary>
-                if (htmlDocument.DocumentNode.SelectSingleNode(".//ul[@class='borderedPhone']/li/strong[@class='indirimliFiyat']") != null && htmlDocument.DocumentNode.SelectSingleNode(".//ul[@class='borderedPhone']/li/span[@class='eskiFiyat']") != null)
+                var indirimliFiyatHtmlNode = htmlDocument.DocumentNode.SelectSingleNode(".//ul[@class='borderedPhone']/li/strong[@class='indirimliFiyat']");
+                var eskiFiyatHtmlNode = htmlDocument.DocumentNode.SelectSingleNode(".//ul[@class='borderedPhone']/li/span[@class='eskiFiyat']");
+
+                if (indirimliFiyatHtmlNode != null && eskiFiyatHtmlNode != null)
                 {
-                    Product.DiscountedPrice = WebUtility.HtmlDecode(htmlDocument.DocumentNode.SelectSingleNode(".//ul[@class='borderedPhone']/li/strong[@class='indirimliFiyat']").InnerText.Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace(",", ".").Replace("TL", ""));
-                    Product.NormalPrice = WebUtility.HtmlDecode(htmlDocument.DocumentNode.SelectSingleNode(".//ul[@class='borderedPhone']/li/span[@class='eskiFiyat']").InnerText.Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace(",", ".").Replace("TL", ""));
+                    DiscountedPrice = indirimliFiyatHtmlNode.InnerText;
+                    NormalPrice = eskiFiyatHtmlNode.InnerText;
+
+                    DiscountedPrice = DiscountedPrice.Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace(",", ".").Replace("TL", "");
+                    NormalPrice = NormalPrice.Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace(",", ".").Replace("TL", "");
                 }
-                else if (htmlDocument.DocumentNode.SelectSingleNode(".//ul[@class='borderedPhone']/li/strong[@class='indirimliFiyat']") != null)
-                    Product.NormalPrice = WebUtility.HtmlDecode(htmlDocument.DocumentNode.SelectSingleNode(".//ul[@class='borderedPhone']/li/strong[@class='indirimliFiyat']").InnerText.Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace(",", ".").Replace("TL", ""));
+                else if (indirimliFiyatHtmlNode != null)
+                {
+                    NormalPrice = indirimliFiyatHtmlNode.InnerText;
+                    NormalPrice = NormalPrice.Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace(",", ".").Replace("TL", "");
+                }
                 else
                 {
-                    Product.Error = "Kitabın fiyatına ulaşılamadı";
-                    return Product;
+                    Error = "Kitabın fiyatına ulaşılamadı";
+                    return this;
                 }
-                if (htmlDocument.DocumentNode.SelectSingleNode(".//div[@class='coverWrapper posRel']/img") != null)
-                    Product.Picture = "https://www.pandora.com.tr" + htmlDocument.DocumentNode.SelectSingleNode(".//div[@class='coverWrapper posRel']/img").Attributes["src"].Value;
-                else Product.Picture = "";
-                Product.Link = url;
-                return SelectPrice(Product);
+
+                var PictureNode = htmlDocument.DocumentNode.SelectSingleNode(".//div[@class='coverWrapper posRel']/img");
+                if (PictureNode != null)
+                {
+                    Picture = "https://www.pandora.com.tr" + PictureNode.Attributes["src"].Value;
+                }
+                else
+                {
+                    Picture = "";
+                }
+
+                Link = url;
+                return SelectPrice(this);
             }
             catch
             {
-                Product.Error = "Beklenmedik bir problem ile karşılaştık";
-                return Product;
+                Error = "Beklenmedik bir problem ile karşılaştık";
+                return this;
             }
         }
 
-        public Pandora SelectPrice(Pandora Product)
+        public Pandora SelectPrice(Pandora pandoraProduct)
         {
-            decimal _Price;
+            double _Price;
             /// <summary>
             /// Product.NormalPrice ve Product.DiscountedPrice var
             /// Eğer ki NormalPrice varsa bunu alıp İndirimli fiyata uğramıyoruz
             /// Sebebiyse Ürünün indirimden çıkabileceğini göz önünde bulundurup Kampanya'yı fiyatlandırmalıyız.
             /// </summary>
 
-
-            if (Product.NormalPrice.Length > 0)
-                _Price = decimal.Parse(Product.NormalPrice);
+            if (pandoraProduct.NormalPrice.Length > 0)
+            {
+                _Price = double.Parse(pandoraProduct.NormalPrice);
+            }
             else
-                _Price = decimal.Parse(Product.DiscountedPrice);
+            {
+                _Price = double.Parse(pandoraProduct.DiscountedPrice);
+            }
 
             //if (_Price < pandoraUcretsizKargo)
             //    _Price += pandoraKargoUcreti;
 
-            Product.Price = (double)_Price;
-            return Product;
+            pandoraProduct.Price = _Price;
+            return pandoraProduct;
         }
     }
 }
