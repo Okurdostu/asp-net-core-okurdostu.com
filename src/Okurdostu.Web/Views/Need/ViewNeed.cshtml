@@ -65,14 +65,6 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
     @Html.AntiForgeryToken()
     <script type="text/javascript">
         var validatetoken = $("input[name=__RequestVerificationToken]").val(); var oldDataFromComments = "oldDataFromComments"; var newDataFromComments = "newDataFromComments";
-
-        $.post("/needcheck", { needId: @Model.Id, __RequestVerificationToken: validatetoken })
-            .done(function (result) {
-                if (result.isPageNeedRefresh == true) {
-                    location.reload();
-                }
-            });
-
         function GetComments(scrollingTargetId) {
             $.post("/Comment/Comments", { Id: @Model.Id, __RequestVerificationToken: validatetoken })
                 .done(function (newDataFromComments) {
@@ -87,25 +79,34 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                     oldDataFromComments = newDataFromComments;
                 });
         }; GetComments(); setInterval(function () { GetComments(); }, 5000);
-
         $("#ShowLikers").on("click", function () {$.post("/Like/Likers", { id: '@Model.Id', username: '@Model.User.Username', __RequestVerificationToken: validatetoken }).done(function (likers) { $("#Likers").html(likers) }); });
     </script>
+    @if (Model.ShouldBeCheck)
+    {
+        <script>
+            $.post("/needcheck", { needId: @Model.Id, __RequestVerificationToken: validatetoken })
+            .done(function(result) {
+                if (result.isPageNeedRefresh == true)
+                {
+                    location.reload();
+                }
+            });
+        </script>
+    }
     @if (!HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
     {
         <script>
-            $("#unsignlikebutton").click(function(){
-                $("#loginsignup-modal-info").html("<h3><i class='fas fa-heart od'></i></h3><p>Kampanyayı sevgin ile destekle</p>")
+            $("#unsignlikebutton").click(function () {
+                $("#loginsignup-modal-info").html("<h2><i class='fas fa-heart od'></i></h2><h5>Kampanyayı sevgin ile destekle</h5>")
             });
-
             $("#DoComment").click(function () {
-                $("#loginsignup-modal-info").html("<h4>Tartışma başlatmak için</h4>")
+                $("#loginsignup-modal-info").html("<h2><i class='fas fa-comment od'></i></h2><h4>Tartışma başlatmak için</h4>")
                 $("#loginsignup").modal('show');
             });
             function getReplyDialog() {
-                $("#loginsignup-modal-info").html("<h4>Cevap yazmak için</h4>")
+                $("#loginsignup-modal-info").html("<h2><i class='fas fa-comments od'></i></h2><h4>Cevap yazmak için</h4>")
                 $("#loginsignup").modal('show');
             }
-               
         </script>
         <script type="text/javascript"> $(document).ready(function(){function n(){$("#LikeCount").load("/like/count/@Model.Id")}n(),setInterval(function(){n()},5e3)}); </script>
         <div class="modal fade" id="loginsignup" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body p-0" style="border-radius: 25px;"> <div class="shadow p-2 bg-white rounded-custom mt-5 mb-5"> <div class="mt-5 mb-5 text-center font-weight-bold text-black-50" id="loginsignup-modal-info"> <h3 class="mb-1 rounded-custom"><i class="fas fa-heart od"></i> </h3> <p>Kampanyayı sevgin ile destekle</p></div><a class="btn-block btn-purple font-weight-bold text-center" href="/girisyap?ReturnUrl=@HttpContextAccessor.HttpContext.Request.Path"> Giriş yap </a> <a class="btn-block btn-purple font-weight-bold text-center" href="/kaydol?ReturnUrl=@HttpContextAccessor.HttpContext.Request.Path"> Kaydol </a> <center class="mt-2"> <button type="button" class="btn w-75 btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Sonra bakarız yaa</button> </center> </div></div></div></div></div>
@@ -158,7 +159,6 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                         });
                     }
                 });
-
                 $("#DoReply").click(function () {
                     if ($("#ReplyComment").val().length >= 5 && $("#ReplyComment").val().length <= 100) {
                     $.post("/Comment/Comment", { RelatedCommentId: ReplyingCommentId, Comment: $("#ReplyComment").val(), __RequestVerificationToken: validatetoken })
@@ -189,7 +189,6 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                         });
                     }
                 });
-
                 $("#Like").on("click", function () {
                     $.ajax({
                         type: "POST",

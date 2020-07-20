@@ -87,7 +87,7 @@ namespace Okurdostu.Web.Controllers
         {
             var Need = await Context.Need.Include(need => need.NeedItem).FirstOrDefaultAsync(x => x.Id == needId && !x.IsRemoved && !x.IsCompleted && x.IsSentForConfirmation);
             bool IsPageNeedRefresh = false;
-            if (Need != null)
+            if (Need != null && Need.ShouldBeCheck)
             {
                 Need.IsWrong = false; //need önceden hatalı olarak işaretlenmiş olabilir her ihtimale karşı hatasının gitmiş olabileceğini var sayarak, 
                                       //false'lıyoruz eğer ki hala hatalıysa zaten tekrar hatalı olarak işaretlenecektir.
@@ -156,6 +156,7 @@ namespace Okurdostu.Web.Controllers
                     IsPageNeedRefresh = true;
                     Need.TotalCharge = TotalCharge;
                 }
+                Need.LastCheckOn = DateTime.Now;
 
                 await Context.SaveChangesAsync(); //değiştirilen bütün verileri sadece bir kere kaydediyoruz.
             }

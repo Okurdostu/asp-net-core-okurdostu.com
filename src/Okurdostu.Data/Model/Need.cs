@@ -33,9 +33,22 @@ namespace Okurdostu.Data.Model
         public DateTime? CreatedOn { get; private set; }
         public DateTime? StartedOn { get; set; }
         public DateTime? FinishedOn { get; set; }
+        public DateTime? LastCheckOn { get; set; }
         public bool IsWrong { get; set; }
 
-        
+        public bool ShouldBeCheck
+        {
+            get
+            {
+                if (LastCheckOn == null) //oluşturulmasından sonra hiç kontrol edilmediyse
+                {
+                    return true;
+                }
+                var PassedTime = DateTime.Now - LastCheckOn;
+
+                return PassedTime.Value.TotalMinutes > 60; // en son kontrolunun üzerinden 60 dakika'dan fazla geçtiyse tekrar kontrol edilmeli.
+            }
+        }
         public decimal? CompletedPercentage => 100 - (TotalCharge - TotalCollectedMoney) * 100 / TotalCharge;
 
         public virtual User User { get; set; }
