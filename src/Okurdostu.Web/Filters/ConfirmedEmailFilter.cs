@@ -9,7 +9,7 @@ namespace Okurdostu.Web.Filters
         {
             Controller controller = actionContext.Controller as Controller;
 
-            if (controller.User.Identity.GetEmailConfirmedState())
+            if (controller.User.Identity.GetEmailConfirmStatus())
             {
                 base.OnActionExecuting(actionContext);
             }

@@ -33,7 +33,8 @@ namespace Okurdostu.Web
                 new Claim("Id", user.Id.ToString()),
                 new Claim("Username", user.Username),
                 new Claim("Email", user.Email),
-                new Claim("EmailState", user.IsEmailConfirmed.ToString())
+                new Claim("EmailConfirmStatus", user.IsEmailConfirmed.ToString()),
+                new Claim("LastChangedOn", user.LastChangedOn.ToString()),
             };
             if (user.PictureUrl != null)
             {
@@ -52,13 +53,22 @@ namespace Okurdostu.Web
                 AuthProperties);
         }
 
+        public async Task SyncAuthenticatedUser(string LastChangedOnFromDB, User AuthenticatedUser)
+        {
+            if (LastChangedOnFromDB != User.Identity.GetLastChangedOn())
+            {
+                await SignInWithCookie(AuthenticatedUser);
+            }
+        }
+
         public async Task<User> GetAuthenticatedUserFromDatabaseAsync()
         {
-            var Id = User?.Identity?.GetUserId();
-            if (Id != null)
+            var authUserId = User?.Identity?.GetUserId();
+            if (authUserId != null)
             {
-                var _User = await Context.User.FirstOrDefaultAsync(x => x.Id == long.Parse(Id) && x.IsActive);
-                return _User ?? null;
+                var AuthenticatedUser = await Context.User.FirstOrDefaultAsync(x => x.Id == long.Parse(authUserId) && x.IsActive);
+                SyncAuthenticatedUser(AuthenticatedUser.LastChangedOn.ToString(), AuthenticatedUser);
+                return AuthenticatedUser ?? null;
             }
             else
             {

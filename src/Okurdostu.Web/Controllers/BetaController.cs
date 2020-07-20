@@ -12,7 +12,7 @@ namespace Okurdostu.Web.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                TempData["emailstate"] = User.Identity.GetEmailConfirmedState();
+                TempData["emailstate"] = User.Identity.GetEmailConfirmStatus();
                 TempData["email"] = User.Identity.GetEmail();
             }
 

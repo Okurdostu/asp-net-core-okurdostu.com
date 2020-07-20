@@ -10,6 +10,7 @@ namespace Okurdostu.Data.Model
             IsEmailConfirmed = false;
             IsActive = true;
             CreatedOn = DateTime.Now;
+            LastChangedOn = DateTime.Now;
 
             Need = new HashSet<Need>();
             NeedLike = new HashSet<NeedLike>();
@@ -27,10 +28,11 @@ namespace Okurdostu.Data.Model
         public string PictureUrl { get; set; }
         public bool IsEmailConfirmed { get; set; }
         public bool IsActive { get; set; }
-        public DateTime? CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; }
         public string Twitter { get; set; }
         public string Github { get; set; }
         public string ContactEmail { get; set; }
+        public DateTime LastChangedOn { get; set; }
 
         public virtual ICollection<Need> Need { get; set; }
         public virtual ICollection<NeedLike> NeedLike { get; set; }

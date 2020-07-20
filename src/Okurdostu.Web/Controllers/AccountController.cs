@@ -221,8 +221,8 @@ namespace Okurdostu.Web.Controllers
 
             if (ConfirmationRequest != null)
             {
-                string Email = AuthUser.Email;
-                bool EmailConfirmState = AuthUser.IsEmailConfirmed;
+                string OldEmail = AuthUser.Email;
+                bool OldEmailConfirmStatus = AuthUser.IsEmailConfirmed;
 
                 if (ConfirmationRequest.NewEmail != null)
                 {
@@ -243,6 +243,7 @@ namespace Okurdostu.Web.Controllers
                     {
                         TempData["ProfileMessage"] = "E-mail adresiniz onaylandı, teşekkürler";
                     }
+                    AuthUser.LastChangedOn = DateTime.Now;
                     await Context.SaveChangesAsync();
                     await SignInWithCookie(AuthUser);
                 }
@@ -251,8 +252,8 @@ namespace Okurdostu.Web.Controllers
                     if (e.InnerException != null && e.InnerException.Message.Contains("Unique_Key_Email"))
                     {
                         TempData["ProfileMessage"] = "Değiştirme talebinde bulunduğunuz e-mail adresini kullanamazsınız.<br>E-mail değiştirme isteğiniz geçersiz kılındı<br>Yeni bir e-mail değiştirme isteğinde bulunun";
-                        AuthUser.Email = Email;
-                        AuthUser.IsEmailConfirmed = EmailConfirmState;
+                        AuthUser.Email = OldEmail;
+                        AuthUser.IsEmailConfirmed = OldEmailConfirmStatus;
                         ConfirmationRequest.IsUsed = true;
                         ConfirmationRequest.UsedOn = DateTime.Now;
                         await Context.SaveChangesAsync();
@@ -317,6 +318,7 @@ namespace Okurdostu.Web.Controllers
                         AuthUser.Username = Model.Username;
                         try
                         {
+                            AuthUser.LastChangedOn = DateTime.Now;
                             await Context.SaveChangesAsync();
                             await SignInWithCookie(AuthUser);
                             TempData["ProfileMessage"] = "Yeni kullanıcı adınız: " + AuthUser.Username;
@@ -429,7 +431,7 @@ namespace Okurdostu.Web.Controllers
                     Logger.LogInformation("User({Id}) added a photo({file}) on server", AuthUser.Id, "/image/profil-fotograf/" + Name);
                     string OldPhoto = AuthUser.PictureUrl;
                     AuthUser.PictureUrl = "/image/profil-fotograf/" + Name;
-
+                    AuthUser.LastChangedOn = DateTime.Now;
                     var result = await Context.SaveChangesAsync();
 
                     if (result > 0)
@@ -469,6 +471,7 @@ namespace Okurdostu.Web.Controllers
             {
                 string OldPhoto = AuthUser.PictureUrl;
                 AuthUser.PictureUrl = null;
+                AuthUser.LastChangedOn = DateTime.Now;
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
                 {
