@@ -66,6 +66,13 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
     <script type="text/javascript">
         var validatetoken = $("input[name=__RequestVerificationToken]").val(); var oldDataFromComments = "oldDataFromComments"; var newDataFromComments = "newDataFromComments";
 
+        $.post("/needcheck", { needId: @Model.Id, __RequestVerificationToken: validatetoken })
+            .done(function (result) {
+                if (result.isPageNeedRefresh == true) {
+                    location.reload();
+                }
+            });
+
         function GetComments(scrollingTargetId) {
             $.post("/Comment/Comments", { Id: @Model.Id, __RequestVerificationToken: validatetoken })
                 .done(function (newDataFromComments) {

@@ -60,6 +60,107 @@ namespace Okurdostu.Web.Controllers
 
             return false;
         }
+        [NonAction]
+        public async Task AddItemOnDBAndFixTotalCharge(long needId, string link, string name, decimal price, string picture, string platformName)
+        {
+            var NeedItem = new NeedItem
+            {
+                NeedId = needId,
+                Link = link,
+                Name = name,
+                Price = price,
+                Picture = picture,
+                PlatformName = platformName,
+                IsRemoved = false,
+                IsWrong = false
+            };
+
+            await Context.AddAsync(NeedItem);
+            NeedItem.Need.TotalCharge += NeedItem.Price;
+            await Context.SaveChangesAsync();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("needcheck")]
+        public async Task<JsonResult> NeedItemsPriceAndStatus(long needId) //checking and correcting needitem status, price.
+        {
+            var Need = await Context.Need.Include(need => need.NeedItem).FirstOrDefaultAsync(x => x.Id == needId && !x.IsRemoved && !x.IsCompleted && x.IsSentForConfirmation);
+            bool IsPageNeedRefresh = false;
+            if (Need != null)
+            {
+                Need.IsWrong = false; //need önceden hatalı olarak işaretlenmiş olabilir her ihtimale karşı hatasının gitmiş olabileceğini var sayarak, 
+                                      //false'lıyoruz eğer ki hala hatalıysa zaten tekrar hatalı olarak işaretlenecektir.
+                var NeedItems = Need.NeedItem.Where(x => !x.IsRemoved).ToList();
+
+                decimal TotalCharge = 0;
+                foreach (var item in NeedItems)
+                {
+                    item.IsWrong = false;   //item önceden hatalı olarak işaretlenmiş olabilir her ihtimale karşı hatasının gitmiş olabileceğini var sayarak, 
+                                            //false'lıyoruz eğer ki hala hatalıysa zaten tekrar hatalı olarak işaretlenecektir.
+                    if (item.PlatformName == "Amazon")
+                    {
+                        var Amazon = new Amazon();
+                        Amazon = Amazon.Product(item.Link);
+
+                        if (Amazon.Error == null) // herhangi bir hata yoksa
+                        {
+                            if (item.Price != (decimal)Amazon.Price) //ürünün amazon sisteminde ki fiyatı ile veritabanında ki fiyatı eşleşmiyorsa
+                            {
+                                IsPageNeedRefresh = true;
+                                item.Price = (decimal)Amazon.Price; //item'a yeni fiyatını al.
+                            }
+                        }
+                        else // hatalı ise ürünü ve kampanyayı hatalı olarak işaretliyoruz, hatalı işaretlenen durumlar kontrol edilmesi için panelde görüntülenecek.
+                        {
+                            item.IsWrong = true;
+                            Need.IsWrong = true;
+                        }
+                    }
+                    else if (item.PlatformName == "Pandora")
+                    {
+                        var Pandora = new Pandora();
+                        Pandora = Pandora.Product(item.Link);
+
+                        if (Pandora.Error == null)
+                        {
+                            if (item.Price != (decimal)Pandora.Price)
+                            {
+                                IsPageNeedRefresh = true;
+                                item.Price = (decimal)Pandora.Price;
+                            }
+                        }
+                        else
+                        {
+                            item.IsWrong = true;
+                            Need.IsWrong = true;
+                        }
+                    }
+                    else
+                    {
+                        var Udemy = new Udemy();
+                        Udemy = Udemy.Product(item.Link);
+                        //udemy fiyatı ile ilgili sorun var. sabit bir değer atılıyor, fiyat değişikliğini kontrol etmeye gerek yok.
+                        if (Udemy.Error != null)
+                        {
+                            item.IsWrong = true;
+                            Need.IsWrong = true;
+                        }
+                    }
+
+                    TotalCharge += item.Price; //fiyat değişikliği kontrol edilip güncellenmesi gerekiyorsa güncellendikten sonra ki fiyatını almalıyız ki totalcharge'i da güncelleyebilelim.
+                }
+
+                if (!Need.IsWrong && Need.TotalCharge != TotalCharge) //kampanya hatalı olarak işaretlendiyse totalcharge güncellemesi yaptırmıyoruz.
+                {
+                    IsPageNeedRefresh = true;
+                    Need.TotalCharge = TotalCharge;
+                }
+
+                await Context.SaveChangesAsync(); //değiştirilen bütün verileri sadece bir kere kaydediyoruz.
+            }
+            return Json(new { IsPageNeedRefresh });
+        }
 
 
         private User AuthUser;
@@ -249,12 +350,12 @@ namespace Okurdostu.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task RemoveItem(long NeedItemId)
         {
-            var item = await Context.NeedItem.Include(needitem => needitem.Need).FirstOrDefaultAsync(x => x.Id == NeedItemId 
-            && !x.Need.IsRemoved 
+            var item = await Context.NeedItem.Include(needitem => needitem.Need).FirstOrDefaultAsync(x => x.Id == NeedItemId
+            && !x.Need.IsRemoved
             && !x.Need.IsSentForConfirmation);
             // Kampanya(need) onaylanma için yollandıysa bir item silemeyecek: onaylanma için gönderdiyse 
             //(completed ve confirmed kontrol etmeye gerek yok çünkü onaylandıysa veya bittiyse de isSentForConfirmation hep true kalacak.)
-            if (item != null) 
+            if (item != null)
             {
                 AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
                 if (AuthUser.Id == item.Need.UserId) //item(ihtiyaç)'ı silmeye çalıştığı kampanya Authenticated olmuş üzere aitse..
@@ -336,25 +437,6 @@ namespace Okurdostu.Web.Controllers
                     Response.Redirect("/" + Need.User.Username.ToLower() + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id);
                 }
             }
-        }
-
-        public async Task AddItemOnDBAndFixTotalCharge(long needId, string link, string name, decimal price, string picture, string platformName)
-        {
-            var NeedItem = new NeedItem
-            {
-                NeedId = needId,
-                Link = link,
-                Name = name,
-                Price = price,
-                Picture = picture,
-                PlatformName = platformName,
-                IsRemoved = false,
-                IsWrong = false
-            };
-
-            await Context.AddAsync(NeedItem);
-            NeedItem.Need.TotalCharge += NeedItem.Price;
-            await Context.SaveChangesAsync();
         }
         #endregion
 
@@ -453,19 +535,21 @@ namespace Okurdostu.Web.Controllers
                 return View(Need);
             }
             else
+            {
                 return Redirect("/ihtiyaclar");
+            }
         }
 
 
-        [Route("{username}/ihtiyac/{friendlytitle}/{id}")]
-        public async Task<IActionResult> ViewNeed(string username, string friendlytitle, long id)
+        [Route("{username}/ihtiyac/{friendlytitle}/{needId}")]
+        public async Task<IActionResult> ViewNeed(string username, string friendlytitle, long needId)
         {
             var Need = await Context.Need
                 .Include(need => need.User)
                         .ThenInclude(needuser => needuser.UserEducation)
                             .ThenInclude(x => x.University)
                 .Include(need => need.NeedItem)
-                .FirstOrDefaultAsync(x => x.Id == id && !x.IsRemoved);
+                .FirstOrDefaultAsync(x => x.Id == needId && !x.IsRemoved);
 
             if (Need != null)
             {
@@ -475,9 +559,7 @@ namespace Okurdostu.Web.Controllers
                 {
                     return Redirect("/" + Need.User.Username.ToLower() + "/ihtiyac/" + Need.FriendlyTitle.ToLower() + "/" + Need.Id);
                 }
-
                 return View(Need);
-
             }
 
             return NotFound();
