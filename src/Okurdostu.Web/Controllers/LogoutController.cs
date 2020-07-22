@@ -9,7 +9,7 @@ namespace Okurdostu.Web.Controllers
     public class LogoutController : Controller
     {
         [Authorize]
-        [HttpPost,ValidateAntiForgeryToken]
+        [HttpPost]
         public async Task<IActionResult> Index()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

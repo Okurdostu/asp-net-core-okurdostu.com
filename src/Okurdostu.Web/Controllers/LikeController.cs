@@ -41,7 +41,6 @@ namespace Okurdostu.Web.Controllers
                 }
 
                 await Context.SaveChangesAsync();
-                Logger.LogInformation("test");
                 return Json(new { succes = true });
             }
             return Json(new { error = true });

@@ -10,10 +10,10 @@ namespace Okurdostu.Web.Controllers
         [Route("beta")]
         public IActionResult Index()
         {
-            if (User.Identity.IsAuthenticated)
+            if (User.Identity.IsAuthenticated && User.Identity.GetEmailConfirmStatus() != true)
             {
-                TempData["emailstate"] = User.Identity.GetEmailConfirmStatus();
-                TempData["email"] = User.Identity.GetEmail();
+                ViewData["emailconfirmstatus"] = User.Identity.GetEmailConfirmStatus();
+                ViewData["email"] = User.Identity.GetEmail();
             }
 
             return View();
@@ -32,10 +32,14 @@ namespace Okurdostu.Web.Controllers
                 await Context.AddAsync(Feedback);
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
+                {
                     TempData["BetaMessage"] = "Geri bildiriminiz iletildi, teşekkür ederiz";
+                }
             }
             else
+            {
                 TempData["BetaMessage"] = "Gerekli bilgileri doldurmadınız.";
+            }
 
             return Redirect("/beta");
         }

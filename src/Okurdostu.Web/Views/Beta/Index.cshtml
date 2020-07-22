@@ -1,6 +1,6 @@
 ﻿@{ ViewData["Title"] = "Beta | Okurdostu"; Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml"; ViewData["BetaActiveClass"] = "active"; }
 
-@if (TempData["emailstate"] != null && !(bool)TempData["emailstate"])
+@if (ViewData["emailconfirmstatus"] != null && !(bool)ViewData["emailconfirmstatus"])
 {
     <div class="modal fade" id="emailconfirm" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -8,12 +8,12 @@
                 <div class="modal-body bg-light" style="border-radius: 25px;">
                     <div class="font-weight-bold text-black-50">
                         <p class="text-center">
-                            Okurdostu hesabınızı rahatça kullanabilmek için lütfen bize verdiğiniz: <span class="text-dark">@TempData["email"]</span> adresine yolladığımız onay mailine göz atınız.<br />
+                            Okurdostu hesabınızı rahatça kullanabilmek için lütfen bize verdiğiniz: <span class="text-dark">@ViewData["email"]</span> adresine yolladığımız onay mailine göz atınız.<br />
                             Eğer ki gelen mailleriniz arasında göremiyorsanız, spam veya sosyal gibi diğer mail klasörleriniz kontrol ediniz
                         </p>
                         <hr />
                         <div class="text-center">
-                            <p><span class="text-dark">@TempData["email"]</span> adresi bana ait</p>
+                            <p><span class="text-dark">@ViewData["email"]</span> adresi bana ait</p>
                             <form method="post" action="/account/sendconfirmationemail">
                                 @Html.AntiForgeryToken()
                                 <input type="submit" value="Tekrar mail gönder" class="btn btn-block btn-outline-purple rounded-custom font-weight-bold" />
@@ -29,9 +29,9 @@
     </div>
     <script>$(document).ready(function () { $('#emailconfirm').modal('show') });</script>
 }
-@if (TempData["BetaMessage"] != null)
+@if (ViewData["BetaMessage"] != null)
 {
-    <div class="alert alert-secondary text-center font-weight-bold" role="alert"> <span> @Html.Raw(TempData["BetaMessage"]) </span></div>
+    <div class="alert alert-secondary text-center font-weight-bold" role="alert"> <span> @Html.Raw(ViewData["BetaMessage"]) </span></div>
 }
 <div> <a class="btn btn-outline-purple font-weight-bold rounded-custom btn-block p-1" href="/ihtiyac-olustur" style="font-size:20px"> İhtiyaç oluştur </a></div><div class="text-black-50 text-center"> <h1><span class="od">Okurdostu</span> Beta</h1> <div class="font-weight-bold"> <p> Beta sürümü temel olarak sistemin nasıl işleyeceğini öğrencilerin ve onları destekleyecek, bağış yapacak okurdostlarının daha iyi anlaması ve bir geliştirici olarak sistemin işleyişini analiz edip, eklenmesi gereken özellikler veya giderilmesi gereken sorunlar hakkında bilgi toplamak için çıkarılmış bir sürümdür. </p><p> Bu sürüm ne yazık ki şirketleşme öncesi yayınlandığı için, bir ödeme yöntemi eklemek yasal olmadığı için, sistem üzerinden bir öğrenci ihtiyacını desteklemek, bağış yapmak mümkün olmayacak. </p></div></div><div> <a class="od font-weight-bold btn-block text-center fontrem1" href="/beta/kullanim"> Okurdostunu nasıl kullanabilirim? </a></div><div class="modal fade" id="Feedback" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-lg modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light text-black-50" style="border-radius: 25px;"> <h3 class="font-weight-bold text-center text-black-50"> Geri bildirim </h3> <div class="text-center"> <span class="font-weight-bold small text-center p-0"> Buradan bize soru sorabilir, Okurdostu.com'da ki bir hatayı bildirebilir veya her ne istiyorsanız yazabilirsin, bilin ki kesinlikle okuyacağız. </span> </div><hr /> @await Component.InvokeAsync("Feedback") </div></div></div></div>
 <script>$(document).ready(function () { -1 != window.location.href.indexOf("#Feedback") && $("#Feedback").modal("show") });</script>

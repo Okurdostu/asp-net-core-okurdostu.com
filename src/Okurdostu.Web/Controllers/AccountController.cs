@@ -280,6 +280,7 @@ namespace Okurdostu.Web.Controllers
                 if (AuthUser.Password != Model.Password)
                 {
                     AuthUser.Password = Model.Password;
+                    AuthUser.LastChangedOn = DateTime.Now;
                     var result = await Context.SaveChangesAsync();
                     if (result > 0)
                     {
@@ -364,6 +365,7 @@ namespace Okurdostu.Web.Controllers
                 AuthUser.ContactEmail = Model.ContactEmail;
                 AuthUser.Twitter = Model.Twitter;
                 AuthUser.Github = Model.Github;
+                AuthUser.LastChangedOn = DateTime.Now;
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
                 {
@@ -381,7 +383,6 @@ namespace Okurdostu.Web.Controllers
         }
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
-
         [HttpPost, ValidateAntiForgeryToken]
         [Route("account/basic")]
         public async Task ProfileBasic(ProfileModel Model) //editing, adding bio and fullname
@@ -392,6 +393,7 @@ namespace Okurdostu.Web.Controllers
             {
                 AuthUser.Biography = Model.Biography;
                 AuthUser.FullName = Model.FullName;
+                AuthUser.LastChangedOn = DateTime.Now;
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
                 {
@@ -425,15 +427,15 @@ namespace Okurdostu.Web.Controllers
 
                     using var ImageSharp = Image.Load(File.OpenReadStream());
                     if (ImageSharp.Width > 200)
+                    {
                         ImageSharp.Mutate(x => x.Resize(200, 200));
-
+                    }
                     ImageSharp.Save(FilePathWithName);
                     Logger.LogInformation("User({Id}) added a photo({file}) on server", AuthUser.Id, "/image/profil-fotograf/" + Name);
                     string OldPhoto = AuthUser.PictureUrl;
                     AuthUser.PictureUrl = "/image/profil-fotograf/" + Name;
                     AuthUser.LastChangedOn = DateTime.Now;
                     var result = await Context.SaveChangesAsync();
-
                     if (result > 0)
                     {
                         await SignInWithCookie(AuthUser);
@@ -449,13 +451,16 @@ namespace Okurdostu.Web.Controllers
                         DeleteFileFromServer("/image/profil-fotograf/" + Name);
                         TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
                     }
-
                 }
                 else
+                {
                     TempData["ProfileMessage"] = "PNG, JPG ve JPEG türünde fotoğraf yükleyiniz";
+                }
             }
             else if (File.Length > 1048576)
+            {
                 TempData["ProfileMessage"] = "Seçtiğiniz dosya 1 megabyte'dan fazla";
+            }
 
             Response.Redirect("/" + AuthUser.Username);
         }

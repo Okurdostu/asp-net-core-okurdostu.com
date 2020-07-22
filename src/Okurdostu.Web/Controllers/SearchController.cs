@@ -15,7 +15,9 @@ namespace Okurdostu.Web.Controllers
                 TempData["q"] = q;
             }
             else
+            {
                 TempData["SearchPageTitle"] = "Arama, keşfetme | Okurdostu";
+            }
 
             return View();
 

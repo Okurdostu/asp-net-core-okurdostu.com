@@ -52,9 +52,13 @@ namespace Okurdostu.Web.Controllers
             catch (Exception e)
             {
                 if (e.InnerException != null && e.InnerException.Message.Contains("Unique_Key_Username"))
+                {
                     TempData["SignUpMessage"] = "Bu kullanıcı adını kullanamazsınız";
+                }
                 else if (e.InnerException != null && e.InnerException.Message.Contains("Unique_Key_Email"))
+                {
                     TempData["SignUpMessage"] = "Bu e-mail adresini kullanamazsınız";
+                }
                 else
                 {
                     Logger.LogError("Guest taking a error when trying sign up Ex message: {ex.message}, InnerEx Message: {iex.message}", e?.Message, e?.InnerException?.Message);

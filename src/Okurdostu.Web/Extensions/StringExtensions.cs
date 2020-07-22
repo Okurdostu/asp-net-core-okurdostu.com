@@ -154,7 +154,10 @@ namespace Okurdostu.Web.Extensions
                     DottedPrice += _price[x];
                     DottedPrice += ".";
                 }
-                else DottedPrice += _price[x];
+                else
+                {
+                    DottedPrice += _price[x];
+                }
             }
             return DottedPrice;
         }

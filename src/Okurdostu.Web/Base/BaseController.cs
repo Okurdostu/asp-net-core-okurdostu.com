@@ -18,12 +18,13 @@ namespace Okurdostu.Web
         protected ILogger<T> Logger => _logger ??= HttpContext.RequestServices.GetService<ILogger<T>>();
         public OkurdostuContext Context => (OkurdostuContext)HttpContext?.RequestServices.GetService(typeof(OkurdostuContext));
 
-
+        //those are blocked because of routing. if a user takes a username from there, can't accessibility their profile.
         public string[] blockedUsernames = {
             "","comment","account","confirmemail","girisyap","kaydol","ihtiyaclar","beta","arama",
             "gizlilik-politikasi","kullanici-sozlesmesi","sss","kvkk",
             "home", "like","logout", "ihtiyac-olustur","ihtiyac", "universiteler"
         };
+
         public async Task SignInWithCookie(User user)
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -52,22 +53,20 @@ namespace Okurdostu.Web
                 new ClaimsPrincipal(ClaimsIdentity),
                 AuthProperties);
         }
-
-        public async Task SyncAuthenticatedUser(string LastChangedOnFromDB, User AuthenticatedUser)
-        {
-            if (LastChangedOnFromDB != User.Identity.GetLastChangedOn())
-            {
-                await SignInWithCookie(AuthenticatedUser);
-            }
-        }
-
         public async Task<User> GetAuthenticatedUserFromDatabaseAsync()
         {
             var authUserId = User?.Identity?.GetUserId();
             if (authUserId != null)
             {
                 var AuthenticatedUser = await Context.User.FirstOrDefaultAsync(x => x.Id == long.Parse(authUserId) && x.IsActive);
-                SyncAuthenticatedUser(AuthenticatedUser.LastChangedOn.ToString(), AuthenticatedUser);
+                //if user did any changing on their profile
+                if (AuthenticatedUser.LastChangedOn.ToString() != User.Identity.GetLastChangedOn()) 
+                {
+                    await SignInWithCookie(AuthenticatedUser);
+                    //actually it should be call in other session of authenticated user.
+                    //but i didn't find a clear way for that.
+                }
+
                 return AuthenticatedUser ?? null;
             }
             else

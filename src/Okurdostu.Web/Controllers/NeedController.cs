@@ -172,7 +172,9 @@ namespace Okurdostu.Web.Controllers
         public async Task<IActionResult> Index(string filtreText, string _)
         {
             if (_ == "jquery")
+            {
                 TempData["Jquery"] = "Yes";
+            }
             else
             {
                 ViewBag.Universities = Context.University.ToList().OrderBy(x => x.Name);
@@ -255,7 +257,9 @@ namespace Okurdostu.Web.Controllers
 
                     }
                     else
+                    {
                         TempData["NeedMessage"] = "Kampanyanızı onaya yollamak için en az bir, en fazla üç hedef belirlemelisiniz";
+                    }
 
                     Response.Redirect("/" + Need.User.Username.ToLower() + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id);
                 }
@@ -415,7 +419,9 @@ namespace Okurdostu.Web.Controllers
                             }
                         }
                         else
+                        {
                             TempData["MesajHata"] = "Pandora.com.tr'den sadece kitap seçebilirsiniz";
+                        }
                     }
                     else if (ItemLink.ToLower().Contains("amazon.com.tr"))
                     {
@@ -472,7 +478,9 @@ namespace Okurdostu.Web.Controllers
                             catch (Exception e)
                             {
                                 if (e.InnerException.Message.Contains("Unique_Key_Title"))
+                                {
                                     TempData["NeedMessage"] = "Bu başlığı seçemezsiniz";
+                                }
                             }
                         }
                     }

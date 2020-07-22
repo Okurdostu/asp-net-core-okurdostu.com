@@ -81,13 +81,16 @@ namespace Okurdostu.Web.Controllers
                         Logger.LogError("Changes aren't save, User({Id}) take error when trying add a new education information", AuthUser.Id);
                         TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
                     }
-
                 }
                 else
+                {
                     TempData["ProfileMessage"] = "Başlangıç yılınız, bitiriş yılınızdan büyük olmamalı";
+                }
             }
             else
+            {
                 TempData["ProfileMessage"] = "Böyle bir üniversite yok";
+            }
 
             Response.Redirect("/" + AuthUser.Username);
         }
@@ -117,7 +120,6 @@ namespace Okurdostu.Web.Controllers
                             goto _redirect;
                         }
                     }
-
 
                     if (Model.Startyear <= Model.Finishyear)
                     {
@@ -244,14 +246,14 @@ namespace Okurdostu.Web.Controllers
                     if (File.ContentType == "document/pdf" || File.ContentType == "image/png" || File.ContentType == "image/jpg" || File.ContentType == "image/jpeg")
                     {
 
-                        string Name = Guid.NewGuid().ToString() + Path.GetExtension(File.FileName);
-                        string FilePathWithName = Environment.WebRootPath + "/documents/" + Name;
+                        string DocumentName = Guid.NewGuid().ToString() + Path.GetExtension(File.FileName);
+                        string FilePathWithName = Environment.WebRootPath + "/documents/" + DocumentName;
 
                         using (var Stream = System.IO.File.Create(FilePathWithName))
                         {
                             await File.CopyToAsync(Stream);
                         };
-                        Logger.LogInformation("User({Id}) uploaded a education document({File}) on server", AuthUser.Id, Name);
+                        Logger.LogInformation("User({Id}) uploaded a education document({File}) on server", AuthUser.Id, DocumentName);
 
                         if (System.IO.File.Exists(FilePathWithName))
                         {
@@ -261,7 +263,7 @@ namespace Okurdostu.Web.Controllers
                                 CreatedOn = DateTime.Now,
                                 UserEducationId = Id,
                                 FullPath = FilePathWithName,
-                                PathAfterRoot = "/documents/" + Name,
+                                PathAfterRoot = "/documents/" + DocumentName,
                             };
                             Education.IsSentToConfirmation = true;
 
@@ -270,7 +272,7 @@ namespace Okurdostu.Web.Controllers
 
                             if (result > 0)
                             {
-                                Logger.LogInformation("Database seeded for a education document({File}).", Name);
+                                Logger.LogInformation("Database seeded for a education document({File}).", DocumentName);
                                 TempData["ProfileMessage"] = "Eğitim dökümanınız yollandı, en geç 6 saat içinde geri dönüş yapılacak";
                             }
                             else
@@ -285,14 +287,19 @@ namespace Okurdostu.Web.Controllers
 
                     }
                     else
+                    {
                         TempData["ProfileMessage"] = "PDF, PNG, JPG veya JPEG türünde belge yükleyiniz";
+                    }
 
                 }
                 else if (File.Length > 1048576)
+                {
                     TempData["ProfileMessage"] = "Seçtiğiniz dosya 1 megabyte'dan fazla olmamalı";
+                }
                 else
+                {
                     TempData["ProfileMessage"] = "Seçtiğiniz dosya ile alakalı problemler var";
-
+                }
             }
 
             Response.Redirect("/" + AuthUser.Username);
