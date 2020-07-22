@@ -100,35 +100,37 @@
     {
         <script>
             var EditingCommentId;
-            var EditingCommentOld;
+            var EditingOldComment;
+            var NewComment;
+
             function getEditDialog(id) {
                 EditingCommentId = id;
                 $.get("/Comment/GetContent", { Id: EditingCommentId }).done(function (data) {
-                    if (data.state) {
+                    if (data.state === true) {
                         $("#edit-comment-input").val(data.comment);
-                        EditingCommentOld = data.comment;
+                        EditingOldComment = data.comment;
                         $('#edit-comment-modal').modal('show');
                     }
                 });
             };
             $("#edit-comment").click(function () {
-                var NewComment = $('#edit-comment-input').val();
-                if (NewComment.length < 5) {
-                    swal("Yorum düzenleme", "En az 5 karakter", "error", {
+                NewComment = $('#edit-comment-input').val();
+                if (NewComment.length === 0) {
+                    swal("Yorum düzenleme", "Boş bir girdi ile düzenleme yapamazsın", "info", {
                         button: "Tamam",
-                        timer: 3000
+                        timer: 2500
                     });
                 }
                 else if (NewComment.length > 100) {
-                    swal("Yorum düzenleme", "En fazla 100 karakter", "error", {
+                    swal("Yorum düzenleme", "En fazla 100 karakter", "info", {
                         button: "Tamam",
-                        timer: 3000
+                        timer: 2500
                     });
                 }
-                else if (NewComment == EditingCommentOld) {
+                else if (NewComment === EditingOldComment) {
                     swal("Yorum düzenleme", "Aynı içeriği giriyorsunuz", "info", {
                         button: "Tamam",
-                        timer: 3000
+                        timer: 2500
                     });
                 }
                 else {
@@ -141,13 +143,13 @@
                             else if (response.state == false && response.errorMessage.length > 0) {
                                 swal("Yorum düzenleme", response.errorMessage, "error", {
                                     button: "Tamam",
-                                    timer: 5000
+                                    timer: 2500
                                 });
                             }
                             else if (response.state == false && response.infoMessage.length > 0) {
                                 swal("Yorum düzenleme", response.infoMessage, "info", {
                                     button: "Tamam",
-                                    timer: 5000
+                                    timer: 2500
                                 });
                             }
                         });

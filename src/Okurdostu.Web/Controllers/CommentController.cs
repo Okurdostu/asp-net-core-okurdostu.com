@@ -22,18 +22,7 @@ namespace Okurdostu.Web.Controllers
             //  aynı veya benzer comment içeriğini girme,
             //  çok fazla ard arda giriş yapma.
 
-            if (Model.Comment != null)
-            {
-                if (Model.Comment.Length > 100)
-                {
-                    return Json(new { errorMessage = "En fazla 100 karakter" });
-                }
-                else if (Model.Comment.Length < 5)
-                {
-                    return Json(new { errorMessage = "En az 5 karakter" });
-                }
-            }
-            else
+            if (!ModelState.IsValid)
             {
                 return Json(null);
             }
@@ -53,11 +42,11 @@ namespace Okurdostu.Web.Controllers
                     };
                     await Context.AddAsync(NewComment);
                     await Context.SaveChangesAsync();
-                    return Json(new { id = NewComment.Id });
+                    return Json(new { id = NewComment.Id }); //returning comment id for sliding page to the new comment
                 }
                 else
                 {
-                    return Json(new { infoMessage = "Bir şeylere ulaşamadık" });
+                    return Json(new { infoMessage = "Tartışma başlatılacak kampanyaya ulaşamadık" });
                 }
             }
             else if (Model.RelatedCommentId != null)
@@ -71,16 +60,16 @@ namespace Okurdostu.Web.Controllers
                         Comment = Model.Comment,
                         UserId = AuthUser.Id,
                         NeedId = RepliedComment.NeedId,
-                        RelatedCommentId = RepliedComment.Id
+                        RelatedCommentId = RepliedComment.Id 
                     };
 
                     await Context.AddAsync(NewReply);
                     await Context.SaveChangesAsync();
-                    return Json(new { id = NewReply.Id });
+                    return Json(new { id = NewReply.Id }); //returning comment id for sliding page to the new comment
                 }
                 else
                 {
-                    return Json(new { infoMessage = "Bir şeylere ulaşamadık" });
+                    return Json(new { infoMessage = "Cevaplanacak yoruma ulaşamadık" });
                 }
             }
 
@@ -103,8 +92,6 @@ namespace Okurdostu.Web.Controllers
                     DeletedComment.IsRemoved = true;
                     DeletedComment.UserId = null;
                     DeletedComment.Comment = "";
-                    //bir daha görüntülenemeyecek yorum(geri getirme olmayacak): userini veya comment içeriğini tutmaya gerek yok
-                    //ve hiyerarşik ağaç yapısını bozmaması için tamamen kaldırmıyorum
                     await Context.SaveChangesAsync();
                     return Json(true);
                 }
@@ -117,6 +104,7 @@ namespace Okurdostu.Web.Controllers
         [HttpGet]
         public async Task<JsonResult> GetContent(Guid Id) //it's for edit and doreply
         {
+            //when user does reply a comment or wants to edit their comment, it works to view comment that will be edited or replied.
             var RequestedComment = await Context.NeedComment.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
 
             if (RequestedComment != null)
@@ -137,9 +125,9 @@ namespace Okurdostu.Web.Controllers
             string errorMessage = "";
             string infoMessage = "";
 
-            if (EditCommentInput == null || EditCommentInput.Length < 5)
+            if (EditCommentInput == null || EditCommentInput.Length == 0 || EditCommentInput.Length > 100)
             {
-                return Json(new { state, errorMessage = "En az 5 karakter" });
+                return Json(new { state, errorMessage = "En fazla 100 karakter ve boş olamaz" });
             }
 
             var EditedComment = await Context.NeedComment.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
@@ -157,8 +145,6 @@ namespace Okurdostu.Web.Controllers
                             EditedComment.Comment = EditCommentInput;
                             await Context.SaveChangesAsync();
                             state = true;
-                            errorMessage = "";
-                            infoMessage = "";
                         }
                         catch (Exception)
                         {
@@ -176,11 +162,6 @@ namespace Okurdostu.Web.Controllers
                             }
                         }
                     }
-                }
-                else
-                {
-                    errorMessage = "Aynı içeriği giriyorsunuz.";
-                    infoMessage = "";
                 }
             }
 

@@ -117,7 +117,6 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
         <partial name="~/Views/Comment/_DoReplyPartial.cshtml" model="null" />
         <div class="modal fade" id="delete-comment" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-sm modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light text-center" style="border-radius: 25px;"> <p class="font-weight-bold text-black-50"> Sildiğiniz içerik sonsuza kadar yok olacak </p><button id="delete" class="btn btn-block btn-danger rounded-custom font-weight-bold mb-1 mt-1">Sil</button> <button class="btn btn-block btn-outline-secondary rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button> </div></div></div></div>
         <script type="text/javascript">
-            $(document).ready(function () {
                 function LikeRefresh() {
                     $.ajax({
                         url: "/like/LikeState/@Model.Id",
@@ -128,42 +127,59 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                         },
                     }),
                         $("#LikeCount").load("/like/count/@Model.Id");
-                }; LikeRefresh(); setInterval(function () { LikeRefresh(); }, 10000);
+                };
+                LikeRefresh();
+                setInterval(function () { LikeRefresh(); }, 10000);
 
+                //do comment (post, controller: Comment, Action: Comment)
                 $("#DoComment").click(function () {
-                    if ($("#Comment").val().length >= 5 && $("#Comment").val().length <= 100) {
+                    if ($("#Comment").val().length <= 100) {
                         $.post("/Comment/Comment", { NeedId: @Model.Id, Comment: $("#Comment").val(), __RequestVerificationToken: validatetoken })
                             .done(function (result) {
-                                if (result.id != null) {
+                                if (result.id.length > 0) {
                                     GetComments(result.id);
                                     $("#Comment").val("");
                                 }
                                 else if (result.errorMesage.length > 0) {
                                     swal("Tartışma başlatma", result.errorMesage, "error", {
                                         button: "Tamam",
-                                        timer: 5000
+                                        timer: 2500
                                     });
                                 }
                                 else if (result.infoMessage.length > 0) {
                                     swal("Tartışma başlatma", result.infoMessage, "info", {
                                         button: "Tamam",
-                                        timer: 5000
+                                        timer: 2500
                                     });
                                 }
                             });
                     }
                     else {
-                        swal("Tartışma başlatma", "En fazla 100, en az 5 karakter", "info", {
+                        swal("Tartışma başlatma", "En fazla 100 karakter", "info", {
                             button: "Tamam",
-                            timer: 3000
+                            timer: 2500
                         });
                     }
                 });
-                $("#DoReply").click(function () {
-                    if ($("#ReplyComment").val().length >= 5 && $("#ReplyComment").val().length <= 100) {
+            //do reply (post, controller: Comment, Action: Comment)
+            $("#DoReply").click(function () {
+                var ReplyComment = $("#ReplyComment").val();
+                if (ReplyComment.length > 100) {
+                    swal("Cevaplama", "En fazla 100 karakter", "info", {
+                        button: "Tamam",
+                        timer: 2500
+                    });
+                }
+                else if (ReplyComment.length === 0) {
+                    swal("Cevaplama", "Boş bir girdi ile cevaplayamazsınız", "info", {
+                        button: "Tamam",
+                        timer: 2500
+                    });
+                }
+                else {
                     $.post("/Comment/Comment", { RelatedCommentId: ReplyingCommentId, Comment: $("#ReplyComment").val(), __RequestVerificationToken: validatetoken })
                         .done(function (result) {
-                            if (result.id != null) {
+                            if (result.id.length > 0) {
                                 GetComments(result.id);
                                 $('#reply-comment-modal').modal('hide');
                                 $("#ReplyComment").val("");
@@ -171,24 +187,18 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                             else if (result.errorMesage.length > 0) {
                                 swal("Cevaplama", result.errorMesage, "error", {
                                     button: "Tamam",
-                                    timer: 5000
+                                    timer: 2500
                                 });
                             }
                             else if (result.infoMessage.length > 0) {
                                 swal("Cevaplama", result.infoMessage, "info", {
                                     button: "Tamam",
-                                    timer: 5000
+                                    timer: 2500
                                 });
                             }
                         });
-                    }
-                    else {
-                        swal("Cevaplama", "En fazla 100, en az 5 karakter", "info", {
-                            button: "Tamam",
-                            timer: 3000
-                        });
-                    }
-                });
+                }
+            });
                 $("#Like").on("click", function () {
                     $.ajax({
                         type: "POST",
@@ -198,7 +208,6 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                         success() { LikeRefresh(); },
                     });
                 });
-            });
         </script>
     }
 }
