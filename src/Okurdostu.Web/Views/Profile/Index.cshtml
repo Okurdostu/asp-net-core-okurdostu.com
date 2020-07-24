@@ -44,8 +44,16 @@
                 {
                     <input hidden="hidden" id="file" name="file" type="file" onchange="Selected()" accept="image/*" /> <button hidden="hidden" type="submit" id="AddPhotoButton"></button>
                 }
-                <div class="modal fade" id="profile-photo" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-sm modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light text-center" style="border-radius: 25px;"> <h3 class="font-weight-bold text-center text-black-50"> Profil fotoğrafı </h3> <hr /> <button class="btn btn-block btn-outline-info rounded-custom font-weight-bold" onclick="FileSelect();"> Yeni fotoğraf yükle </button> @using (Html.BeginForm("RemovePhoto", "Account", FormMethod.Post))
-                {<button class="btn btn-block btn-danger rounded-custom font-weight-bold mb-1 mt-1" type="submit">Şuan ki fotoğrafı kaldır</button>}<button class="btn btn-block btn-outline-secondary rounded-custom font-weight-bold" data-dismiss="modal"> Vazgeçtim </button> </div></div></div></div>
+                <div class="modal fade" id="profile-photo" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+                        <div class="modal-content" style="background: transparent;">
+                            <div class="modal-body bg-light text-center" style="border-radius: 25px;">
+                                <h3 class="font-weight-bold text-center text-black-50"> Profil fotoğrafı </h3> <hr /> <button class="btn btn-block btn-outline-info rounded-custom font-weight-bold" onclick="FileSelect();"> Yeni fotoğraf yükle </button> @using (Html.BeginForm("RemovePhoto", "Account", FormMethod.Post))
+                                {<button class="btn btn-block btn-danger rounded-custom font-weight-bold mb-1 mt-1" type="submit">Şuan ki fotoğrafı kaldır</button>}<button class="btn btn-block btn-outline-secondary rounded-custom font-weight-bold" data-dismiss="modal"> Vazgeçtim </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             }
         }
         @if (Model.PictureUrl != null)
@@ -167,26 +175,7 @@ else
                 }
                 @if (IsAuthenticatedUserEqualModelUser)
                 {
-                    <div class="row"> <div class="col-auto" style="padding-right:3px"> <a class="btn btn-outline-info rounded-custom" href="" data-toggle="modal" onclick="getEducationInformationForEdit(@item.Id)"> <i class="far fa-edit mr-3 ml-3"></i> </a> </div><div class="col-auto" style="padding-left:3px;"> <a class="btn btn-outline-danger rounded-custom" href="" data-toggle="modal" data-target="#education-remove-@item.Id" style="cursor:pointer;"> <i class="fas fa-trash-alt mr-3 ml-3"></i> </a> </div></div>
-                    <div class="modal fade" id="education-remove-@item.Id" tabindex="-1" role="dialog" aria-hidden="true">
-                        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-                            <div class="modal-content" style="background: transparent;">
-                                <div class="modal-body bg-light" style="border-radius: 25px;">
-                                    <p class="text-md-center font-weight-bold text-black-50">
-                                        @item.University.Name okulunda varolan eğitiminiz kaldıralacak
-                                    </p>
-                                    <hr />
-                                    @using (Html.BeginForm("RemoveEducation", "Education", FormMethod.Post))
-                                    {
-                                        <input type="hidden" id="Username" name="Username" value="@item.User.Username" />
-                                        <input type="hidden" id="Id" name="Id" value="@item.Id" /> <button type="submit" class="btn btn-danger btn-block font-weight-bold rounded-custom"> Kaldır </button>
-                                    }
-                                    <hr />
-                                    <button type="button" class="btn btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="row"> <div class="col-auto" style="padding-right:3px"> <a class="btn btn-outline-info rounded-custom" href="" data-toggle="modal" onclick="getEducationInformationForEdit(@item.Id)"> <i class="far fa-edit mr-3 ml-3"></i> </a> </div><div class="col-auto" style="padding-left:3px;"> <a class="btn btn-outline-danger rounded-custom" href="" data-toggle="modal" onclick="getEducationInformationForRemove(@item.Id)"> <i class="fas fa-trash-alt mr-3 ml-3"></i> </a> </div></div>
                 }
             </div>
         </div>
@@ -198,6 +187,26 @@ else
 @if (IsAuthenticatedUserEqualModelUser)
 {
 
+    <script>
+        function getEducationInformationForEdit(id) {
+            $.get("/api/education/get", { EducationId: id }).done(function (result) {
+                if (result.status === true) {
+                    $('#education-edit-modal').modal('show');
+                    $('#education-edit-modal-body').load("/education/editview/?ActivitiesSocieties=" + result.data.activitiesSocieties + "&Department=" + result.data.department + "&UniversityId=" + result.data.universityId + "&EducationId=" + result.data.educationId + "&Startyear=" + result.data.startyear + "&Finishyear=" + result.data.finishyear);
+                }
+            });
+        };
+
+        function getEducationInformationForRemove(id) {
+            $.get("/api/education/get", { EducationId: id }).done(function (result) {
+                if (result.status === true) {
+                    $('#education-remove-modal').modal('show');
+                    $("input[name='removeEducationId']").val(id).trigger('change');
+                }
+            });
+        };
+    </script>
+
     <div class="modal fade" id="education-edit-modal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content" style="background: transparent;">
@@ -208,19 +217,24 @@ else
         </div>
     </div>
 
-    <script>
-        function getEducationInformationForEdit(id) {
-            $.get("/api/education/get", { EducationId: id }).done(function (result) {
-                if (result.status === true) {
-                    $('#education-edit-modal').modal('show');
-                    $('#education-edit-modal-body').load("/education/editview/?ActivitiesSocieties=" + result.data.activitiesSocieties + "&Department=" + result.data.department + "&UniversityId=" + result.data.universityId + "&EducationId=" + result.data.educationId + "&Startyear=" + result.data.startyear + "&Finishyear=" + result.data.finishyear);
-                }
-                else {
-                    console.log(result.message);
-                    console.log(result.messageTitle);
-                }
-            });
-        };
-    </script>
+
+    <div class="modal fade" id="education-remove-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content" style="background: transparent;">
+                <div class="modal-body bg-light" style="border-radius: 25px;">
+                    <p class="text-md-center font-weight-bold text-black-50">
+                        Seçtiğiniz eğitiminiz kaldırılacak
+                    </p>
+                    <hr />
+                    @using (Html.BeginForm("RemoveEducation", "Education", FormMethod.Post))
+                    {
+                        <input type="hidden" id="removeEducationId" name="removeEducationId" /> <button type="submit" class="btn btn-danger btn-block font-weight-bold rounded-custom"> Kaldır </button>
+                    }
+                    <hr />
+                    <button type="button" class="btn btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 }

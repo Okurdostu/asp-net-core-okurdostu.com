@@ -162,9 +162,9 @@ namespace Okurdostu.Web.Controllers
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
         [Route("account/remove-education")]
-        public async Task RemoveEducation(long Id, string Username)
+        public async Task RemoveEducation(long removeEducationId)
         {
-            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && x.User.Username == Username && !x.IsRemoved);
+            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == removeEducationId && !x.IsRemoved);
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
 
             if (Education != null)

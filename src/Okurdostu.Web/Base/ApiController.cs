@@ -21,8 +21,8 @@ namespace Okurdostu.Web.Base
 
             if (jsonReturnModel.Code == 401)
             {
+                jsonReturnModel.Message = "Authorized user not found";
                 jsonReturnModel.MessageTitle = "Unauthorized";
-                jsonReturnModel.MessageTitle = "Authorized user not found"; //client'da bunu yakala ve girişe yönlendir
                 return Unauthorized(jsonReturnModel);
             }
             else if (jsonReturnModel.Code == 403)
