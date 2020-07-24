@@ -39,37 +39,38 @@
         @{ //when click profile photo: data-target="#profile-photo"
             if (IsAuthenticatedUserEqualModelUser)
             {
-                <script> function FileSelect() {document.getElementById('file').click();} function Selected() {document.getElementById('AddPhotoButton').click();} </script>
+                <script>function FileSelect() { document.getElementById('file').click(); } function Selected() { document.getElementById('AddPhotoButton').click(); }</script>
                 using (Html.BeginForm("AddPhoto", "Account", FormMethod.Post, new { enctype = "multipart/form-data" }))
                 {
                     <input hidden="hidden" id="file" name="file" type="file" onchange="Selected()" accept="image/*" /> <button hidden="hidden" type="submit" id="AddPhotoButton"></button>
                 }
-                <div class="modal fade" id="profile-photo" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-sm modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light text-center" style="border-radius: 25px;"> <h3 class="font-weight-bold text-center text-black-50"> Profil fotoğrafı </h3> <hr/> <button class="btn btn-block btn-outline-info rounded-custom font-weight-bold" onclick="FileSelect();"> Yeni fotoğraf yükle </button> @using (Html.BeginForm("RemovePhoto", "Account", FormMethod.Post)){<button class="btn btn-block btn-danger rounded-custom font-weight-bold mb-1 mt-1" type="submit">Şuan ki fotoğrafı kaldır</button>}<button class="btn btn-block btn-outline-secondary rounded-custom font-weight-bold" data-dismiss="modal"> Vazgeçtim </button> </div></div></div></div>
+                <div class="modal fade" id="profile-photo" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-sm modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light text-center" style="border-radius: 25px;"> <h3 class="font-weight-bold text-center text-black-50"> Profil fotoğrafı </h3> <hr /> <button class="btn btn-block btn-outline-info rounded-custom font-weight-bold" onclick="FileSelect();"> Yeni fotoğraf yükle </button> @using (Html.BeginForm("RemovePhoto", "Account", FormMethod.Post))
+                {<button class="btn btn-block btn-danger rounded-custom font-weight-bold mb-1 mt-1" type="submit">Şuan ki fotoğrafı kaldır</button>}<button class="btn btn-block btn-outline-secondary rounded-custom font-weight-bold" data-dismiss="modal"> Vazgeçtim </button> </div></div></div></div>
             }
         }
         @if (Model.PictureUrl != null)
         {
             if (IsAuthenticatedUserEqualModelUser)
-            { <a data-toggle="modal" data-target="#profile-photo" style="cursor:pointer;"><img src="@Model.PictureUrl" class="profil-image img-thumbnail rounded-pill mb-2" style="width:150px; height:150px;" /></a> }
+            {<a data-toggle="modal" data-target="#profile-photo" style="cursor:pointer;"><img src="@Model.PictureUrl" class="profil-image img-thumbnail rounded-pill mb-2" style="width:150px; height:150px;" /></a> }
             else
             { <img src="@Model.PictureUrl" class="profil-image img-thumbnail rounded-pill mb-2" style="width:150px; height:150px;" /> }
         }
         else
         {
             if (IsAuthenticatedUserEqualModelUser)
-            { <a data-toggle="modal" data-target="#profile-photo" style="cursor:pointer;"> <img src="~/svg/user.svg" class="profil-image img-thumbnail rounded-pill mb-2" style="width:150px; max-height:150px;"/> </a> }
+            { <a data-toggle="modal" data-target="#profile-photo" style="cursor:pointer;"> <img src="~/svg/user.svg" class="profil-image img-thumbnail rounded-pill mb-2" style="width:150px; max-height:150px;" /> </a> }
             else
-            { <img src="~/svg/user.svg" class="profil-image img-thumbnail rounded-pill mb-2" style="width:150px; max-height:150px;" /> }
+            { <img src="~/svg/user.svg" class="profil-image img-thumbnail rounded-pill mb-2" style="width:150px; max-height:150px;" />}
         }
         @if (Model.ContactEmail != null || Model.Twitter != null || Model.Github != null)
         {
             <div style="font-size:22px" class="text-center">
                 @if (Model.Twitter != null)
-                { <a class="od font-weight-bold" href="https://twitter.com/@Model.Twitter" target="_blank"><i class="fab fa-twitter"></i></a> }
+                {<a class="od font-weight-bold" href="https://twitter.com/@Model.Twitter" target="_blank"><i class="fab fa-twitter"></i></a>}
                 @if (Model.Github != null)
-                { <a class="od font-weight-bold" href="https://github.com/@Model.Github" target="_blank"><i class="fab fa-github"></i></a> }
+                {<a class="od font-weight-bold" href="https://github.com/@Model.Github" target="_blank"><i class="fab fa-github"></i></a>}
                 @if (Model.ContactEmail != null)
-                { <a class="od font-weight-bold" href="mailto:@Model.ContactEmail" target="_blank"><i class="far fa-envelope"></i></a> }
+                {<a class="od font-weight-bold" href="mailto:@Model.ContactEmail" target="_blank"><i class="far fa-envelope"></i></a>}
             </div>
         }
     </div>
@@ -78,29 +79,31 @@
     <h5 style="color:black;" class="m-0">
         @Html.Raw(Model.FullName)
         @if (IsAuthenticatedUserEqualModelUser)
-        { <a style="font-size:20px" class="od" href="" data-toggle="modal" data-target="#ProfileSettings"><i class="far fa-edit"></i></a> }
+        {<a style="font-size:20px" class="od" href="" data-toggle="modal" data-target="#ProfileSettings"><i class="far fa-edit"></i></a>}
     </h5>
     <span style="font-size:17px;" class="pl-1"> @Html.Raw("(@" + Model.Username + ")") </span>
     <div style="font-size:15.5px;" class="pl-1">
         @if (Model.Biography != null)
-        { 
+        {
             <span class="text-break">
                 @Html.Raw(Model.Biography.Replace("\r\n", "<br />"))
             </span>
-            }
+        }
     </div>
     <div>
         @if (IsAuthenticatedUserEqualModelUser)
-        { <hr class="mb-1" /> <div>  <a class="btn btn-outline-purple font-weight-bold rounded-custom btn-block" href="/ihtiyac-olustur" style="font-size:16px">İhtiyaç oluştur</a> </div> }
+        {<hr class="mb-1" /> <div>  <a class="btn btn-outline-purple font-weight-bold rounded-custom btn-block" href="/ihtiyac-olustur" style="font-size:16px">İhtiyaç oluştur</a> </div>}
     </div>
 </div>
 @if (IsAuthenticatedUserEqualModelUser)
 {
-    <hr class="mb-1" /> <div class="row"> <div class="col-auto"> <h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim</h4> </div><div class="col"> <div class="float-right"> <a class="btn od rounded-custom p-0 font-weight-bold" data-toggle="modal" data-target="#AddEducation" style="cursor:pointer; font-size:18px"><i class="fas fa-plus"></i> Eğitim</a> </div></div><div class="modal fade" id="AddEducation" tabindex="-1" role="dialog" aria-hidden="true"> @await Component.InvokeAsync("AddEducation") </div></div>
+    <hr class="mb-1" />
+    <div class="row"> <div class="col-auto"> <h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim</h4> </div><div class="col"> <div class="float-right"> <a class="btn od rounded-custom p-0 font-weight-bold" data-toggle="modal" data-target="#AddEducation" style="cursor:pointer; font-size:18px"><i class="fas fa-plus"></i> Eğitim</a> </div></div><div class="modal fade" id="AddEducation" tabindex="-1" role="dialog" aria-hidden="true"> @await Component.InvokeAsync("AddEducation") </div></div>
 }
 else
 {
-    <hr class="mb-1" /> <h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim</h4>
+    <hr class="mb-1" />
+    <h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim</h4>
 }
 @if (Model.UserEducation.Count == 0)
 {
@@ -114,15 +117,15 @@ else
         <div class="row pr-3 egitim">
             <div class="col-auto pr-0 pl-2">
                 @if (item.University.LogoUrl != null)
-                { <a href="/universite/@item.University.FriendlyName"> <img src="@item.University.LogoUrl" class="profil-image rounded-pill" style="width:100px;" /> </a> }
+                {<a href="/universite/@item.University.FriendlyName"> <img src="@item.University.LogoUrl" class="profil-image rounded-pill" style="width:100px;" /> </a> }
                 else
-                { <a href="/universite/@item.University.FriendlyName"> <img src="~/svg/building.svg" class="profil-image rounded-pill" style="width:100px;" /> </a> }
+                { <a href="/universite/@item.University.FriendlyName"> <img src="~/svg/building.svg" class="profil-image rounded-pill" style="width:100px;" /> </a>}
             </div>
             <div class="col p-0">
                 <h5>
                     <a class="od" href="/universite/@item.University.FriendlyName"> @Html.Raw(item.University.Name) </a>
                     @if (item.IsConfirmed == true)
-                    { <a class="od" href=""><i class="fas fa-check-double"></i></a> }
+                    {<a class="od" href=""><i class="fas fa-check-double"></i></a>}
                 </h5>
                 <h6 class="text-black-50 pl-2 text-break">@Html.Raw(item.Department)</h6>
                 <h6 class="text-black-50 pl-2 text-break">@Html.Raw(@item.StartYear + "-" + @item.EndYear)</h6>
@@ -190,24 +193,27 @@ else
     }
 }
 
-<div class="modal fade" id="education-edit-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content" style="background: transparent;">
-            <div class="modal-body bg-light" style="border-radius: 25px;" id="education-edit-modal-body">
 
-            </div>
-        </div>
-    </div>
-</div>
 
 @if (IsAuthenticatedUserEqualModelUser)
 {
+
+    <div class="modal fade" id="education-edit-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content" style="background: transparent;">
+                <div class="modal-body bg-light" style="border-radius: 25px;" id="education-edit-modal-body">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         function getEducationInformationForEdit(id) {
             $.get("/api/education/get", { EducationId: id }).done(function (result) {
                 if (result.status === true) {
                     $('#education-edit-modal').modal('show');
-                    $('#education-edit-modal-body').load("/education/editview/?ActivitiesSocieties=" + result.data.activitiesSocieties + "&Department=" + result.data.department + "&EducationId=" + result.data.educationId + "&Startyear=" + result.data.startyear + "&Finishyear=" + result.data.finishyear);
+                    $('#education-edit-modal-body').load("/education/editview/?ActivitiesSocieties=" + result.data.activitiesSocieties + "&Department=" + result.data.department + "&UniversityId=" + result.data.universityId + "&EducationId=" + result.data.educationId + "&Startyear=" + result.data.startyear + "&Finishyear=" + result.data.finishyear);
                 }
                 else {
                     console.log(result.message);
@@ -216,4 +222,5 @@ else
             });
         };
     </script>
+
 }

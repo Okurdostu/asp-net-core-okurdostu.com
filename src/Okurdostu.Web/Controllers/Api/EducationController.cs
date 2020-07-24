@@ -10,22 +10,26 @@ namespace Okurdostu.Web.Controllers.Api
     public class EducationController : ApiController
     {
         [Route("get")]
-        public async Task<JsonResult> Get(long EducationId)
+        public async Task<IActionResult> Get(long EducationId)
         {
-            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == EducationId);
-
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
+            var AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+
+            if (AuthUser == null)
+            {
+                jsonReturnModel.Code = 401;
+                return Error(jsonReturnModel);
+            }
+
+            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == EducationId && !x.IsRemoved);
 
             if (Education != null)
             {
-                var AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-
-                if (AuthUser == null || AuthUser.Id != Education.UserId)
+                
+                if (AuthUser.Id != Education.UserId)
                 {
-                    jsonReturnModel.Status = false;
-                    jsonReturnModel.MessageTitle = "MC Hammer";
-                    jsonReturnModel.Message = "You can't touch this";
-                    return Json(jsonReturnModel);
+                    jsonReturnModel.Code = 403;
+                    return Error(jsonReturnModel);
                 }
 
                 var educationModel = new EducationModel
@@ -42,17 +46,18 @@ namespace Okurdostu.Web.Controllers.Api
                     educationModel.Department = Education.Department;
                 }
 
-                jsonReturnModel.Status = true;
                 jsonReturnModel.Data = educationModel;
             }
             else
             {
-                jsonReturnModel.Status = false;
-                jsonReturnModel.MessageTitle = "Başarısız";
-                jsonReturnModel.Message = "Eğitime ulaşamadık";
+                jsonReturnModel.Code = 404;
+                jsonReturnModel.MessageTitle = "Bulunamadı";
+                jsonReturnModel.Message = "Eğitim yok";
+
+                return Error(jsonReturnModel);
             }
 
-            return Json(jsonReturnModel);
+            return Succes(jsonReturnModel);
         }
     }
 }
