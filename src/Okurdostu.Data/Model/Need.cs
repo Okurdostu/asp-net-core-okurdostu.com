@@ -40,13 +40,9 @@ namespace Okurdostu.Data.Model
         {
             get
             {
-                if (LastCheckOn == null) //oluşturulmasından sonra hiç kontrol edilmediyse
-                {
-                    return true;
-                }
                 var PassedTime = DateTime.Now - LastCheckOn;
 
-                return PassedTime.Value.TotalMinutes > 60; // en son kontrolunun üzerinden 60 dakika'dan fazla geçtiyse tekrar kontrol edilmeli.
+                return LastCheckOn == null || PassedTime.Value.TotalMinutes > 60; // en son kontrolunun üzerinden 60 dakika'dan fazla geçtiyse veya o ana kadar hiç kontrol edilmediyse tekrar kontrol edilmeli.
             }
         }
         public decimal? CompletedPercentage => 100 - (TotalCharge - TotalCollectedMoney) * 100 / TotalCharge;
