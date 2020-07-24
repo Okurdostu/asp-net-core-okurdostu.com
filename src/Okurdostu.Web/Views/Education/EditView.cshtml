@@ -4,8 +4,7 @@
 }
 <h3 class="font-weight-bold text-center font-weight-bold text-black-50">Eğitim düzenleme</h3>
 <hr />
-@using (Html.BeginForm("EditEducation", "Education", FormMethod.Post))
-{
+<div id="post-edit" name="post-edit">
     @Html.HiddenFor(model => model.EducationId)
     <div class="form-horizontal">
         @if (Model.Universities != null)
@@ -19,6 +18,56 @@
         }
         <div class="form-group"> <span class="control-label pl-2 pr-0 font-weight-bold text-black-50"> Aktiviteler veya topluluklar </span> <div> @Html.EditorFor(model => model.ActivitiesSocieties, new { htmlAttributes = new { @class = "form-control font-weight-bold", @autocomplete = "off", @maxlength = "200" } }) @Html.ValidationMessageFor(model => model.ActivitiesSocieties, "", new { @class = "text-danger font-weight-bold" }) </div></div>
         <div class="form-group"> <div class="row"> <div class="col-6"> <span class="control-label pl-0 pr-0 font-weight-bold text-black-50"> Başlangıç yılı </span> @Html.DropDownListFor(model => model.Startyear, Model.StartYears, new { @class = "form-control font-weight-bold" }) @Html.ValidationMessageFor(model => model.Startyear, "", new { @class = "text-danger font-weight-bold" }) </div><div class="col-6"> <span class="control-label pl-0 pr-0 font-weight-bold text-black-50"> Bitiş yılı </span> @Html.DropDownListFor(model => model.Finishyear, Model.FinishYears, new { @class = "form-control font-weight-bold" }) @Html.ValidationMessageFor(model => model.Finishyear, "", new { @class = "text-danger font-weight-bold" }) </div></div></div>
-        <div class="modal-footer pb-0 pt-1"> <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button> <input type="submit" value="Kaydet" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" /> </div>
+        <div class="modal-footer pb-0 pt-1"> <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button> <input type="submit" id="edit-education-button" value="Kaydet" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" /> </div>
     </div>
-}
+</div>
+@Html.AntiForgeryToken()
+<script>
+    var validatetoken = $("input[name=__RequestVerificationToken]").val();
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top',
+        timer: 3000,
+        showConfirmButton: false,
+        timerProgressBar: true,
+        onOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    });
+
+    $("#edit-education-button").click(function () {
+        var universityId = $("#post-edit select[name=UniversityId]").val();
+        var department = $("#post-edit input[name=Department]").val();
+        var activitiesSocieties = $("#post-edit input[name=ActivitiesSocieties]").val();
+        var startYear = $("#post-edit select[name=Startyear]").val();
+        var finishYear = $("#post-edit select[name=Finishyear]").val();
+        var educationId = $("#post-edit input[name=EducationId]").val();
+        if (department != null && department.length <= 0) {
+            Toast.fire({
+                icon: 'warning',
+                html: '<span class="font-weight-bold text-black-50 ml-1">Okuduğunuz bölümü yazmalısınız</span>'
+            });
+        }
+        else {
+            $.post("/api/education/postedit", { UniversityId: universityId, Department: department, ActivitiesSocieties: activitiesSocieties, Startyear: startYear, Finishyear: finishYear, EducationId: educationId, __RequestVerificationToken: validatetoken })
+                .done(function (result) {
+                    if (result.status === true) {
+                        $('#edit-education-button').prop('disabled', true);
+                        Toast.fire({
+                            icon: 'success',
+                            html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+                        });
+                        //yenilemek yerine düzenlenen eğitimin verilerini yenileri ile değiştirmem lazım
+                        setTimeout(function () { location.reload(); }, 3000)
+                    }
+                    else {
+                        Toast.fire({
+                            icon: 'warning',
+                            html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+                        });
+                    }
+                });
+        }
+    });
+</script>

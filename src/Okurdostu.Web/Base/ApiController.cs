@@ -15,7 +15,7 @@ namespace Okurdostu.Web.Base
 
             return Ok(jsonReturnModel);
         }
-        public ActionResult Error(JsonReturnModel jsonReturnModel)
+        public ActionResult Error(JsonReturnModel jsonReturnModel) 
         {
             jsonReturnModel.Status = false;
 
@@ -32,6 +32,11 @@ namespace Okurdostu.Web.Base
             else if (jsonReturnModel.Code == 404)
             {
                 return (NotFound(jsonReturnModel));
+            } //10001: db'de değişiklik yapmaya çalışılırken hiç bir verinin değiştirilmediğini durumu: db.savechanges resultının 0 gelmesi.
+            else if (jsonReturnModel.Code == 1001 || jsonReturnModel.Code == 200)
+            {
+                
+                return (Ok(jsonReturnModel));
             }
 
             jsonReturnModel.Code = 400;

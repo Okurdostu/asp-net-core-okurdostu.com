@@ -20,8 +20,8 @@ namespace Okurdostu.Data.Model
         public short UniversityId { get; set; }
         public string Department { get; set; }
         public string ActivitiesSocieties { get; set; }
-        public string StartYear { get; set; }
-        public string EndYear { get; set; }
+        public string StartYear { get; set; } //manipüle edilebiliyor: editlerken veya yeni eğitim oluştururken 1980'den aşağıya, şuan ki yılın üstünde bir değer girilmesine izin verme
+        public string EndYear { get; set; } //manipüle edilebiliyor: editlerken veya yeni eğitim oluştururken 1980'den aşağıya ve (şuan ki yıl + 7) üstünde bir değer girilmesine izin verme
         public DateTime CreatedOn { get; private set; }
         public bool IsRemoved { get; set; }
         public bool IsSentToConfirmation { get; set; }

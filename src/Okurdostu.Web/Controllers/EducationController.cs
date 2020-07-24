@@ -7,7 +7,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Okurdostu.Data.Model;
-using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Filters;
 using System;
 using System.IO;
@@ -68,7 +67,6 @@ namespace Okurdostu.Web.Controllers
                         EndYear = Model.Finishyear.ToString(),
                         ActivitiesSocieties = Model.ActivitiesSocieties
                     };
-
                     await Context.UserEducation.AddAsync(Education);
                     var result = await Context.SaveChangesAsync();
 
@@ -96,68 +94,7 @@ namespace Okurdostu.Web.Controllers
             Response.Redirect("/" + AuthUser.Username);
         }
 
-        [ServiceFilter(typeof(ConfirmedEmailFilter))]
-        [HttpPost, ValidateAntiForgeryToken]
-        [Route("account/edit-education")]
-        public async Task EditEducation(EducationModel Model)
-        {
-            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Model.EducationId && !x.IsRemoved);
-            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
 
-            if (Education != null)
-            {
-                if (Education.UserId == AuthUser.Id)
-                {
-                    if (Education.IsUniversityInformationsCanEditable())
-                    {
-                        if (await Context.University.FirstOrDefaultAsync(x => x.Id == Model.UniversityId) != null)
-                        {
-                            Education.UniversityId = Model.UniversityId;
-                            Education.Department = Model.Department;
-                        }
-                        else
-                        {
-                            TempData["ProfileMessage"] = "Böyle bir üniversite yok";
-                            goto _redirect;
-                        }
-                    }
-
-                    if (Model.Startyear <= Model.Finishyear)
-                    {
-                        Education.StartYear = Model.Startyear.ToString();
-                        Education.EndYear = Model.Finishyear.ToString();
-                    }
-                    else
-                    {
-                        TempData["ProfileMessage"] = "Başlangıç yılınız, bitiriş yılınızdan büyük olmamalı";
-                    }
-
-                    Education.ActivitiesSocieties = Model.ActivitiesSocieties;
-                    var result = await Context.SaveChangesAsync();
-                    if (result > 0)
-                    {
-                        Logger.LogInformation("User({Id}) edited an education information", AuthUser.Id);
-
-                        if (!(Model.Startyear <= Model.Finishyear))
-                        {
-                            TempData["ProfileMessage"] = "Başlangıç yılınız, bitiriş yılınızdan büyük olmamalı" +
-                            "<br />" + "Bunlar dışında ki eğitim bilgileriniz düzenlendi";
-                        }
-                        else
-                        {
-                            TempData["ProfileMessage"] = "Eğitim bilgileriniz düzenlendi";
-                        }
-                    }
-                }
-                else
-                {
-                    Logger.LogWarning(401, "User({Id}) tried change another user data[Education: {EducationId}]", AuthUser.Id, Education.Id);
-                    TempData["ProfileMessage"] = "MC Hammer: You can't touch this";
-                }
-
-            }
-        _redirect: Response.Redirect("/" + AuthUser.Username);
-        }
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
@@ -235,9 +172,9 @@ namespace Okurdostu.Web.Controllers
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost, ValidateAntiForgeryToken]
         [Route("account/education-document")]
-        public async Task SendEducationDocument(long Id, IFormFile File)
+        public async Task SendEducationDocument(long confirmEducationId, IFormFile File)
         {
-            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && !x.IsSentToConfirmation); //bir belge yollayabilir.
+            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == confirmEducationId && !x.IsRemoved && !x.IsSentToConfirmation);
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
             if (Education != null && AuthUser.Id == Education.UserId)
             {
@@ -262,7 +199,7 @@ namespace Okurdostu.Web.Controllers
                             var EducationDocument = new UserEducationDoc
                             {
                                 CreatedOn = DateTime.Now,
-                                UserEducationId = Id,
+                                UserEducationId = confirmEducationId,
                                 FullPath = FilePathWithName,
                                 PathAfterRoot = "/documents/" + DocumentName,
                             };
@@ -308,7 +245,7 @@ namespace Okurdostu.Web.Controllers
 
         public async Task<IActionResult> EditView([FromQuery] EducationModel educationModel)
         {
-            if (educationModel.Department != "null")
+            if (educationModel.Department != "undefined")
             {
                 educationModel.Universities = await Context.University.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
             }

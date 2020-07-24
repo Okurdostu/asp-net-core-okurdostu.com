@@ -20,6 +20,9 @@
 }
 @if (IsAuthenticatedUserEqualModelUser)
 {
+    <script src="~/js/popper.min.js"></script>
+    <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
+    <script src="~/lib/sweetalert/sweetalert2.all.min.js"></script>
     @if (TempData["ProfileMessage"] != null)
     {
         <div class="alert alert-secondary text-center font-weight-bold" role="alert">
@@ -28,8 +31,46 @@
             </span>
         </div>
     }
-    <script src="~/js/popper.min.js"></script>
-    <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
+
+    <div class="modal fade" id="education-edit-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light" style="border-radius: 25px;" id="education-edit-modal-body"> </div> </div>
+        </div>
+    </div>
+    <div class="modal fade" id="education-remove-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content" style="background: transparent;">
+                <div class="modal-body bg-light" style="border-radius: 25px;">
+                    <p class="text-md-center font-weight-bold text-black-50"> Seçtiğiniz eğitiminiz kaldırılacak </p>
+                    <hr />
+                    @using (Html.BeginForm("RemoveEducation", "Education", FormMethod.Post))
+                    {
+                        <input type="hidden" id="removeEducationId" name="removeEducationId" /> <button type="submit" class="btn btn-danger btn-block font-weight-bold rounded-custom"> Kaldır </button>
+                    }
+                    <hr />
+                    <button type="button" class="btn btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="education-confirm-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content" style="background: transparent;">
+                <div class="modal-body bg-light" style="border-radius: 25px;">
+                    <p>
+                        açıklama yapılacak
+                    </p>
+                    <hr />
+                    @using (Html.BeginForm("SendEducationDocument", "Education", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+                        <input type="hidden" id="confirmEducationId" name="confirmEducationId" />
+                        <input type="file" id="file" name="file" required class="form-control mb-1"> <div class="modal-footer pb-0 pt-1"> <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button> <input type="submit" value="Dökümanı yolla" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" /> </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="text-center"><div class="btn-group btn-block"><button class="btn btn-outline-primary rounded-custom btn-block font-weight-bold mb-2" type="button" id="dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Ayarlar <i class="fas fa-user-cog"></i></button> <div class="dropdown-menu btn-block mt-1 rounded-custom" aria-labelledby="dropdown"><button class="dropdown-item font-weight-bold text-center text-xl-left text-lg-left fontrem1" type="button" data-toggle="modal" data-target="#AccountSettings">Hesap ayarları</button><button class="dropdown-item font-weight-bold text-center text-xl-left text-lg-left fontrem1" type="button" data-toggle="modal" data-target="#ProfileSettings">Profil düzenleme</button></div> </div></div>
     <div class="modal fade" id="AccountSettings" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-lg modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light text-left" style="border-radius: 25px;"> <h3 class="font-weight-bold text-center text-black-50">Hesap ayarları</h3> <ul class="nav nav-tabs font-weight-bold justify-content-center" id="tab" role="tablist"> <li class="nav-item"> <a class="nav-link active" id="username-tab" data-toggle="tab" href="#username" role="tab" aria-controls="basic" aria-selected="true">Kullanıcı adı</a> </li><li class="nav-item"> <a class="nav-link" id="password-tab" data-toggle="tab" href="#password" role="tab" aria-controls="password" aria-selected="false">Parola</a> </li><li class="nav-item"> <a class="nav-link" id="email-tab" data-toggle="tab" href="#email" role="tab" aria-controls="email" aria-selected="false">Email</a> </li></ul> <div class="tab-content"> <div class="tab-pane fade show active" id="username" role="tabpanel" aria-labelledby="username-tab"> @await Component.InvokeAsync("EditUsername") </div><div class="tab-pane fade" id="password" role="tabpanel" aria-labelledby="password-tab"> @await Component.InvokeAsync("EditPassword") </div><div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab"> @await Component.InvokeAsync("EditEmail", new { Email = Model.Email }) </div></div></div></div></div></div>
     <div class="modal fade" id="ProfileSettings" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-lg modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light text-left" style="border-radius: 25px;"> <h3 class="font-weight-bold text-center text-black-50"> Profil düzenleme </h3> <ul class="nav nav-tabs font-weight-bold justify-content-center" id="tab" role="tablist"> <li class="nav-item"> <a class="nav-link active" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="true">Profil</a> </li><li class="nav-item"> <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">İletişim</a> </li></ul> <div class="tab-content"> <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profil-tab"> @await Component.InvokeAsync("ProfileBasic") </div><div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab"> @await Component.InvokeAsync("Contact") </div></div></div></div></div></div>
@@ -149,24 +190,7 @@ else
                     }
                     else
                     {
-                        <a class="text-warning small font-weight-bold" href="" data-toggle="modal" data-target="#education-confirm-@item.Id"><i class="fas fa-exclamation-circle"></i> Onaylatmak için tıklayın</a>
-
-                        <div class="modal fade" id="education-confirm-@item.Id" tabindex="-1" role="dialog" aria-hidden="true">
-                            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                                <div class="modal-content" style="background: transparent;">
-                                    <div class="modal-body bg-light" style="border-radius: 25px;">
-                                        <p>
-                                            açıklama yapılacak
-                                        </p>
-                                        @using (Html.BeginForm("SendEducationDocument", "Education", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                                        {
-                                            @Html.Hidden("Id", item.Id)
-                                            <input type="file" id="file" name="file" required class="form-control mb-1"> <div class="modal-footer pb-0 pt-1"> <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button> <input type="submit" value="Dökümanı yolla" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" /> </div>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <a class="text-warning small font-weight-bold" href="" onclick="getEducationInformationForConfirm('@item.Id')" data-toggle="modal"><i class="fas fa-exclamation-circle"></i> Onaylatmak için tıklayın</a>
                     }
                 }
                 else if (!item.IsConfirmed)
@@ -183,11 +207,13 @@ else
 }
 
 
-
 @if (IsAuthenticatedUserEqualModelUser)
 {
-
     <script>
+        function postEdit() {
+
+        }
+
         function getEducationInformationForEdit(id) {
             $.get("/api/education/get", { EducationId: id }).done(function (result) {
                 if (result.status === true) {
@@ -205,36 +231,18 @@ else
                 }
             });
         };
+
+        function getEducationInformationForConfirm(id) {
+            $.get("/api/education/get", { EducationId: id }).done(function (result) {
+                if (result.status === true) {
+                    $('#education-confirm-modal').modal('show');
+                    $("input[name='confirmEducationId']").val(id).trigger('change');
+                }
+            });
+        };
+
+
     </script>
 
-    <div class="modal fade" id="education-edit-modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content" style="background: transparent;">
-                <div class="modal-body bg-light" style="border-radius: 25px;" id="education-edit-modal-body">
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="modal fade" id="education-remove-modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-            <div class="modal-content" style="background: transparent;">
-                <div class="modal-body bg-light" style="border-radius: 25px;">
-                    <p class="text-md-center font-weight-bold text-black-50">
-                        Seçtiğiniz eğitiminiz kaldırılacak
-                    </p>
-                    <hr />
-                    @using (Html.BeginForm("RemoveEducation", "Education", FormMethod.Post))
-                    {
-                        <input type="hidden" id="removeEducationId" name="removeEducationId" /> <button type="submit" class="btn btn-danger btn-block font-weight-bold rounded-custom"> Kaldır </button>
-                    }
-                    <hr />
-                    <button type="button" class="btn btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
 }
