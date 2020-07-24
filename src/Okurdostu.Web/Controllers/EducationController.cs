@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -303,6 +304,17 @@ namespace Okurdostu.Web.Controllers
             }
 
             Response.Redirect("/" + AuthUser.Username);
+        }
+
+        public async Task<IActionResult> EditView([FromQuery] EducationModel educationModel)
+        {
+            if (educationModel.Department != "null")
+            {
+                educationModel.Universities = await Context.University.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
+            }
+
+            educationModel.ListYears();
+            return View(educationModel);
         }
     }
 }

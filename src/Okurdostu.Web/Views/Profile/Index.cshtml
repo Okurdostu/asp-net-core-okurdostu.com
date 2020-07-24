@@ -164,7 +164,7 @@ else
                 }
                 @if (IsAuthenticatedUserEqualModelUser)
                 {
-                    <div class="row"> <div class="col-auto" style="padding-right:3px"> <a class="btn btn-outline-info rounded-custom" href="" data-toggle="modal" data-target="#education-edit-@item.Id" style="cursor:pointer;"> <i class="far fa-edit mr-3 ml-3"></i> </a> </div><div class="col-auto" style="padding-left:3px;"> <a class="btn btn-outline-danger rounded-custom" href="" data-toggle="modal" data-target="#education-remove-@item.Id" style="cursor:pointer;"> <i class="fas fa-trash-alt mr-3 ml-3"></i> </a> </div></div>
+                    <div class="row"> <div class="col-auto" style="padding-right:3px"> <a class="btn btn-outline-info rounded-custom" href="" data-toggle="modal" onclick="getEducationInformationForEdit(@item.Id)"> <i class="far fa-edit mr-3 ml-3"></i> </a> </div><div class="col-auto" style="padding-left:3px;"> <a class="btn btn-outline-danger rounded-custom" href="" data-toggle="modal" data-target="#education-remove-@item.Id" style="cursor:pointer;"> <i class="fas fa-trash-alt mr-3 ml-3"></i> </a> </div></div>
                     <div class="modal fade" id="education-remove-@item.Id" tabindex="-1" role="dialog" aria-hidden="true">
                         <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
                             <div class="modal-content" style="background: transparent;">
@@ -175,7 +175,7 @@ else
                                     <hr />
                                     @using (Html.BeginForm("RemoveEducation", "Education", FormMethod.Post))
                                     {
-                                        <input type="hidden" id="Username" name="Username" value="@item.User.Username" /> 
+                                        <input type="hidden" id="Username" name="Username" value="@item.User.Username" />
                                         <input type="hidden" id="Id" name="Id" value="@item.Id" /> <button type="submit" class="btn btn-danger btn-block font-weight-bold rounded-custom"> Kaldır </button>
                                     }
                                     <hr />
@@ -184,10 +184,36 @@ else
                             </div>
                         </div>
                     </div>
-                    <div class="modal fade" id="education-edit-@item.Id" tabindex="-1" role="dialog" aria-hidden="true"> @await Component.InvokeAsync("EditEducation", new { EducationdId = item.Id }) </div>
                 }
             </div>
         </div>
     }
 }
 
+<div class="modal fade" id="education-edit-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content" style="background: transparent;">
+            <div class="modal-body bg-light" style="border-radius: 25px;" id="education-edit-modal-body">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (IsAuthenticatedUserEqualModelUser)
+{
+    <script>
+        function getEducationInformationForEdit(id) {
+            $.get("/api/education/get", { EducationId: id }).done(function (result) {
+                if (result.status === true) {
+                    $('#education-edit-modal').modal('show');
+                    $('#education-edit-modal-body').load("/education/editview/?ActivitiesSocieties=" + result.data.activitiesSocieties + "&Department=" + result.data.department + "&EducationId=" + result.data.educationId + "&Startyear=" + result.data.startyear + "&Finishyear=" + result.data.finishyear);
+                }
+                else {
+                    console.log(result.message);
+                    console.log(result.messageTitle);
+                }
+            });
+        };
+    </script>
+}
