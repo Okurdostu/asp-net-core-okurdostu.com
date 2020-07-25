@@ -1,39 +1,27 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Okurdostu.Data.Model;
 using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
-using Okurdostu.Web.Filters;
 using Okurdostu.Web.Models;
+using System;
 using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers.Api
 {
+    //api/education/{actionroutename}
     public class EducationController : ApiController
     {
-        [Route("get")]
-        public async Task<IActionResult> Get(long EducationId)
+        [Authorize, HttpGet("get")]
+        public async Task<IActionResult> Get(long EducationId) //get education informations
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
-            var AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-
-            if (AuthUser == null)
-            {
-                jsonReturnModel.Code = 401;
-                return Error(jsonReturnModel);
-            }
-
-            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == EducationId && !x.IsRemoved);
+            var AuthenticatedUserId = User.Identity.GetUserId();
+            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == EducationId && !x.IsRemoved && x.UserId == long.Parse(AuthenticatedUserId));
 
             if (Education != null)
             {
-
-                if (AuthUser.Id != Education.UserId)
-                {
-                    jsonReturnModel.Code = 403;
-                    return Error(jsonReturnModel);
-                }
-
                 var educationModel = new EducationModel
                 {
                     EducationId = EducationId,
@@ -42,7 +30,7 @@ namespace Okurdostu.Web.Controllers.Api
                     Finishyear = int.Parse(Education.EndYear),
                 };
 
-                if (educationModel.ActivitiesSocieties == null)
+                if (educationModel.ActivitiesSocieties == null || educationModel.ActivitiesSocieties == "undefined")
                 {
                     educationModel.ActivitiesSocieties = "";
                 }
@@ -58,99 +46,106 @@ namespace Okurdostu.Web.Controllers.Api
             else
             {
                 jsonReturnModel.Code = 404;
-                jsonReturnModel.MessageTitle = "Bulunamadı";
-                jsonReturnModel.Message = "Eğitim yok";
-
                 return Error(jsonReturnModel);
             }
 
             return Succes(jsonReturnModel);
         }
 
-        [ServiceFilter(typeof(ConfirmedEmailFilter))]
-        [HttpPost, Authorize, ValidateAntiForgeryToken]
-        [Route("postedit")]
-        public async Task<IActionResult> PostEdit(EducationModel Model)
+        [HttpPost("post"), Authorize, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Post(EducationModel Model)
         {
-            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Model.EducationId && !x.IsRemoved);
             var AuthenticatedUserId = User.Identity.GetUserId();
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
 
-            if (Education != null)
+            if (Model.Startyear > Model.Finishyear)
             {
-                if (Education.UserId == long.Parse(AuthenticatedUserId))
+                jsonReturnModel.Message = "Başlangıç yılı, bitiş yılından büyük olamaz";
+                jsonReturnModel.Code = 200;
+                return Error(jsonReturnModel);
+            }
+            else if (Model.Startyear < 1980 || Model.Startyear > DateTime.Now.Year || Model.Finishyear < 1980 || Model.Startyear > DateTime.Now.Year + 7)
+            {
+                jsonReturnModel.Message = "Başlangıç yılı, bitiş yılı ile alakalı bilgileri kontrol edip, tekrar deneyin";
+                jsonReturnModel.Code = 200;
+                return Error(jsonReturnModel);
+            }
+
+            if (Model.EducationId > 0 && !string.IsNullOrEmpty(Model.EducationId.ToString()))
+            {
+                var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Model.EducationId && !x.IsRemoved && long.Parse(AuthenticatedUserId) == x.UserId);
+
+                if (Education != null)
                 {
+                    Education.StartYear = Model.Startyear.ToString();
+                    Education.EndYear = Model.Finishyear.ToString();
+                    Education.ActivitiesSocieties = Model.ActivitiesSocieties;
+
                     if (Education.IsUniversityInformationsCanEditable())
                     {
                         Education.UniversityId = Model.UniversityId;
                         Education.Department = Model.Department;
                     }
-                    if (Model.Startyear <= Model.Finishyear)
-                    {
-                        Education.StartYear = Model.Startyear.ToString();
-                        Education.EndYear = Model.Finishyear.ToString();
-                    }
-
-                    Education.ActivitiesSocieties = Model.ActivitiesSocieties;
-                    try
-                    {
-                        var result = await Context.SaveChangesAsync();
-                        if (result > 0)
-                        {
-                            if (!(Model.Startyear <= Model.Finishyear))
-                            {
-                                jsonReturnModel.Message = "Başlangıç yılınız, bitiriş yılınızdan büyük olmamalı" +
-                                    "<br />" + "Bunlar dışında ki eğitim bilgileriniz düzenlendi";
-                                return Succes(jsonReturnModel);
-                            }
-                            else
-                            {
-                                jsonReturnModel.Message = "Eğitim bilgileriniz düzenlendi";
-                                return Succes(jsonReturnModel);
-                            }
-                        }
-                        else
-                        {
-                            if (!(Model.Startyear <= Model.Finishyear))
-                            {
-                                jsonReturnModel.Message = "Başlangıç yılınız, bitiriş yılınızdan büyük olmamalı";
-                            }
-                            else
-                            {
-                                jsonReturnModel.Message = "Bir değişiklik yapılmadı";
-                            }
-                            jsonReturnModel.Code = 1001;
-
-
-                            return Error(jsonReturnModel);
-                        }
-                    }
-                    catch (System.Exception e)
-                    {
-                        if (e.InnerException.Message.ToLower().Contains("department"))
-                        {
-                            jsonReturnModel.Code = 200;
-                            jsonReturnModel.Message = "Eğitimin bölümüyle alakalı bir şeylere ulaşamadık";
-                        }
-                        else if (e.InnerException.Message.ToLower().Contains("university"))
-                        {
-                            jsonReturnModel.Code = 200;
-                            jsonReturnModel.Message = "Eğitimin üniversitesi alakalı bir şeylere ulaşamadık";
-                        }
-
-                        return Error(jsonReturnModel);
-                    }
-
                 }
                 else
                 {
-                    jsonReturnModel.Code = 200;
-                    jsonReturnModel.Message = "McHammer: You can't touch this";
+                    jsonReturnModel.Code = 404;
                     return Error(jsonReturnModel);
                 }
             }
+            else 
+            {
+                var NewEducation = new UserEducation
+                {
+                    UserId = long.Parse(AuthenticatedUserId),
+                    UniversityId = Model.UniversityId,
+                    Department = Model.Department,
+                    ActivitiesSocieties = Model.ActivitiesSocieties,
+                    StartYear = Model.Startyear.ToString(),
+                    EndYear = Model.Finishyear.ToString(),
+                };
+                await Context.AddAsync(NewEducation);
+            }
+            try
+            {
+                var result = await Context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    jsonReturnModel.Message = "Eğitim bilgisi kaydedildi";
+                    return Succes(jsonReturnModel);
+                }
+                else
+                {
+                    jsonReturnModel.Message = "Bir işlem yapılmadı";
+                    jsonReturnModel.Code = 1001;
+                    return Error(jsonReturnModel);
+                }
+            }
+            catch (Exception e)
+            {
+                jsonReturnModel.Code = 200;
 
-            return Error(jsonReturnModel);
+                string innerMessage = (e.InnerException != null) ? e.InnerException.Message.ToLower() : "";
+
+                if (innerMessage.Contains("department"))
+                {
+                    jsonReturnModel.Message = "Bölüm bilgilerine ulaşamadık veya eksik";
+                }
+                else if (innerMessage.Contains("university"))
+                {
+                    jsonReturnModel.Message = "Üniversite bilgilerine ulaşamadık veya eksik";
+                }
+                else if (innerMessage.Contains("startyear") || innerMessage.Contains("endyear"))
+                {
+                    jsonReturnModel.Message = "Başlangıç veya bitiş yılını kontrol edin";
+                }
+                else
+                {
+                    jsonReturnModel.Message = "Başaramadık ve ne olduğunu bilmiyoruz, tekrar deneyin";
+                }
+
+                return Error(jsonReturnModel);
+            }
         }
     }
 }

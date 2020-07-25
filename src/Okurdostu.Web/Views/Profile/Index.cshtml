@@ -32,11 +32,7 @@
         </div>
     }
 
-    <div class="modal fade" id="education-edit-modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light" style="border-radius: 25px;" id="education-edit-modal-body"> </div> </div>
-        </div>
-    </div>
+
     <div class="modal fade" id="education-remove-modal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
             <div class="modal-content" style="background: transparent;">
@@ -147,7 +143,15 @@
 @if (IsAuthenticatedUserEqualModelUser)
 {
     <hr class="mb-1" />
-    <div class="row"> <div class="col-auto"> <h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim</h4> </div><div class="col"> <div class="float-right"> <a class="btn od rounded-custom p-0 font-weight-bold" data-toggle="modal" data-target="#AddEducation" style="cursor:pointer; font-size:18px"><i class="fas fa-plus"></i> Eğitim</a> </div></div><div class="modal fade" id="AddEducation" tabindex="-1" role="dialog" aria-hidden="true"> @await Component.InvokeAsync("AddEducation") </div></div>
+    <div class="row">
+        <div class="col-auto"><h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim</h4></div>
+        <div class="col">
+            <div class="float-right">
+                <a class="btn od rounded-custom p-0 font-weight-bold" data-toggle="modal" data-target="#AddEducation" style="cursor: pointer; font-size: 18px;"><i class="fas fa-plus"></i> Eğitim</a>
+            </div>
+        </div>
+        <div class="modal fade" id="AddEducation" tabindex="-1" role="dialog" aria-hidden="true">@await Component.InvokeAsync("AddEducation")</div>
+    </div>
 }
 else
 {
@@ -207,12 +211,95 @@ else
 }
 
 
+@Html.AntiForgeryToken()
 @if (IsAuthenticatedUserEqualModelUser)
 {
+    <div class="modal fade" id="education-edit-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light" style="border-radius: 25px;" id="education-edit-modal-body"> </div> </div>
+        </div>
+    </div>
     <script>
-        function postEdit() {
+        var validatetoken = $("input[name=__RequestVerificationToken]").val();
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            timer: 3000,
+            showConfirmButton: false,
+            timerProgressBar: true,
+            onOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
 
-        }
+        var universityId;
+        var department;
+        var activitiesSocieties;
+        var startYear;
+        var finishYear;
+        var educationId;
+
+        $(document).on('submit', '#edit-education-form', function (evt) {
+            evt.preventDefault();
+            universityId = $("#edit-education-form select[name=UniversityId]").val();
+            department = $("#edit-education-form input[name=Department]").val();
+            activitiesSocieties = $("#edit-education-form input[name=ActivitiesSocieties]").val();
+            startYear = $("#edit-education-form select[name=Startyear]").val();
+            finishYear = $("#edit-education-form select[name=Finishyear]").val();
+            educationId = $("#edit-education-form input[name=EducationId]").val();
+
+            if (department != null && department.length <= 0) {
+                Toast.fire({
+                    icon: 'warning',
+                    html: '<span class="font-weight-bold text-black-50 ml-1">Bölümünüzü yazmalısınız</span>'
+                });
+            }
+            else {
+                apiEducationPost();
+            }
+        });
+        $('#add-education-form').submit(function (evt) {
+            evt.preventDefault();
+            universityId = $("#add-education-form select[name=UniversityId]").val();
+            department = $("#add-education-form input[name=Department]").val();
+            activitiesSocieties = $("#add-education-form input[name=ActivitiesSocieties]").val();
+            startYear = $("#add-education-form select[name=Startyear]").val();
+            finishYear = $("#add-education-form select[name=Finishyear]").val();
+            educationId = $("#add-education-form input[name=EducationId]").val();
+
+            if (department != null && department.length <= 0) {
+                Toast.fire({
+                    icon: 'warning',
+                    html: '<span class="font-weight-bold text-black-50 ml-1">Bölümünüzü yazmalısınız</span>'
+                });
+            }
+            else {
+                apiEducationPost();
+            }
+        });
+
+        function apiEducationPost() {
+            $.post("/api/education/post", { UniversityId: universityId, Department: department, ActivitiesSocieties: activitiesSocieties, Startyear: startYear, Finishyear: finishYear, EducationId: educationId, __RequestVerificationToken: validatetoken })
+                .done(function (result) {
+                    if (result.status === true) {
+                        $('#edit-education-button').prop('disabled', true);
+                        $('#add-education-button').prop('disabled', true);
+                        Toast.fire({
+                            icon: 'success',
+                            html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+                        });
+                        //yenilemek yerine bir eğitimlerin olduğu component'i yeniden çağırmam lazım
+                        setTimeout(function () { location.reload(); }, 3000)
+                    }
+                    else {
+                        Toast.fire({
+                            icon: 'warning',
+                            html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+                        });
+                    }
+                });
+        };
 
         function getEducationInformationForEdit(id) {
             $.get("/api/education/get", { EducationId: id }).done(function (result) {
@@ -241,8 +328,5 @@ else
             });
         };
 
-
     </script>
-
-
 }
