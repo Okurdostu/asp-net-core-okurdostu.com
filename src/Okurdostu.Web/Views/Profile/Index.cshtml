@@ -33,22 +33,7 @@
     }
 
 
-    <div class="modal fade" id="education-remove-modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-            <div class="modal-content" style="background: transparent;">
-                <div class="modal-body bg-light" style="border-radius: 25px;">
-                    <p class="text-md-center font-weight-bold text-black-50"> Seçtiğiniz eğitiminiz kaldırılacak </p>
-                    <hr />
-                    @using (Html.BeginForm("RemoveEducation", "Education", FormMethod.Post))
-                    {
-                        <input type="hidden" id="removeEducationId" name="removeEducationId" /> <button type="submit" class="btn btn-danger btn-block font-weight-bold rounded-custom"> Kaldır </button>
-                    }
-                    <hr />
-                    <button type="button" class="btn btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
     <div class="modal fade" id="education-confirm-modal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content" style="background: transparent;">
@@ -219,7 +204,20 @@ else
             <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light" style="border-radius: 25px;" id="education-edit-modal-body"> </div> </div>
         </div>
     </div>
-    
-}
 
-<script src="~/js/profileEducation.js"></script>
+    <div class="modal fade" id="education-remove-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content" style="background: transparent;">
+                <div class="modal-body bg-light" style="border-radius: 25px;">
+                    <p class="text-md-center font-weight-bold text-black-50"> Seçtiğiniz eğitiminiz kaldırılacak </p>
+                    <hr />
+                    <button type="submit" class="btn btn-danger btn-block font-weight-bold rounded-custom" onclick="deleteEducation()">Kaldır</button>
+                    <hr />
+                    <button type="button" class="btn btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/js/profileEducation.js"></script>
+}

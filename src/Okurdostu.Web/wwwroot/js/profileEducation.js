@@ -99,21 +99,39 @@ function apiEducationPost() {
             }
         });
 };
+var _educationIdForRemove;
 
 function getEducationInformationForRemove(id) {
     $.get("/api/education/get", { EducationId: id }).done(function (result) {
         if (result.status === true) {
             $('#education-remove-modal').modal('show');
-            $("input[name='removeEducationId']").val(id).trigger('change');
+            _educationIdForRemove = id;
+
         }
     });
 };
 
-function getEducationInformationForConfirm(id) {
-    $.get("/api/education/get", { EducationId: id }).done(function (result) {
+
+function deleteEducation() {
+
+    $.post("/api/education/post", { educationIdForRemove: _educationIdForRemove, __RequestVerificationToken: validatetoken }).done(function (result) {
         if (result.status === true) {
-            $('#education-confirm-modal').modal('show');
-            $("input[name='confirmEducationId']").val(id).trigger('change');
+
+            Toast.fire({
+                icon: 'success',
+                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+            });
+
+        }
+        else if (result.message != null) {
+
+            Toast.fire({
+                icon: 'info',
+                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+            });
+
         }
     });
+
+    setTimeout(function () { location.reload(); }, 2000)
 };
