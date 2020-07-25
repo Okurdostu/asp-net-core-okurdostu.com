@@ -10,7 +10,16 @@
     }
 }
 @{ ViewData["Title"] = Model.Title + " @" + Model.User.Username + " | Okurdostu"; ViewData["OGDescription"] = "Bir öğrencinin ihtiyaç kampanyası: " + Model.Title; ViewData["Description"] = "Bir öğrencinin ihtiyaç kampanyası: " + Model.Title; Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml"; }
-
+@Html.AntiForgeryToken()
+<script>
+    var validatetoken = $("input[name=__RequestVerificationToken]").val();
+</script>
+@if (Model.ShouldBeCheck)
+{
+    <script>
+        $.post("/needcheck", { needId: @Model.Id, __RequestVerificationToken: validatetoken }).done(function (result) { if (result.isPageNeedRefresh == true) { location.reload(); } });
+    </script>
+}
 @if (IsAuthenticatedUserEqualModelUser && !Model.IsCompleted)
 {
     <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
@@ -21,12 +30,23 @@
 @if (!Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUserEqualModelUser)
 {
     <p class="font-weight-bold text-black-50 text-center">İkinci aşama</p><div class="small"> <p class="font-weight-bold text-black-50"> Merhaba dostum.<br /> İhtiyacınız olan hedefler için para toplamaya çok yakınsınız.<br /> İlk başta şunları bilmelisiniz: </p><p class="font-weight-bold text-black-50"> 1.İhtiyaç kampanyanız için 3 adet hedef belirleyebilirsiniz.<br /> 2.İhtiyaç kampanyanızı başlatmak için en az bir hedef belirlemelisiniz <br /> 3.İhtiyaç kampanyanıza hedef eklemek için biraz aşağıda ki kısmı kullanabilirsiniz <br /> 4.Bu sayfadayken, ihtiyaç kampayanızı (başlık, açıklama) düzenleyip, gözden geçirebilirsiniz. </p><hr /> <div class="text-center"> <button class="btn btn-outline-primary rounded-custom font-weight-bold" href="" data-toggle="modal" data-target="#confirm" style="cursor:pointer;"> <i class="fas fa-approval"></i> Onaylama </button> <span class="font-weight-bold text-black-50"> <br /> İhtiyaç kampanyanızı hazır olduğunu düşünüyorsanız artık her hangi bir hedef eklemek veya çıkarmak gibi bir kararsızlığınız yoksa onay için yollayabilirsiniz. </span> </div></div>
-<hr/> <div class="modal fade" id="confirm" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light" style="border-radius: 25px;"> <h4 class="text-center text-black-50"> Onaylama </h4> <hr/> <div> <p class="text-black-50 font-weight-bold text-md-left text-center"> Seçtiğiniz başlığa ve hedeflerinize son bir kez göz atıp onay için yollayabilirsiniz. </p>
+    <hr />
+    <div class="modal fade" id="confirm" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal modal-dialog-centered" role="document">
+            <div class="modal-content" style="background: transparent;">
+                <div class="modal-body bg-light" style="border-radius: 25px;">
+                    <h4 class="text-center text-black-50"> Onaylama </h4> <hr /> <div>
+                        <p class="text-black-50 font-weight-bold text-md-left text-center"> Seçtiğiniz başlığa ve hedeflerinize son bir kez göz atıp onay için yollayabilirsiniz. </p>
                         @using (Html.BeginForm("SendToConfirmation", "Need", FormMethod.Post))
                         {
                             @Html.Hidden("NeedId", Model.Id) <button type="submit" class="btn btn-primary btn-block font-weight-bold rounded-custom"> Tamamdır, onay için yolla </button>
                         }
-<hr/> <button type="button" class="btn btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button> </div></div></div></div></div>
+                        <hr /> <button type="button" class="btn btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUserEqualModelUser)
 {
@@ -62,9 +82,9 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
         @await Component.InvokeAsync("NeedDescriptionSupporter", new { need = Model })
     </div>
 
-    @Html.AntiForgeryToken()
+
     <script type="text/javascript">
-        var validatetoken = $("input[name=__RequestVerificationToken]").val(); var oldDataFromComments = "oldDataFromComments"; var newDataFromComments = "newDataFromComments";
+        var oldDataFromComments = "oldDataFromComments"; var newDataFromComments = "newDataFromComments";
         function GetComments(scrollingTargetId) {
             $.post("/Comment/Comments", { Id: @Model.Id, __RequestVerificationToken: validatetoken })
                 .done(function (newDataFromComments) {
@@ -78,21 +98,17 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                     }
                     oldDataFromComments = newDataFromComments;
                 });
-        }; GetComments(); setInterval(function () { GetComments(); }, 5000);
+        };
+
+        $('#pills-comment-tab').click(function () {
+            GetComments();
+        });
+
+        setInterval(function () { GetComments(); }, 15000);
+
         $("#ShowLikers").on("click", function () {$.post("/Like/Likers", { id: '@Model.Id', username: '@Model.User.Username', __RequestVerificationToken: validatetoken }).done(function (likers) { $("#Likers").html(likers) }); });
     </script>
-    @if (Model.ShouldBeCheck)
-    {
-        <script>
-            $.post("/needcheck", { needId: @Model.Id, __RequestVerificationToken: validatetoken })
-            .done(function(result) {
-                if (result.isPageNeedRefresh == true)
-                {
-                    location.reload();
-                }
-            });
-        </script>
-    }
+
     @if (!HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
     {
         <script>
@@ -108,7 +124,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                 $("#loginsignup").modal('show');
             }
         </script>
-        <script type="text/javascript"> $(document).ready(function(){function n(){$("#LikeCount").load("/like/count/@Model.Id")}n(),setInterval(function(){n()},5e3)}); </script>
+        <script type="text/javascript"> $(document).ready(function(){function n(){$("#LikeCount").load("/like/count/@Model.Id")}n(),setInterval(function(){n()},15000)}); </script>
         <div class="modal fade" id="loginsignup" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body p-0" style="border-radius: 25px;"> <div class="shadow p-2 bg-white rounded-custom mt-5 mb-5"> <div class="mt-5 mb-5 text-center font-weight-bold text-black-50" id="loginsignup-modal-info"> <h3 class="mb-1 rounded-custom"><i class="fas fa-heart od"></i> </h3> <p>Kampanyayı sevgin ile destekle</p></div><a class="btn-block btn-purple font-weight-bold text-center" href="/girisyap?ReturnUrl=@HttpContextAccessor.HttpContext.Request.Path"> Giriş yap </a> <a class="btn-block btn-purple font-weight-bold text-center" href="/kaydol?ReturnUrl=@HttpContextAccessor.HttpContext.Request.Path"> Kaydol </a> <center class="mt-2"> <button type="button" class="btn w-75 btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Sonra bakarız yaa</button> </center> </div></div></div></div></div>
     }
     else
@@ -117,50 +133,52 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
         <partial name="~/Views/Comment/_DoReplyPartial.cshtml" model="null" />
         <div class="modal fade" id="delete-comment" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-sm modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light text-center" style="border-radius: 25px;"> <p class="font-weight-bold text-black-50"> Sildiğiniz içerik sonsuza kadar yok olacak </p><button id="delete" class="btn btn-block btn-danger rounded-custom font-weight-bold mb-1 mt-1">Sil</button> <button class="btn btn-block btn-outline-secondary rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button> </div></div></div></div>
         <script type="text/javascript">
-                function LikeRefresh() {
-                    $.ajax({
-                        url: "/like/LikeState/@Model.Id",
-                        type: "Get",
-                        contentType: "application/json;",
-                        success: function (bool) {
-                            bool ? $("#Like").html("<h3 class='unlike mb-0 rounded-custom'><i class='fas fa-heart'></i></h3>") : $("#Like").html("<h3 class='like mb-0 rounded-custom'><i class='far fa-heart'></i></h3>");
-                        },
-                    }),
-                        $("#LikeCount").load("/like/count/@Model.Id");
-                };
-                LikeRefresh();
-                setInterval(function () { LikeRefresh(); }, 10000);
+            function LikeRefresh() {
+                $.ajax({
+                    url: "/like/LikeState/@Model.Id",
+                    type: "Get",
+                    contentType: "application/json;",
+                    success: function (bool) {
+                        bool ? $("#Like").html("<h3 class='unlike mb-0 rounded-custom'><i class='fas fa-heart'></i></h3>") : $("#Like").html("<h3 class='like mb-0 rounded-custom'><i class='far fa-heart'></i></h3>");
+                    },
+                }),
+                    $("#LikeCount").load("/like/count/@Model.Id");
+            };
+            LikeRefresh();
 
-                //do comment (post, controller: Comment, Action: Comment)
-                $("#DoComment").click(function () {
-                    if ($("#Comment").val().length <= 100) {
-                        $.post("/Comment/Comment", { NeedId: @Model.Id, Comment: $("#Comment").val(), __RequestVerificationToken: validatetoken })
-                            .done(function (result) {
-                                if (result.id.length > 0) {
-                                    GetComments(result.id);
-                                    $("#Comment").val("");
-                                }
-                                else if (result.errorMesage.length > 0) {
-                                    swal("Tartışma başlatma", result.errorMesage, "error", {
-                                        button: "Tamam",
-                                        timer: 2500
-                                    });
-                                }
-                                else if (result.infoMessage.length > 0) {
-                                    swal("Tartışma başlatma", result.infoMessage, "info", {
-                                        button: "Tamam",
-                                        timer: 2500
-                                    });
-                                }
-                            });
-                    }
-                    else {
-                        swal("Tartışma başlatma", "En fazla 100 karakter", "info", {
-                            button: "Tamam",
-                            timer: 2500
+            setInterval(function () { LikeRefresh(); }, 10000);
+
+            //do comment (post, controller: Comment, Action: Comment)
+            $("#DoComment").click(function () {
+                if ($("#Comment").val().length <= 100) {
+                    $.post("/Comment/Comment", { NeedId: @Model.Id, Comment: $("#Comment").val(), __RequestVerificationToken: validatetoken })
+                        .done(function (result) {
+                            if (result.id.length > 0) {
+                                GetComments(result.id);
+                                $("#Comment").val("");
+                            }
+                            else if (result.errorMesage.length > 0) {
+                                swal("Tartışma başlatma", result.errorMesage, "error", {
+                                    button: "Tamam",
+                                    timer: 2500
+                                });
+                            }
+                            else if (result.infoMessage.length > 0) {
+                                swal("Tartışma başlatma", result.infoMessage, "info", {
+                                    button: "Tamam",
+                                    timer: 2500
+                                });
+                            }
                         });
-                    }
-                });
+                }
+                else {
+                    swal("Tartışma başlatma", "En fazla 100 karakter", "info", {
+                        button: "Tamam",
+                        timer: 2500
+                    });
+                }
+            });
+
             //do reply (post, controller: Comment, Action: Comment)
             $("#DoReply").click(function () {
                 var ReplyComment = $("#ReplyComment").val();
@@ -176,6 +194,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                         timer: 2500
                     });
                 }
+
                 else {
                     $.post("/Comment/Comment", { RelatedCommentId: ReplyingCommentId, Comment: $("#ReplyComment").val(), __RequestVerificationToken: validatetoken })
                         .done(function (result) {
@@ -199,15 +218,16 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                         });
                 }
             });
-                $("#Like").on("click", function () {
-                    $.ajax({
-                        type: "POST",
-                        url: "/like",
-                        data: { id: "@Model.Id", username: "@Model.User.Username" },
-                        dataType: "json",
-                        success() { LikeRefresh(); },
-                    });
+
+            $("#Like").on("click", function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/like",
+                    data: { id: "@Model.Id", username: "@Model.User.Username" },
+                    dataType: "json",
+                    success() { LikeRefresh(); },
                 });
+            });
         </script>
     }
 }

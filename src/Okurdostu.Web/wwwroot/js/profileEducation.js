@@ -8,13 +8,15 @@ const Toast = Swal.mixin({
 });
 
 var oldUniversityId, oldEducationId, oldDepartment, oldActivitiesSocieties, oldStartYear, oldFinishYear;
-function getEducationInformationForEdit(id) {
+
+function getModalToEditEducation(id) {
     $.get("/api/education/get", { EducationId: id }).done(function (result) {
         if (result.status === true) {
             oldUniversityId = result.data.universityId; oldActivitiesSocieties = result.data.activitiesSocieties;
             oldDepartment = result.data.department; oldEducationId = result.data.educationId;
             oldStartYear = result.data.startyear; oldFinishYear = result.data.finishyear;
             //gelen verileri old olarak alıyoruz ki edit ederken değişiklik yapılmış mı kontrol edilip ona göre post yollasın diye.
+
             $('#education-edit-modal').modal('show');
             $('#education-edit-modal-body').load("/education/editview/?ActivitiesSocieties=" + result.data.activitiesSocieties + "&Department=" + result.data.department + "&UniversityId=" + result.data.universityId + "&EducationId=" + result.data.educationId + "&Startyear=" + result.data.startyear + "&Finishyear=" + result.data.finishyear + "&AreUniversityorDepartmentCanEditable=" + result.data.areUniversityorDepartmentCanEditable);
         }
@@ -22,7 +24,7 @@ function getEducationInformationForEdit(id) {
 };
 
 var universityId, educationId, department, activitiesSocieties, startYear, finishYear;
-
+//edit
 $(document).on('submit', '#edit-education-form', function (evt) {
     evt.preventDefault();
     universityId = $("#edit-education-form select[name=UniversityId]").val();
@@ -40,13 +42,6 @@ $(document).on('submit', '#edit-education-form', function (evt) {
     }
     else {
         if (universityId != oldUniversityId || department != oldDepartment || educationId != oldEducationId || activitiesSocieties != oldActivitiesSocieties || startYear != oldStartYear || finishYear != oldFinishYear) {
-            console.log(universityId + ' ' + oldUniversityId);
-            console.log(department + ' ' + oldDepartment);
-            console.log(educationId + ' ' + oldEducationId);
-            console.log(activitiesSocieties + ' ' + oldActivitiesSocieties);
-            console.log(startYear + ' ' + oldStartYear);
-            console.log(finishYear + ' ' + oldFinishYear);
-
             apiEducationPost();
         }
         else {
@@ -57,7 +52,7 @@ $(document).on('submit', '#edit-education-form', function (evt) {
         }
     }
 });
-
+//add
 $('#add-education-form').submit(function (evt) {
     evt.preventDefault();
     universityId = $("#add-education-form select[name=UniversityId]").val();
@@ -99,9 +94,12 @@ function apiEducationPost() {
             }
         });
 };
+
+
+//remove
 var _educationIdForRemove;
 
-function getEducationInformationForRemove(id) {
+function getModalToRemoveEducation(id) {
     $.get("/api/education/get", { EducationId: id }).done(function (result) {
         if (result.status === true) {
             $('#education-remove-modal').modal('show');
@@ -111,17 +109,15 @@ function getEducationInformationForRemove(id) {
     });
 };
 
-
-function deleteEducation() {
-
+function removeEducation() {
     $.post("/api/education/post", { educationIdForRemove: _educationIdForRemove, __RequestVerificationToken: validatetoken }).done(function (result) {
         if (result.status === true) {
-
+            $('#education-remove-modal').modal('hide');
+            $('#education-' + _educationIdForRemove).attr('style', 'display:none;');
             Toast.fire({
                 icon: 'success',
                 html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
             });
-
         }
         else if (result.message != null) {
 
@@ -130,8 +126,29 @@ function deleteEducation() {
                 html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
             });
 
+            setTimeout(function () { location.reload(); }, 2000)
         }
     });
 
-    setTimeout(function () { location.reload(); }, 2000)
 };
+//remove
+
+function getModalToRemoveEducation(id) {
+    $.get("/api/education/get", { EducationId: id }).done(function (result) {
+        if (result.status === true) {
+            $('#education-remove-modal').modal('show');
+            _educationIdForRemove = id;
+
+        }
+    });
+};
+
+var _educationIdForRemove;
+function getModalToConfirmFile(id){
+    $.get("/api/education/get", { EducationId: id }).done(function (result) {
+        if (result.status === true) {
+            $('#education-confirm-modal').modal('show');
+            $('#confirmEducationId').val(id).trigger('change');
+        }
+    });
+}

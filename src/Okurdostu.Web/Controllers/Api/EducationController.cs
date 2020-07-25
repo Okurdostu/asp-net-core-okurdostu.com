@@ -81,7 +81,7 @@ namespace Okurdostu.Web.Controllers.Api
             var AuthenticatedUserId = User.Identity.GetUserId();
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
 
-            if (educationIdForRemove > 0)
+            if (educationIdForRemove > 0) //deleting a education information
             {
                 var deletedEducation = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == educationIdForRemove && !x.IsRemoved && long.Parse(AuthenticatedUserId) == x.UserId);
 
@@ -141,7 +141,7 @@ namespace Okurdostu.Web.Controllers.Api
                 }
             }
 
-            if (Model.Startyear > Model.Finishyear)
+            if (Model.Startyear > Model.Finishyear) 
             {
                 jsonReturnModel.Message = "Başlangıç yılı, bitiş yılından büyük olamaz";
                 jsonReturnModel.Code = 200;
@@ -154,7 +154,7 @@ namespace Okurdostu.Web.Controllers.Api
                 return Error(jsonReturnModel);
             }
 
-            if (Model.EducationId > 0)
+            if (Model.EducationId > 0) //editing a education information
             {
                 var editedEducation = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Model.EducationId && !x.IsRemoved && long.Parse(AuthenticatedUserId) == x.UserId);
 
@@ -176,7 +176,7 @@ namespace Okurdostu.Web.Controllers.Api
                     return Error(jsonReturnModel);
                 }
             }
-            else
+            else //adding a new education information
             {
                 var NewEducation = new UserEducation
                 {
@@ -190,7 +190,7 @@ namespace Okurdostu.Web.Controllers.Api
                 await Context.AddAsync(NewEducation);
             }
 
-            try
+            try //db savechanges, editing and adding
             {
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
