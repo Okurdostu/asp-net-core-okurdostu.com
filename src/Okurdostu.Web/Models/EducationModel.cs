@@ -11,10 +11,11 @@ public class EducationModel
     public long EducationId { get; set; } //it's for edit UserEducation[Table] : Id
     [Required(ErrorMessage = "Başlangıç yılı seçmelisiniz")]
     public int Startyear { get; set; }
+
     [Required(ErrorMessage = "Bitiş yılı seçmelisiniz")]
     public int Finishyear { get; set; }
 
-    [Required(ErrorMessage = "Bölümünüz girmelisiniz")]
+    [Required(ErrorMessage = "Bölümünüzü yazmalısınız")]
     [MaxLength(50, ErrorMessage = "En fazla 50 karakter")]
     [Display(Name = "Bölüm")]
     public string Department { get; set; }
@@ -23,6 +24,7 @@ public class EducationModel
     [Display(Name = "Aktiviteler veya topluluklar")]
     public string ActivitiesSocieties { get; set; }
 
+    public bool AreUniversityorDepartmentCanEditable { get; set; }
     [Required]
     public List<SelectListItem> Universities { get; set; } //sabit bir veri bloguna bağlanabilir.
 

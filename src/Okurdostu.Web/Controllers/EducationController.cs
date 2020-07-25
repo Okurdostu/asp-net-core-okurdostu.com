@@ -245,11 +245,7 @@ namespace Okurdostu.Web.Controllers
 
         public async Task<IActionResult> EditView([FromQuery] EducationModel educationModel)
         {
-            if (educationModel.Department != "undefined")
-            {
-                educationModel.Universities = await Context.University.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
-            }
-
+            educationModel.Universities = await Context.University.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToListAsync();
             educationModel.ListYears();
             return View(educationModel);
         }

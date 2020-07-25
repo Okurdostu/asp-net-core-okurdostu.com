@@ -24,21 +24,18 @@ namespace Okurdostu.Web.Controllers.Api
             {
                 var educationModel = new EducationModel
                 {
+                    UniversityId = Education.UniversityId,
+                    Department = Education.Department,
                     EducationId = EducationId,
                     ActivitiesSocieties = Education.ActivitiesSocieties,
                     Startyear = int.Parse(Education.StartYear),
                     Finishyear = int.Parse(Education.EndYear),
+                    
                 };
-
+                educationModel.AreUniversityorDepartmentCanEditable = Education.AreUniversityorDepartmentCanEditable();
                 if (educationModel.ActivitiesSocieties == null || educationModel.ActivitiesSocieties == "undefined")
                 {
                     educationModel.ActivitiesSocieties = "";
-                }
-
-                if (Education.IsUniversityInformationsCanEditable())
-                {
-                    educationModel.UniversityId = Education.UniversityId;
-                    educationModel.Department = Education.Department;
                 }
 
                 jsonReturnModel.Data = educationModel;
@@ -81,7 +78,7 @@ namespace Okurdostu.Web.Controllers.Api
                     Education.EndYear = Model.Finishyear.ToString();
                     Education.ActivitiesSocieties = Model.ActivitiesSocieties;
 
-                    if (Education.IsUniversityInformationsCanEditable())
+                    if (Education.AreUniversityorDepartmentCanEditable())
                     {
                         Education.UniversityId = Model.UniversityId;
                         Education.Department = Model.Department;
@@ -93,7 +90,7 @@ namespace Okurdostu.Web.Controllers.Api
                     return Error(jsonReturnModel);
                 }
             }
-            else 
+            else
             {
                 var NewEducation = new UserEducation
                 {

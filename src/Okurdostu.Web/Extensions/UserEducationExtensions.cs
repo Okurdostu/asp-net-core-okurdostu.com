@@ -4,9 +4,9 @@ namespace Okurdostu.Web.Extensions
 {
     public static class UserEducationExtensions
     {
-        public static bool IsUniversityInformationsCanEditable(this UserEducation edu)
+        public static bool AreUniversityorDepartmentCanEditable(this UserEducation edu)
         {
-            return !edu.IsConfirmed && !edu.IsRemoved;
+            return edu.IsConfirmed == false && edu.IsRemoved == false;
         }
     }
 }
