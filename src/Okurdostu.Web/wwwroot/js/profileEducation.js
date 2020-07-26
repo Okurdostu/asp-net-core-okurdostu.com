@@ -129,10 +129,9 @@ function removeEducation() {
             setTimeout(function () { location.reload(); }, 2000)
         }
     });
-
 };
 //remove
-
+var _educationIdForRemove;
 function getModalToRemoveEducation(id) {
     $.get("/api/education/get/" + id).done(function (result) {
         if (result.status === true) {
@@ -143,12 +142,59 @@ function getModalToRemoveEducation(id) {
     });
 };
 
-var _educationIdForRemove;
+var _educationIdForDocument;
+var documentFile;
+
 function getModalToConfirmFile(id) {
     $.get("/api/education/get/" + id).done(function (result) {
         if (result.status === true) {
             $('#education-confirm-modal').modal('show');
-            $('#confirmEducationId').val(id).trigger('change');
+            _educationIdForDocument = id;
         }
     });
 }
+
+function sendDocument() {
+    var formData = new FormData();
+    formData.append('File', $('#educationDocument')[0].files[0]);
+    formData.append('educationId', _educationIdForDocument);
+
+    $.ajax({
+            type:'POST',
+            url: "/api/educationdocument/post",
+            data: formData,
+            processData: false,
+            contentType: false,
+            type: "POST",
+            success: function (result) {
+                if (result.status === true) {
+                    Toast.fire({
+                        icon: 'success',
+                        html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+                    });
+                    setTimeout(function () { location.reload(); }, 2000)
+                }
+                else if(result.message != null) {
+                    Toast.fire({
+                        icon: 'error',
+                        html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+                    });
+                }
+            }
+        }
+    );
+}
+
+$('#send-education-document').click(function () {
+    documentFile = $('#educationDocument').prop('files')[0];
+
+    if (documentFile != null) {
+        sendDocument();
+    }
+    else {
+        Toast.fire({
+            icon: 'warning',
+            html: '<span class="font-weight-bold text-black-50 ml-1">' + 'Dosya seçmelisiniz' + '</span>'
+        });
+    }
+});

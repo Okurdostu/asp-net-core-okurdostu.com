@@ -38,7 +38,7 @@ namespace Okurdostu.Web.Controllers.Api
             }
         }
 
-        [Authorize, HttpGet("get/{EducationId}")] //api/education/list/EducationId
+        [Authorize, HttpGet("get/{EducationId}")] //api/education/get/EducationId
         public async Task<IActionResult> Get(long EducationId) //get education informations
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
@@ -240,12 +240,12 @@ namespace Okurdostu.Web.Controllers.Api
 
             if (AppUser != null)
             {
-                var Educations = await Context.UserEducation.Where(x => x.UserId == AppUser.Id && !x.IsRemoved).Select(x => new
+                var Educations = await Context.UserEducation.Where(x => x.UserId == AppUser.Id).Select(x => new
                 {
                     x.Id,
                     x.EndYear,
                     x.StartYear,
-                    //x.IsRemoved,
+                    x.IsRemoved,
                     x.IsConfirmed,
                     x.IsActiveEducation,
                     x.IsSentToConfirmation,

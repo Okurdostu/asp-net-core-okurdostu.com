@@ -122,7 +122,7 @@ else
     <hr class="mb-1" />
     <h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim</h4>
 }
-@if (Model.UserEducation.Where(x=> !x.IsRemoved).ToList().Count == 0)
+@if (Model.UserEducation.Where(x => !x.IsRemoved).ToList().Count == 0)
 {
     <h5 class="text-black-50 text-center">Eğitim bilgisi yok</h5>
 }
@@ -204,15 +204,14 @@ else
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content" style="background: transparent;">
                 <div class="modal-body bg-light" style="border-radius: 25px;">
+                    <h3>Eğitim dökümanı yollama</h3>
+                    <hr class="mb-1" />
                     <p>
                         açıklama yapılacak
                     </p>
                     <hr class="mb-1" />
-                    @using (Html.BeginForm("SendEducationDocument", "Education", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                    {
-                        <input type="hidden" id="confirmEducationId" name="confirmEducationId" />
-                        <input type="file" id="file" name="file" required class="form-control mb-1"> <div class="modal-footer pb-0 pt-1"> <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button> <input type="submit" value="Dökümanı yolla" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" /> </div>
-                    }
+                        <input id="educationId" name="educationId" hidden="hidden" value="test" />
+                        <input type="file" id="educationDocument" name="educationDocument" class="form-control mb-1"> <div class="modal-footer pb-0 pt-1"> <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button> <input type="submit" id="send-education-document" value="Dökümanı yolla" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" /> </div>
                 </div>
             </div>
         </div>
