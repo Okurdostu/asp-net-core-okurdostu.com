@@ -61,7 +61,7 @@ namespace Okurdostu.Web.Controllers
             return false;
         }
         [NonAction]
-        public async Task AddItemOnDBAndFixTotalCharge(Guid needId, string link, string name, decimal price, string picture, string platformName)
+        public async Task AddNeedItemAndFixTotalCharge(Guid needId, string link, string name, decimal price, string picture, string platformName)
         {
             var NeedItem = new NeedItem
             {
@@ -394,7 +394,7 @@ namespace Okurdostu.Web.Controllers
                         Udemy = Udemy.Product(ItemLink);
                         if (Udemy.Error == null)
                         {
-                            await AddItemOnDBAndFixTotalCharge(Need.Id, Udemy.Link, Udemy.Name, (decimal)Udemy.Price, "/image/udemy.png", "Udemy");
+                            await AddNeedItemAndFixTotalCharge(Need.Id, Udemy.Link, Udemy.Name, (decimal)Udemy.Price, "/image/udemy.png", "Udemy");
                         }
                         else
                         {
@@ -410,7 +410,7 @@ namespace Okurdostu.Web.Controllers
                             Pandora = Pandora.Product(ItemLink);
                             if (Pandora.Error == null)
                             {
-                                await AddItemOnDBAndFixTotalCharge(Need.Id, Pandora.Link, Pandora.Name, (decimal)Pandora.Price, Pandora.Picture, "Pandora");
+                                await AddNeedItemAndFixTotalCharge(Need.Id, Pandora.Link, Pandora.Name, (decimal)Pandora.Price, Pandora.Picture, "Pandora");
                             }
                             else
                             {
@@ -429,7 +429,7 @@ namespace Okurdostu.Web.Controllers
                         Amazon = Amazon.Product(ItemLink);
                         if (Amazon.Error == null)
                         {
-                            await AddItemOnDBAndFixTotalCharge(Need.Id, Amazon.Link, Amazon.Name, (decimal)Amazon.Price, "/image/amazon.png", "Amazon");
+                            await AddNeedItemAndFixTotalCharge(Need.Id, Amazon.Link, Amazon.Name, (decimal)Amazon.Price, "/image/amazon.png", "Amazon");
                         }
                         else
                         {

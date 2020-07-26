@@ -131,6 +131,7 @@ function removeEducation() {
     });
 };
 //remove
+
 var _educationIdForRemove;
 function getModalToRemoveEducation(id) {
     $.get("/api/education/get/" + id).done(function (result) {

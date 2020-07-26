@@ -140,8 +140,7 @@ namespace Okurdostu.Web.Extensions
             //      1.500,00 olarak döndürmek için kullanılıyor
             price = price.Replace(".", ",");
 
-            string DeletedLast2Digit = price[0..^2];
-            return DeletedLast2Digit.Length >= 7 ? AddDot(DeletedLast2Digit) : DeletedLast2Digit;
+            return price.Substring(0, price.Length - 2).Length >= 7 ? AddDot(price.Substring(0, price.Length - 2)) : price.Substring(0, price.Length - 2);
         }
         private static string AddDot(string price)
         {

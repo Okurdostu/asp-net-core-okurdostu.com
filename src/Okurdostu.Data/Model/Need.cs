@@ -14,6 +14,8 @@ namespace Okurdostu.Data
             IsConfirmed = false;
             IsRemoved = false;
             IsWrong = false;
+            TotalCharge = 0;
+            TotalCollectedMoney = 0;
 
             NeedComment = new HashSet<NeedComment>();
             NeedItem = new HashSet<NeedItem>();
