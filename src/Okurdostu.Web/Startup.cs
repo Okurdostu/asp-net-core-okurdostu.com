@@ -26,6 +26,11 @@ namespace Okurdostu.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc()
+             .AddJsonOptions(options => {
+                 options.JsonSerializerOptions.IgnoreNullValues = true;
+             });
+
             services.AddRazorPages();
             services.AddSingleton<IEmailConfiguration>(Configuration.GetSection("Email").Get<EmailConfiguration>());
 
@@ -34,6 +39,7 @@ namespace Okurdostu.Web
                 {
                     options.Cookie.Name = "okurdostu-authentication";
                     options.LoginPath = "/girisyap";
+                    options.AccessDeniedPath = "/";
 
                     options.ExpireTimeSpan = System.TimeSpan.FromDays(1);
                     options.SlidingExpiration = true;

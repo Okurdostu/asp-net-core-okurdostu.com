@@ -78,15 +78,14 @@
                 <div> <a href="/girisyap"><i class="fas fa-sign-in-alt"></i> <span>Giriş yap</span></a> </div>}
         </div>
         }
-        <div class="content">
-            <div class="row">
-                <div class="pt-3 pr-2 pl-2 pb-3 col rounded-custom shadow rounded-custom">
-                    @RenderBody()
-                </div>
+    <div class="content">
+        <div class="row">
+            <div class="pt-3 pr-2 pl-2 pb-3 col rounded-custom shadow rounded-custom">
+                @RenderBody()
             </div>
- <div class="text-center mt-2 small"> <div> <a class="od font-weight-bold" href="/">Okurdostu</a> </div><div> <div class="row"> 
-     <div class="col"> @if (Context.Request.Path.Value.ToLower()=="/beta"){<a class="font-weight-bold text-black-50" href="" data-toggle="modal" data-target="#Feedback" style="cursor:pointer;">Geri bildirim</a>}else{<a class="font-weight-bold text-black-50" href="/beta#Feedback">Geri bildirim</a>}</div><div class="col"> <a class="font-weight-bold text-black-50" href="/beta/kullanim">Nasıl kullanabilirim?</a> </div><div class="col"> <a class="font-weight-bold text-black-50" href="/SSS">SSS</a> </div></div><a class="font-weight-bold text-black-50 " href="/kullanici-sozlesmesi">Kullanıcı sözleşmesi</a> <br/> <a class="font-weight-bold text-black-50 " href="/gizlilik-politikasi">Gizlilik politikası</a> </div></div>
         </div>
+        <div class="text-center mt-2 small"> <div><a class="od font-weight-bold" href="/">Okurdostu</a></div><div> <div class="row"> <div class="col"> @if (Context.Request.Path.Value.ToLower()=="/beta"){<a class="font-weight-bold text-black-50" href="" data-toggle="modal" data-target="#Feedback" style="cursor:pointer;">Geri bildirim</a>}else{<a class="font-weight-bold text-black-50" href="/beta#Feedback">Geri bildirim</a>}</div><div class="col"><a class="font-weight-bold text-black-50 " href="/kullanici-sozlesmesi">Kullanıcı sözleşmesi</a><br/><a class="font-weight-bold text-black-50 " href="/gizlilik-politikasi">Gizlilik politikası</a></div><div class="col"><a class="font-weight-bold text-black-50" href="/SSS">SSS</a></div></div></div></div>
+    </div>
     </div>
     @if (IsAuthenticated)
     {

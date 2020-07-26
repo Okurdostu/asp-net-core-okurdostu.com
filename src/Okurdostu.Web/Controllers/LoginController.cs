@@ -14,7 +14,9 @@ namespace Okurdostu.Web.Controllers
     public class LoginController : BaseController<LoginController>
     {
         [Route("Girisyap")]
-        public IActionResult Index()
+#pragma warning disable IDE0060 // Remove unused parameter
+        public IActionResult Index(string ReturnUrl)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             return HttpContext.User.Identity.IsAuthenticated ? (IActionResult)Redirect("/") : View();
         }
