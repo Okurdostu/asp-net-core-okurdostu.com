@@ -62,14 +62,14 @@
             if (IsAuthenticatedUserEqualModelUser)
             {<a data-toggle="modal" data-target="#profile-photo" style="cursor:pointer;"><img src="@Model.PictureUrl" class="profil-image img-thumbnail rounded-pill mb-2" style="width:150px; height:150px;" /></a> }
             else
-            { <img src="@Model.PictureUrl" class="profil-image img-thumbnail rounded-pill mb-2" style="width:150px; height:150px;" /> }
+            { <img src="@Model.PictureUrl" class="img-thumbnail rounded-pill mb-2" style="width:150px; height:150px;" /> }
         }
         else
         {
             if (IsAuthenticatedUserEqualModelUser)
             { <a data-toggle="modal" data-target="#profile-photo" style="cursor:pointer;"> <img src="~/svg/user.svg" class="profil-image img-thumbnail rounded-pill mb-2" style="width:150px; max-height:150px;" /> </a> }
             else
-            { <img src="~/svg/user.svg" class="profil-image img-thumbnail rounded-pill mb-2" style="width:150px; max-height:150px;" />}
+            { <img src="~/svg/user.svg" class="img-thumbnail rounded-pill mb-2" style="width:150px; max-height:150px;" />}
         }
         @if (Model.ContactEmail != null || Model.Twitter != null || Model.Github != null)
         {
@@ -133,11 +133,11 @@ else
         <div id="education-@item.Id">
             <hr class="mb-2 mt-2" />
             <div class="row pr-3 egitim">
-                <div class="col-auto pr-0 pl-2">
+                <div class="col-auto pr-0 pl-2 egitim">
                     @if (item.University.LogoUrl != null)
-                    {<a href="/universite/@item.University.FriendlyName"> <img src="@item.University.LogoUrl" class="profil-image rounded-pill" style="width:100px;" /> </a> }
+                    {<a href="/universite/@item.University.FriendlyName"> <img src="@item.University.LogoUrl" class="rounded-pill" style="width:100px;" /> </a> }
                     else
-                    { <a href="/universite/@item.University.FriendlyName"> <img src="~/svg/building.svg" class="profil-image rounded-pill" style="width:100px;" /> </a>}
+                    { <a href="/universite/@item.University.FriendlyName"> <img src="~/svg/building.svg" class="rounded-pill" style="width:100px;" /> </a>}
                 </div>
                 <div class="col p-0">
                     <h5>
@@ -204,14 +204,15 @@ else
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content" style="background: transparent;">
                 <div class="modal-body bg-light" style="border-radius: 25px;">
-                    <h3>Eğitim dökümanı yollama</h3>
+                    <h3 class="text-black-50 text-center">Döküman yollama</h3>
                     <hr class="mb-1" />
-                    <p>
+                    <p class="p-0 font-weight-bold">
                         açıklama yapılacak
                     </p>
-                    <hr class="mb-1" />
+                    <hr class="mb-1 mt-1" />
                         <input id="educationId" name="educationId" hidden="hidden" value="test" />
-                        <input type="file" id="educationDocument" name="educationDocument" class="form-control mb-1"> <div class="modal-footer pb-0 pt-1"> <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button> <input type="submit" id="send-education-document" value="Dökümanı yolla" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" /> </div>
+                        <input type="file" id="educationDocument" name="educationDocument" class="form-control mb-1"> 
+                    <div class="modal-footer pb-0 pt-1"> <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button> <input type="submit" id="send-education-document" value="Yolla" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" /> </div>
                 </div>
             </div>
         </div>
