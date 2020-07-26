@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Okurdostu.Web.Models
 {
     public class NeedModel
     {
-        public long Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required(ErrorMessage = "Bir başlık yazmalısınız")]
         [MaxLength(75, ErrorMessage = "Başlık en fazla 75 karakter olmalı")]

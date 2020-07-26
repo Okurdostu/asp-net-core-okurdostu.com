@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Okurdostu.Data;
-using Okurdostu.Data.Model;
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -58,7 +58,7 @@ namespace Okurdostu.Web
             var authUserId = User?.Identity?.GetUserId();
             if (authUserId != null)
             {
-                var AuthenticatedUser = await Context.User.FirstOrDefaultAsync(x => x.Id == long.Parse(authUserId) && x.IsActive);
+                var AuthenticatedUser = await Context.User.FirstOrDefaultAsync(x => x.Id == Guid.Parse(authUserId) && x.IsActive);
                 //if user did any changing on their profile
                 if (AuthenticatedUser.LastChangedOn.ToString() != User.Identity.GetLastChangedOn()) 
                 {

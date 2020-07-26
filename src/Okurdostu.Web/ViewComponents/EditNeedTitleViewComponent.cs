@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data;
 using Okurdostu.Web.Models;
+using System;
 using System.Threading.Tasks;
 
 namespace Okurdostu.Web.ViewComponents
@@ -12,7 +13,7 @@ namespace Okurdostu.Web.ViewComponents
 
         private readonly OkurdostuContext Context;
         public EditNeedTitleViewComponent(OkurdostuContext _context) => Context = _context;
-        public async Task<IViewComponentResult> InvokeAsync(long Id)
+        public async Task<IViewComponentResult> InvokeAsync(Guid Id)
         {
             var Need = await Context.Need.FirstOrDefaultAsync(x => x.Id == Id);
             

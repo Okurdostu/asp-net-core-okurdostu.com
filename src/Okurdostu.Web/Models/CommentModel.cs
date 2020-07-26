@@ -5,7 +5,7 @@ namespace Okurdostu.Web.Models
 {
     public class CommentModel
     {
-        public long? NeedId { get; set; }
+        public Guid? NeedId { get; set; }
         public Guid? RelatedCommentId { get; set; }
 
         [Required(ErrorMessage = "Bir şeyler yazmalısın")]

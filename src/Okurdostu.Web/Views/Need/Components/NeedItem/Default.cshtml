@@ -1,4 +1,4 @@
-﻿@model Okurdostu.Data.Model.Need
+﻿@model Okurdostu.Data.Need
 
 @{
     var UnRemovedItemList = Model.NeedItem.Where(x => x.IsRemoved == false).ToList();
@@ -27,7 +27,7 @@
 <div class="pl-1 text-black-50 text-break">
     @if (Model.NeedItem != null)
     {
-        foreach (Okurdostu.Data.Model.NeedItem Item in UnRemovedItemList)
+        foreach (Okurdostu.Data.NeedItem Item in UnRemovedItemList)
         {
             <div class="row pt-1">
                 @if (Item.Picture.ToLower() == "udemy")

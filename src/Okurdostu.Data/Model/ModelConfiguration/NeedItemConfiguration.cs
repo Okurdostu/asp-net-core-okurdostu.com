@@ -1,12 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Okurdostu.Data.Model.ModelConfiguration
+namespace Okurdostu.Data.ModelConfiguration
 {
     public class NeedItemConfiguration : IEntityTypeConfiguration<NeedItem>
     {
         public void Configure(EntityTypeBuilder<NeedItem> entity)
         {
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
 
             entity.Property(e => e.Link).IsRequired();
 

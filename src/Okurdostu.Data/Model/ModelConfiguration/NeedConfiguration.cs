@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Okurdostu.Data.Model.ModelConfiguration
+namespace Okurdostu.Data.ModelConfiguration
 {
     public class NeedConfiguration : IEntityTypeConfiguration<Need>
     {
@@ -11,19 +11,21 @@ namespace Okurdostu.Data.Model.ModelConfiguration
                     .HasName("Unique_Key_Title")
                     .IsUnique();
 
+            entity.Property(e => e.Id).ValueGeneratedNever();
+
+            entity.Property(e => e.CreatedOn).HasColumnType("smalldatetime");
+
             entity.Property(e => e.Description).IsRequired();
 
+            entity.Property(e => e.FinishedOn).HasColumnType("smalldatetime");
 
             entity.Property(e => e.FriendlyTitle)
                 .IsRequired()
                 .HasMaxLength(200);
 
-
-            entity.Property(e => e.CreatedOn).HasColumnType("smalldatetime");
+            entity.Property(e => e.LastCheckOn).HasColumnType("datetime");
 
             entity.Property(e => e.StartedOn).HasColumnType("smalldatetime");
-
-            entity.Property(e => e.FinishedOn).HasColumnType("smalldatetime");
 
             entity.Property(e => e.Title)
                 .IsRequired()
@@ -31,10 +33,11 @@ namespace Okurdostu.Data.Model.ModelConfiguration
 
             entity.Property(e => e.TotalCharge).HasColumnType("money");
 
+            entity.Property(e => e.TotalCollectedMoney).HasColumnType("money");
+
             entity.HasOne(d => d.User)
                 .WithMany(p => p.Need)
                 .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Need_User");
         }
     }

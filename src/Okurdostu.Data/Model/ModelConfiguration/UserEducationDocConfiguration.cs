@@ -1,12 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Okurdostu.Data.Model.ModelConfiguration
+namespace Okurdostu.Data.ModelConfiguration
 {
     public class UserEducationDocConfiguration : IEntityTypeConfiguration<UserEducationDoc>
     {
         public void Configure(EntityTypeBuilder<UserEducationDoc> entity)
         {
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
 
             entity.Property(e => e.CreatedOn).HasColumnType("smalldatetime");
 
@@ -14,11 +16,11 @@ namespace Okurdostu.Data.Model.ModelConfiguration
 
             entity.Property(e => e.PathAfterRoot).IsRequired();
 
-            entity.HasOne(d => d.UserEducation)
-                .WithMany(p => p.UserEducationDoc)
-                .HasForeignKey(d => d.UserEducationId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_UserEducationDoc_UserEducation");
+            entity.Property(e => e.UserEducationId)
+                .IsRequired()
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasDefaultValueSql("((0))");
 
         }
     }

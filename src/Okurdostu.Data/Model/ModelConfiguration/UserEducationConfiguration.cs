@@ -1,12 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Okurdostu.Data.Model.ModelConfiguration
+namespace Okurdostu.Data.ModelConfiguration
 {
     public class UserEducationConfiguration : IEntityTypeConfiguration<UserEducation>
     {
         public void Configure(EntityTypeBuilder<UserEducation> entity)
         {
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
 
             entity.Property(e => e.ActivitiesSocieties).HasMaxLength(200);
 

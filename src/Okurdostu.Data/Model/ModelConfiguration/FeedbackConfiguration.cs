@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Okurdostu.Data.Model.ModelConfiguration
+namespace Okurdostu.Data.ModelConfiguration
 {
     public class FeedbackConfiguration : IEntityTypeConfiguration<Feedback>
     {
         public void Configure(EntityTypeBuilder<Feedback> entity)
         {
+            entity.Property(e => e.Id).ValueGeneratedNever();
 
             entity.Property(e => e.CreatedOn).HasColumnType("datetime");
 

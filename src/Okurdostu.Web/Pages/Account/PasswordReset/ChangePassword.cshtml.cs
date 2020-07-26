@@ -35,7 +35,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
             if (_UserPaswordReset != null)
             {
                 var elapsedTime = DateTime.Now - _UserPaswordReset.CreatedOn;
-                if (elapsedTime.Value.Hours < 12)
+                if (elapsedTime.Hours < 12)
                 {
                     TempData["Guid"] = _UserPaswordReset.GUID;
                     return Page();
@@ -69,7 +69,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                 {
                     var elapsedTime = DateTime.Now - _UserPaswordReset.CreatedOn;
 
-                    if (elapsedTime.Value.Hours < 12)
+                    if (elapsedTime.Hours < 12)
                     {
                         var User = await Context.User.FirstOrDefaultAsync(x => x.Id == _UserPaswordReset.UserId);
                         if (User != null && User.IsActive)

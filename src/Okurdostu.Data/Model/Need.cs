@@ -1,26 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Okurdostu.Data.Model
+namespace Okurdostu.Data
 {
     public partial class Need
     {
         public Need()
         {
+            Id = Guid.NewGuid();
             CreatedOn = DateTime.Now;
             IsSentForConfirmation = false;
             IsCompleted = false;
             IsConfirmed = false;
             IsRemoved = false;
             IsWrong = false;
+            TotalCharge = 0;
+            TotalCollectedMoney = 0;
 
+            NeedComment = new HashSet<NeedComment>();
             NeedItem = new HashSet<NeedItem>();
             NeedLike = new HashSet<NeedLike>();
-            NeedComment = new HashSet<NeedComment>();
         }
 
-        public long Id { get; set; }
-        public long UserId { get; set; }
+        public Guid Id { get; private set; }
+        public Guid UserId { get; set; }
         public string Title { get; set; }
         public string FriendlyTitle { get; set; }
         public string Description { get; set; }
@@ -35,7 +38,6 @@ namespace Okurdostu.Data.Model
         public DateTime? FinishedOn { get; set; }
         public DateTime? LastCheckOn { get; set; }
         public bool IsWrong { get; set; }
-
         public bool ShouldBeCheck
         {
             get

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Okurdostu.Data.Model;
+using Okurdostu.Data;
 using Okurdostu.Web.Models;
 using System;
 using System.Linq;
@@ -38,7 +38,7 @@ namespace Okurdostu.Web.Controllers
                     {
                         Comment = Model.Comment,
                         UserId = AuthUser.Id,
-                        NeedId = (long)Model.NeedId
+                        NeedId = (Guid)Model.NeedId
                     };
                     await Context.AddAsync(NewComment);
                     await Context.SaveChangesAsync();
@@ -170,7 +170,7 @@ namespace Okurdostu.Web.Controllers
 
 
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Comments(long Id)
+        public async Task<IActionResult> Comments(Guid Id)
         {
             var result = await Context.NeedComment.Where(x => x.NeedId == Id).Include(x => x.User).OrderBy(x => x.CreatedOn).ToListAsync();
             return View(result);

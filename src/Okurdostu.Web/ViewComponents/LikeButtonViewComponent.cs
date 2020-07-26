@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,7 +12,7 @@ namespace Okurdostu.Web.ViewComponents
     {
         private readonly OkurdostuContext Context;
         public LikeButtonViewComponent(OkurdostuContext _context) => Context = _context;
-        public async Task<IViewComponentResult> InvokeAsync(long id)
+        public async Task<IViewComponentResult> InvokeAsync(Guid id)
         {
             var AuthUser = await Context.User.FirstOrDefaultAsync(x => x.Id.ToString() == User.Identity.GetUserId());
             bool isLiked = false;

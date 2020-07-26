@@ -1,8 +1,7 @@
-﻿using Okurdostu.Data.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace Okurdostu.Data.Model
+namespace Okurdostu.Data
 {
     public partial class NeedComment
     {
@@ -11,14 +10,15 @@ namespace Okurdostu.Data.Model
             Id = Guid.NewGuid();
             CreatedOn = DateTime.Now;
             IsRemoved = false;
+
             InverseRelatedComment = new HashSet<NeedComment>();
         }
 
-        public Guid Id { get; set; }
+        public Guid Id { get; private set; }
         public string Comment { get; set; }
         public Guid? RelatedCommentId { get; set; }
-        public long NeedId { get; set; }
-        public long? UserId { get; set; }
+        public Guid NeedId { get; set; }
+        public Guid? UserId { get; set; }
         public bool IsRemoved { get; set; }
         public DateTime CreatedOn { get; set; }
         public string HowLongPassed

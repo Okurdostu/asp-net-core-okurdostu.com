@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Okurdostu.Data.Model;
+using Okurdostu.Data;
 using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Filters;
@@ -39,11 +39,11 @@ namespace Okurdostu.Web.Controllers.Api
         }
 
         [Authorize, HttpGet("get/{EducationId}")] //api/education/get/EducationId
-        public async Task<IActionResult> Get(long EducationId) //get education informations
+        public async Task<IActionResult> Get(Guid EducationId) //get education informations
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
             var AuthenticatedUserId = User.Identity.GetUserId();
-            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == EducationId && !x.IsRemoved && x.UserId == long.Parse(AuthenticatedUserId));
+            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == EducationId && !x.IsRemoved && x.UserId == Guid.Parse(AuthenticatedUserId));
 
             if (Education != null)
             {
@@ -76,18 +76,18 @@ namespace Okurdostu.Web.Controllers.Api
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))] //api/education/post?EducationId=....&Somevalue=...
         [HttpPost("post"), Authorize, ValidateAntiForgeryToken] //deleting, adding, editing a education information
-        public async Task<IActionResult> Post(EducationModel Model, long educationIdForRemove)
+        public async Task<IActionResult> Post(EducationModel Model, Guid educationIdForRemove)
         {
             var AuthenticatedUserId = User.Identity.GetUserId();
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
 
-            if (educationIdForRemove > 0) //deleting a education information
+            if (educationIdForRemove != Guid.Empty) //deleting a education information
             {
-                var deletedEducation = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == educationIdForRemove && !x.IsRemoved && long.Parse(AuthenticatedUserId) == x.UserId);
+                var deletedEducation = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == educationIdForRemove && !x.IsRemoved && Guid.Parse(AuthenticatedUserId) == x.UserId);
 
                 if (deletedEducation != null)
                 {
-                    var AuthUserActiveNeedCount = Context.Need.Where(x => !x.IsRemoved && x.UserId == long.Parse(AuthenticatedUserId)).Count();
+                    var AuthUserActiveNeedCount = Context.Need.Where(x => !x.IsRemoved && x.UserId == Guid.Parse(AuthenticatedUserId)).Count();
                     if (deletedEducation.IsActiveEducation && AuthUserActiveNeedCount > 0)
                     {
                         jsonReturnModel.Code = 200;
@@ -154,9 +154,9 @@ namespace Okurdostu.Web.Controllers.Api
                 return Error(jsonReturnModel);
             }
 
-            if (Model.EducationId > 0) //editing a education information
+            if (Model.EducationId != Guid.Empty) //editing a education information
             {
-                var editedEducation = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Model.EducationId && !x.IsRemoved && long.Parse(AuthenticatedUserId) == x.UserId);
+                var editedEducation = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Model.EducationId && !x.IsRemoved && Guid.Parse(AuthenticatedUserId) == x.UserId);
 
                 if (editedEducation != null)
                 {
@@ -180,7 +180,7 @@ namespace Okurdostu.Web.Controllers.Api
             {
                 var NewEducation = new UserEducation
                 {
-                    UserId = long.Parse(AuthenticatedUserId),
+                    UserId = Guid.Parse(AuthenticatedUserId),
                     UniversityId = Model.UniversityId,
                     Department = Model.Department,
                     ActivitiesSocieties = Model.ActivitiesSocieties,

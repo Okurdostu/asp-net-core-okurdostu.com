@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data;
-using Okurdostu.Data.Model;
 using Okurdostu.Web.Models;
 using System.Collections.Generic;
 using System.Linq;

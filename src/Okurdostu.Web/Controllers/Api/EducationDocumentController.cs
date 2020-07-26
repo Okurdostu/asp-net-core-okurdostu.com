@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Okurdostu.Data.Model;
+using Okurdostu.Data;
 using Okurdostu.Web.Base;
 using Okurdostu.Web.Models;
 using System;
@@ -39,7 +39,7 @@ namespace Okurdostu.Web.Controllers.Api
         }
 
         [Authorize, HttpPost("post")] //api/educationdocument/post?educationId=..
-        public async Task<IActionResult> Post(long educationId, IFormFile File)
+        public async Task<IActionResult> Post(Guid educationId, IFormFile File)
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
 
@@ -71,7 +71,7 @@ namespace Okurdostu.Web.Controllers.Api
                 return Error(jsonReturnModel);
             }
 
-            var AuthenticatedUserId = long.Parse(User.Identity.GetUserId());
+            var AuthenticatedUserId = Guid.Parse(User.Identity.GetUserId());
 
             var Education = await Context.UserEducation.FirstOrDefaultAsync(
                x => x.Id == educationId

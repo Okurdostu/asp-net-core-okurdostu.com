@@ -1,24 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Okurdostu.Data.Model
+namespace Okurdostu.Data
 {
     public partial class User
     {
         public User()
         {
+            Id = Guid.NewGuid();
             IsEmailConfirmed = false;
             IsActive = true;
             CreatedOn = DateTime.Now;
             LastChangedOn = DateTime.Now;
 
             Need = new HashSet<Need>();
+            NeedComment = new HashSet<NeedComment>();
             NeedLike = new HashSet<NeedLike>();
             UserEducation = new HashSet<UserEducation>();
-            NeedComment = new HashSet<NeedComment>();
+            UserEmailConfirmation = new HashSet<UserEmailConfirmation>();
+            UserPasswordReset = new HashSet<UserPasswordReset>();
         }
 
-        public long Id { get; private set; }
+        public Guid Id { get; private set; }
         public string Username { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
@@ -35,8 +38,10 @@ namespace Okurdostu.Data.Model
         public DateTime LastChangedOn { get; set; }
 
         public virtual ICollection<Need> Need { get; set; }
+        public virtual ICollection<NeedComment> NeedComment { get; set; }
         public virtual ICollection<NeedLike> NeedLike { get; set; }
         public virtual ICollection<UserEducation> UserEducation { get; set; }
-        public virtual ICollection<NeedComment> NeedComment { get; set; }
+        public virtual ICollection<UserEmailConfirmation> UserEmailConfirmation { get; set; }
+        public virtual ICollection<UserPasswordReset> UserPasswordReset { get; set; }
     }
 }

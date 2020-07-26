@@ -1,4 +1,4 @@
-﻿@model Okurdostu.Data.Model.Need
+﻿@model Okurdostu.Data.Need
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
 @{ bool IsAuthenticatedUserEqualModelUser = false; ViewData["NeedsActiveClass"] = "active";}
 @{
@@ -17,7 +17,7 @@
 @if (Model.ShouldBeCheck)
 {
     <script>
-        $.post("/needcheck", { needId: @Model.Id, __RequestVerificationToken: validatetoken }).done(function (result) { if (result.isPageNeedRefresh == true) { location.reload(); } });
+        $.post("/needcheck", { needId: '@Model.Id', __RequestVerificationToken: validatetoken }).done(function (result) { if (result.isPageNeedRefresh == true) { location.reload(); } });
     </script>
 }
 @if (IsAuthenticatedUserEqualModelUser && !Model.IsCompleted)
@@ -86,7 +86,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
     <script type="text/javascript">
         var oldDataFromComments = "oldDataFromComments"; var newDataFromComments = "newDataFromComments";
         function GetComments(scrollingTargetId) {
-            $.post("/Comment/Comments", { Id: @Model.Id, __RequestVerificationToken: validatetoken })
+            $.post("/Comment/Comments", { Id: '@Model.Id', __RequestVerificationToken: validatetoken })
                 .done(function (newDataFromComments) {
                     if (newDataFromComments != oldDataFromComments) {
                         $("#comments").html(newDataFromComments)
@@ -151,7 +151,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
             //do comment (post, controller: Comment, Action: Comment)
             $("#DoComment").click(function () {
                 if ($("#Comment").val().length <= 100) {
-                    $.post("/Comment/Comment", { NeedId: @Model.Id, Comment: $("#Comment").val(), __RequestVerificationToken: validatetoken })
+                    $.post("/Comment/Comment", { NeedId: '@Model.Id', Comment: $("#Comment").val(), __RequestVerificationToken: validatetoken })
                         .done(function (result) {
                             if (result.id.length > 0) {
                                 GetComments(result.id);
