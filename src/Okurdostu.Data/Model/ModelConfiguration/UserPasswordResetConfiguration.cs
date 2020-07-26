@@ -1,16 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Okurdostu.Data.Model.ModelConfiguration
+namespace Okurdostu.Data.ModelConfiguration
 {
     public class UserPasswordResetConfiguration : IEntityTypeConfiguration<UserPasswordReset>
     {
         public void Configure(EntityTypeBuilder<UserPasswordReset> entity)
         {
 
-            entity.HasKey(e => e.Guid);
+            entity.HasKey(e => e.GUID);
 
-            entity.Property(e => e.Guid)
+            entity.Property(e => e.GUID)
                 .HasColumnName("GUID")
                 .ValueGeneratedNever();
 

@@ -84,7 +84,7 @@ namespace Okurdostu.Web.Controllers
                     SenderName = "Halil İbrahim Kocaöz"
                 };
 
-                Email.Send(Email.NewUserMail(User.FullName, User.Email, _UserEmailConfirmation.Guid));
+                Email.Send(Email.NewUserMail(User.FullName, User.Email, _UserEmailConfirmation.GUID));
 
                 return string.IsNullOrEmpty(ReturnUrl) ? Redirect("/beta") : Redirect(ReturnUrl);
             }

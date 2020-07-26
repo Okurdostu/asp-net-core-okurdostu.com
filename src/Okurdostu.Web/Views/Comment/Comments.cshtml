@@ -1,13 +1,13 @@
-﻿@model List<Okurdostu.Data.Model.NeedComment>
+﻿@model List<Okurdostu.Data.NeedComment>
 @{ Layout = null; }
 
 @if (Model != null)
 {
     @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
-    long AuthenticatedUserId = 0;
+    Guid AuthenticatedUserId = Guid.Empty;
     if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
     {
-        AuthenticatedUserId = long.Parse(HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value);
+        AuthenticatedUserId = Guid.Parse(HttpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value);
     }
     <style>
         .comments-vertical-line {

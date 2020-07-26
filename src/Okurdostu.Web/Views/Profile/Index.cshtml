@@ -1,4 +1,4 @@
-﻿@model Okurdostu.Data.Model.User
+﻿@model Okurdostu.Data.User
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
 @{ bool IsAuthenticatedUserEqualModelUser = false; }
 @{
@@ -168,7 +168,7 @@ else
                     }
                     @if (IsAuthenticatedUserEqualModelUser)
                     {
-                        <div class="row"> <div class="col-auto" style="padding-right:3px"> <a class="btn btn-outline-info rounded-custom" href="" data-toggle="modal" onclick="getModalToEditEducation(@item.Id)"> <i class="far fa-edit mr-3 ml-3"></i> </a> </div><div class="col-auto" style="padding-left:3px;"> <a class="btn btn-outline-danger rounded-custom" href="" data-toggle="modal" onclick="getModalToRemoveEducation(@item.Id)"> <i class="fas fa-trash-alt mr-3 ml-3"></i> </a> </div></div>
+                        <div class="row"> <div class="col-auto" style="padding-right:3px"> <a class="btn btn-outline-info rounded-custom" href="" data-toggle="modal" onclick="getModalToEditEducation('@item.Id')"> <i class="far fa-edit mr-3 ml-3"></i> </a> </div><div class="col-auto" style="padding-left:3px;"> <a class="btn btn-outline-danger rounded-custom" href="" data-toggle="modal" onclick="getModalToRemoveEducation('@item.Id')"> <i class="fas fa-trash-alt mr-3 ml-3"></i> </a> </div></div>
                     }
                 </div>
             </div>

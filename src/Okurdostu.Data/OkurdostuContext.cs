@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data;
-using Okurdostu.Data.Model.ModelConfiguration;
+using Okurdostu.Data.ModelConfiguration;
 
 namespace Okurdostu.Data
 {

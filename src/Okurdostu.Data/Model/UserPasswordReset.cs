@@ -7,13 +7,13 @@ namespace Okurdostu.Data
     {
         public UserPasswordReset()
         {
-            Guid = new Guid();
+            GUID = new Guid();
             CreatedOn = DateTime.Now;
             IsUsed = false;
         }
 
         [Key]
-        public Guid Guid { get; private set; }
+        public Guid GUID { get; private set; }
         public Guid UserId { get; set; }
         public bool IsUsed { get; set; }
         public DateTime CreatedOn { get; set; }

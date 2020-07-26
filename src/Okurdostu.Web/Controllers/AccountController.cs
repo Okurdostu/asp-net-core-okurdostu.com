@@ -79,7 +79,7 @@ namespace Okurdostu.Web.Controllers
                 Guid confirmationGuid = Guid.Empty;
                 if (_UserEmailConfirmation != null)
                 {
-                    confirmationGuid = _UserEmailConfirmation.Guid;
+                    confirmationGuid = _UserEmailConfirmation.GUID;
                 }
                 else
                 {
@@ -89,7 +89,7 @@ namespace Okurdostu.Web.Controllers
                     };
                     await Context.AddAsync(newUserEmailConfirmation);
                     await Context.SaveChangesAsync();
-                    confirmationGuid = newUserEmailConfirmation.Guid;
+                    confirmationGuid = newUserEmailConfirmation.GUID;
                 }
 
                 Email.Send(Email.NewUserMail(AuthUser.FullName, AuthUser.Email, confirmationGuid));
@@ -182,7 +182,7 @@ namespace Okurdostu.Web.Controllers
                             var result = await Context.SaveChangesAsync();
                             if (result > 0)
                             {
-                                Email.Send(Email.EmailAddressChangeMail(AuthUser.FullName, UserEmailConfirmation.NewEmail, UserEmailConfirmation.Guid));
+                                Email.Send(Email.EmailAddressChangeMail(AuthUser.FullName, UserEmailConfirmation.NewEmail, UserEmailConfirmation.GUID));
                                 TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + UserEmailConfirmation.NewEmail + ") onaylamanız için bir e-mail gönderildi";
                             }
                             else
@@ -193,7 +193,7 @@ namespace Okurdostu.Web.Controllers
                         }
                         else
                         {
-                            Email.Send(Email.EmailAddressChangeMail(AuthUser.FullName, RequestWithSameEmailandUser.NewEmail, RequestWithSameEmailandUser.Guid));
+                            Email.Send(Email.EmailAddressChangeMail(AuthUser.FullName, RequestWithSameEmailandUser.NewEmail, RequestWithSameEmailandUser.GUID));
                             TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + RequestWithSameEmailandUser.NewEmail + ") onaylamanız için bir e-mail gönderildi";
                         }
 
@@ -217,7 +217,7 @@ namespace Okurdostu.Web.Controllers
         public async Task ConfirmEmail(Guid guid)
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-            var ConfirmationRequest = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => !x.IsUsed && x.UserId == AuthUser.Id && x.Guid == guid);
+            var ConfirmationRequest = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => !x.IsUsed && x.UserId == AuthUser.Id && x.GUID == guid);
 
             if (ConfirmationRequest != null)
             {

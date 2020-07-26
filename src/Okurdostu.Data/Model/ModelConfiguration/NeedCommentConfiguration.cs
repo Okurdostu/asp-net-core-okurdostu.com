@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Okurdostu.Data.Model.ModelConfiguration
+namespace Okurdostu.Data.ModelConfiguration
 {
     public class NeedCommentConfiguration : IEntityTypeConfiguration<NeedComment>
     {

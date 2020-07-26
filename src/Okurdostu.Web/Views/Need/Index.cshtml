@@ -1,4 +1,4 @@
-﻿@model List<Okurdostu.Data.Model.Need>
+﻿@model List<Okurdostu.Data.Need>
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
 @{ bool isRequestComingFromUniversityPage; ViewData["NeedsActiveClass"] = "active"; }
 @if (HttpContextAccessor.HttpContext.Request.Path.Value.ToLower().Contains("need"))
@@ -14,9 +14,9 @@ else
 @{
     int i = 0; //üniversite sayfasında geliyorsa istek en fazla 6 tane kaydı görüntülemek için aşağıda ki bir foreach'da kullanılıyor
 
-    var viewbagUniversity = new Okurdostu.Data.Model.University();
+    var viewbagUniversity = new Okurdostu.Data.University();
     if (ViewBag.University != null)
-    { viewbagUniversity = (ViewBag.University as Okurdostu.Data.Model.University); }
+    { viewbagUniversity = (ViewBag.University as Okurdostu.Data.University); }
 }
 
 @if (!isRequestComingFromUniversityPage)
@@ -35,7 +35,7 @@ else
 @if (Model.Count > 0)
 {
     <div class="row pt-2">
-        @foreach (Okurdostu.Data.Model.Need item in Model)
+        @foreach (Okurdostu.Data.Need item in Model)
         {
             i++;
             if (i > 6 && isRequestComingFromUniversityPage)
@@ -113,7 +113,7 @@ else
                     <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
                     <hr />
                     <button class="btn btn-outline-purple btn-block mb-1 font-weight-bold" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false">Üniversiteler</button>
-                    @foreach (var item in (IEnumerable<Okurdostu.Data.Model.University>)ViewBag.Universities)
+                    @foreach (var item in (IEnumerable<Okurdostu.Data.University>)ViewBag.Universities)
                     {
                         <div class="collapse multi-collapse" id="@item.FriendlyName"><a class="od font-weight-bold" href="/ihtiyaclar/@item.FriendlyName"><div class="card card-body bg-transparent p-2 pt-1 pb-1">@Html.Raw(item.Name)</div></a></div>
                     }
