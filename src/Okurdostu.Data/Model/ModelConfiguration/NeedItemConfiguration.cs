@@ -7,7 +7,7 @@ namespace Okurdostu.Data.ModelConfiguration
     {
         public void Configure(EntityTypeBuilder<NeedItem> entity)
         {
-
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             entity.Property(e => e.Id).ValueGeneratedNever();
 
             entity.Property(e => e.Link).IsRequired();

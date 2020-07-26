@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System;
+using System.Threading;
 
 namespace Okurdostu.Web.Models.NeedItem
 {
@@ -7,6 +8,7 @@ namespace Okurdostu.Web.Models.NeedItem
     {
         public Amazon Product(string url)
         {
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             try
             {
                 var link = @url;

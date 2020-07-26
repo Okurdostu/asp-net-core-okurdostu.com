@@ -1,6 +1,8 @@
 ﻿@model Okurdostu.Data.Need
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
-
+@{ 
+    System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+}
 @if (Model.IsConfirmed == true)
 {
     <div class="card text-center rounded-custom" style="width:100%;">

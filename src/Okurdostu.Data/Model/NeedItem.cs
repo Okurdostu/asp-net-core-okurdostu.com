@@ -7,6 +7,8 @@ namespace Okurdostu.Data
     {
         public NeedItem()
         {
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
             Id = Guid.NewGuid();
         }
         public Guid Id { get; private set; }

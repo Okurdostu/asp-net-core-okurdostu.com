@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Okurdostu.Web.Controllers
 {
@@ -61,14 +62,15 @@ namespace Okurdostu.Web.Controllers
             return false;
         }
         [NonAction]
-        public async Task AddNeedItemAndFixTotalCharge(Guid needId, string link, string name, decimal price, string picture, string platformName)
+        public async Task AddNeedItemAndFixTotalCharge(Guid needId, string link, string name, double price, string picture, string platformName)
         {
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             var NeedItem = new NeedItem
             {
                 NeedId = needId,
                 Link = link,
                 Name = name,
-                Price = price,
+                Price = (decimal)price,
                 Picture = picture,
                 PlatformName = platformName,
                 IsRemoved = false,
@@ -85,6 +87,8 @@ namespace Okurdostu.Web.Controllers
         [Route("needcheck")]
         public async Task<JsonResult> NeedItemsPriceAndStatus(Guid needId) //checking and correcting needitem status, price.
         {
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
             var Need = await Context.Need.Include(need => need.NeedItem).FirstOrDefaultAsync(x => x.Id == needId && !x.IsRemoved && !x.IsCompleted && x.IsSentForConfirmation);
             bool IsPageNeedRefresh = false;
             if (Need != null && Need.ShouldBeCheck)
@@ -233,6 +237,8 @@ namespace Okurdostu.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task SendToConfirmation(Guid NeedId)
         {
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
             var Need = await Context.Need.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == NeedId);
 
             if (Need != null)
@@ -355,6 +361,8 @@ namespace Okurdostu.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task RemoveItem(Guid NeedItemId)
         {
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
             var item = await Context.NeedItem.Include(needitem => needitem.Need).FirstOrDefaultAsync(x => x.Id == NeedItemId
             && !x.Need.IsRemoved
             && !x.Need.IsSentForConfirmation);
@@ -394,7 +402,7 @@ namespace Okurdostu.Web.Controllers
                         Udemy = Udemy.Product(ItemLink);
                         if (Udemy.Error == null)
                         {
-                            await AddNeedItemAndFixTotalCharge(Need.Id, Udemy.Link, Udemy.Name, (decimal)Udemy.Price, "/image/udemy.png", "Udemy");
+                            await AddNeedItemAndFixTotalCharge(Need.Id, Udemy.Link, Udemy.Name, Udemy.Price, "/image/udemy.png", "Udemy");
                         }
                         else
                         {
@@ -410,7 +418,7 @@ namespace Okurdostu.Web.Controllers
                             Pandora = Pandora.Product(ItemLink);
                             if (Pandora.Error == null)
                             {
-                                await AddNeedItemAndFixTotalCharge(Need.Id, Pandora.Link, Pandora.Name, (decimal)Pandora.Price, Pandora.Picture, "Pandora");
+                                await AddNeedItemAndFixTotalCharge(Need.Id, Pandora.Link, Pandora.Name, Pandora.Price, Pandora.Picture, "Pandora");
                             }
                             else
                             {
@@ -429,7 +437,7 @@ namespace Okurdostu.Web.Controllers
                         Amazon = Amazon.Product(ItemLink);
                         if (Amazon.Error == null)
                         {
-                            await AddNeedItemAndFixTotalCharge(Need.Id, Amazon.Link, Amazon.Name, (decimal)Amazon.Price, "/image/amazon.png", "Amazon");
+                            await AddNeedItemAndFixTotalCharge(Need.Id, Amazon.Link, Amazon.Name, Amazon.Price, "/image/amazon.png", "Amazon");
                         }
                         else
                         {

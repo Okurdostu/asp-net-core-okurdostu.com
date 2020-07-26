@@ -1,6 +1,8 @@
 ﻿@model Okurdostu.Data.Need
 
 @{
+    System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
     var UnRemovedItemList = Model.NeedItem.Where(x => x.IsRemoved == false).ToList();
 }
 <div class="text-center text-black-50">

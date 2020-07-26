@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System.Net;
+using System.Threading;
 
 namespace Okurdostu.Web.Models.NeedItem
 {
@@ -90,6 +91,8 @@ namespace Okurdostu.Web.Models.NeedItem
 
         public Pandora SelectPrice(Pandora pandoraProduct)
         {
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
             double _Price;
             /// <summary>
             /// Product.NormalPrice ve Product.DiscountedPrice var

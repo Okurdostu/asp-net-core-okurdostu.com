@@ -35,7 +35,8 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
             if (_UserPaswordReset != null)
             {
                 var elapsedTime = DateTime.Now - _UserPaswordReset.CreatedOn;
-                if (elapsedTime.Hours < 12)
+
+                if (elapsedTime.TotalHours < 12)
                 {
                     TempData["Guid"] = _UserPaswordReset.GUID;
                     return Page();
@@ -55,6 +56,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
             {
                 return Redirect("/");
             }
+
             if (ModelState.IsValid)
             {
                 Guid guid = Guid.Empty;
@@ -69,7 +71,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                 {
                     var elapsedTime = DateTime.Now - _UserPaswordReset.CreatedOn;
 
-                    if (elapsedTime.Hours < 12)
+                    if (elapsedTime.TotalHours < 12)
                     {
                         var User = await Context.User.FirstOrDefaultAsync(x => x.Id == _UserPaswordReset.UserId);
                         if (User != null && User.IsActive)
@@ -97,7 +99,6 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                         Context.Remove(_UserPaswordReset);
                         await Context.SaveChangesAsync();
                     }
-
                 }
             }
             return NotFound("Böyle bir þey yok");

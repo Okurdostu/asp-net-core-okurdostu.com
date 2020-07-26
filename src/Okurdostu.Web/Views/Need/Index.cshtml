@@ -2,7 +2,10 @@
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
 @{ bool isRequestComingFromUniversityPage; ViewData["NeedsActiveClass"] = "active"; }
 @if (HttpContextAccessor.HttpContext.Request.Path.Value.ToLower().Contains("need"))
-{ HttpContextAccessor.HttpContext.Response.Redirect("/ihtiyaclar"); }
+{
+    HttpContextAccessor.HttpContext.Response.Redirect("/ihtiyaclar");
+    System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+}
 <!--
    bonsai.css
 -->

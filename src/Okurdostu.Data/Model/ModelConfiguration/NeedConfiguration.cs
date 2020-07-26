@@ -7,6 +7,8 @@ namespace Okurdostu.Data.ModelConfiguration
     {
         public void Configure(EntityTypeBuilder<Need> entity)
         {
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
             entity.HasIndex(e => e.Title)
                     .HasName("Unique_Key_Title")
                     .IsUnique();

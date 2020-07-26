@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using System.Threading;
 
 namespace Okurdostu.Web.Models.NeedItem
 {
@@ -6,6 +7,8 @@ namespace Okurdostu.Web.Models.NeedItem
     {
         public Udemy Product(string url)
         {
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
             try
             {
                 var link = @url;

@@ -7,6 +7,8 @@ namespace Okurdostu.Data
     {
         public Need()
         {
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
             Id = Guid.NewGuid();
             CreatedOn = DateTime.Now;
             IsSentForConfirmation = false;
@@ -42,6 +44,8 @@ namespace Okurdostu.Data
         {
             get
             {
+                System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
                 var PassedTime = DateTime.Now - LastCheckOn;
 
                 return LastCheckOn == null || PassedTime.Value.TotalMinutes > 60; // en son kontrolunun üzerinden 60 dakika'dan fazla geçtiyse veya o ana kadar hiç kontrol edilmediyse tekrar kontrol edilmeli.
