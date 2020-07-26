@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data;
-using Okurdostu.Data.Model;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Services;
 
@@ -30,7 +29,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                 return Redirect("/account/passwordreset");
             }
 
-            AppUser = Context.User.FirstOrDefault(x => x.Id == long.Parse(UserId) && x.IsActive);
+            AppUser = Context.User.FirstOrDefault(x => x.Id == Guid.Parse(UserId) && x.IsActive);
 
             if (User != null)
             {
@@ -49,7 +48,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
         {
             var UserId = TempData.Get<string>("resetPasswordUserId");
             TempData.Remove("resetPasswordUserId");
-            AppUser = Context.User.FirstOrDefault(x => x.Id == long.Parse(UserId) && x.IsActive);
+            AppUser = Context.User.FirstOrDefault(x => x.Id == Guid.Parse(UserId) && x.IsActive);
 
             if (HttpContext.User.Identity.IsAuthenticated)
             {
@@ -72,7 +71,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
 
             if (preCreatedPaswordReset != null && elapsedTime.Value.Hours < 11.5)
             {
-                Email.Send(Email.PasswordResetMail(preCreatedPaswordReset.User.FullName, preCreatedPaswordReset.User.Email, preCreatedPaswordReset.GUID));
+                Email.Send(Email.PasswordResetMail(preCreatedPaswordReset.User.FullName, preCreatedPaswordReset.User.Email, preCreatedPaswordReset.Guid));
             }
             else
             {
@@ -84,7 +83,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
                 {
-                    Email.Send(Email.PasswordResetMail(AppUser.FullName, AppUser.Email, UserPaswordReset.GUID));
+                    Email.Send(Email.PasswordResetMail(AppUser.FullName, AppUser.Email, UserPaswordReset.Guid));
                 }
             }
             return Redirect("/account/passwordreset/successent");

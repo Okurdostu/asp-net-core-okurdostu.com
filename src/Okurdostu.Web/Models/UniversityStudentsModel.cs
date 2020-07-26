@@ -1,8 +1,10 @@
-﻿namespace Okurdostu.Web.Models
+﻿using System;
+
+namespace Okurdostu.Web.Models
 {
     public class UniversityStudentsModel
     {
-        public long ID;
+        public Guid ID;
         public string FullName;
         public string Username;
         public string ProfilePicture;

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Okurdostu.Data.Model;
-using System.Threading.Tasks;
+using Okurdostu.Data;
+
 
 namespace Okurdostu.Web.ViewComponents
 {

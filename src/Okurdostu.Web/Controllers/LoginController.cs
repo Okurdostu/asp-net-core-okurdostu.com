@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Okurdostu.Data.Model;
+using Okurdostu.Data;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 using System;

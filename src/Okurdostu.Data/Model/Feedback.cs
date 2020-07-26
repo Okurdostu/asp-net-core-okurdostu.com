@@ -6,11 +6,13 @@ namespace Okurdostu.Data
     {
         public Feedback()
         {
+            Id = Guid.NewGuid();
             CreatedOn = DateTime.Now;
         }
-        public long Id { get; set; }
+
+        public Guid Id { get; private set; }
         public string Email { get; set; }
         public string Message { get; set; }
-        public DateTime? CreatedOn { get; private set; }
+        public DateTime? CreatedOn { get; set; }
     }
 }

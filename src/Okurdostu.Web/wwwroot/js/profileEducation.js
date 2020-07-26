@@ -18,7 +18,7 @@ function getModalToEditEducation(id) {
             //gelen verileri old olarak alıyoruz ki değiştirirken, değişiklik yapılmış mı kontrol edilip ona göre post yollasın diye.
 
             $('#education-edit-modal').modal('show');
-            $('#education-edit-modal-body').load("/education/editview/?ActivitiesSocieties=" + result.data.activitiesSocieties + "&Department=" + result.data.department + "&UniversityId=" + result.data.universityId + "&EducationId=" + result.data.educationId + "&Startyear=" + result.data.startyear + "&Finishyear=" + result.data.finishyear + "&AreUniversityorDepartmentCanEditable=" + result.data.areUniversityorDepartmentCanEditable);
+            $('#education-edit-modal-body').load("/education/editview/?ActivitiesSocieties=" + result.data.activitiesSocieties.replace(" ", "%20") + "&Department=" + result.data.department.replace(" ", "%20") + "&UniversityId=" + result.data.universityId + "&EducationId=" + result.data.educationId + "&Startyear=" + result.data.startyear + "&Finishyear=" + result.data.finishyear + "&AreUniversityorDepartmentCanEditable=" + result.data.areUniversityorDepartmentCanEditable);
         }
     });
 };

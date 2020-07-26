@@ -15,6 +15,8 @@ namespace Okurdostu.Data.Model.ModelConfiguration
                 .HasName("Unique_Key_Username")
                 .IsUnique();
 
+            entity.Property(e => e.Id).ValueGeneratedNever();
+
             entity.Property(e => e.Biography).HasMaxLength(256);
 
             entity.Property(e => e.ContactEmail).HasMaxLength(50);
@@ -31,11 +33,11 @@ namespace Okurdostu.Data.Model.ModelConfiguration
 
             entity.Property(e => e.Github).HasMaxLength(39);
 
+            entity.Property(e => e.LastChangedOn).HasColumnType("datetime");
+
             entity.Property(e => e.Password).IsRequired();
 
-            entity.Property(e => e.Telephone)
-                .HasMaxLength(15)
-                .IsFixedLength();
+            entity.Property(e => e.Telephone).HasMaxLength(50);
 
             entity.Property(e => e.Twitter).HasMaxLength(15);
 

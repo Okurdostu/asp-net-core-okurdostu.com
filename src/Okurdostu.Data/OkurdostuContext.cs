@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Okurdostu.Data.Model;
+using Okurdostu.Data;
 using Okurdostu.Data.Model.ModelConfiguration;
 
 namespace Okurdostu.Data
@@ -7,10 +7,13 @@ namespace Okurdostu.Data
     public partial class OkurdostuContext : DbContext
     {
         public OkurdostuContext(DbContextOptions<OkurdostuContext> options)
-            : base(options)
+           : base(options)
         {
         }
+
+        public virtual DbSet<Feedback> Feedback { get; set; }
         public virtual DbSet<Need> Need { get; set; }
+        public virtual DbSet<NeedComment> NeedComment { get; set; }
         public virtual DbSet<NeedItem> NeedItem { get; set; }
         public virtual DbSet<NeedLike> NeedLike { get; set; }
         public virtual DbSet<University> University { get; set; }
@@ -19,7 +22,6 @@ namespace Okurdostu.Data
         public virtual DbSet<UserEducationDoc> UserEducationDoc { get; set; }
         public virtual DbSet<UserEmailConfirmation> UserEmailConfirmation { get; set; }
         public virtual DbSet<UserPasswordReset> UserPasswordReset { get; set; }
-        public virtual DbSet<NeedComment> NeedComment { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

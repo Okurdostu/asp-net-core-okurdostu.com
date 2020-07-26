@@ -7,6 +7,7 @@ namespace Okurdostu.Data.Model.ModelConfiguration
     {
         public void Configure(EntityTypeBuilder<Feedback> entity)
         {
+            entity.Property(e => e.Id).ValueGeneratedNever();
 
             entity.Property(e => e.CreatedOn).HasColumnType("datetime");
 

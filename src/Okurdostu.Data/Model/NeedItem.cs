@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Okurdostu.Data.Model
+namespace Okurdostu.Data
 {
     public partial class NeedItem
     {
-        public long Id { get; set; }
-        public long NeedId { get; set; }
+        public NeedItem()
+        {
+            Id = Guid.NewGuid();
+        }
+        public Guid Id { get; private set; }
+        public Guid NeedId { get; set; }
         public string Link { get; set; }
         public string Picture { get; set; }
         public string Name { get; set; }

@@ -1,4 +1,4 @@
-﻿using Okurdostu.Data.Model;
+﻿using Okurdostu.Data;
 
 namespace Okurdostu.Web.Extensions
 {

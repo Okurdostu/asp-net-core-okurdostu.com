@@ -7,6 +7,8 @@ namespace Okurdostu.Data.Model.ModelConfiguration
     {
         public void Configure(EntityTypeBuilder<University> entity)
         {
+            entity.Property(e => e.Id).ValueGeneratedNever();
+
             entity.Property(e => e.Name).IsRequired();
         }
     }

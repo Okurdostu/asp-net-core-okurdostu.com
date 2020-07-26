@@ -8,6 +8,8 @@ namespace Okurdostu.Data.Model.ModelConfiguration
         public void Configure(EntityTypeBuilder<UserEducation> entity)
         {
 
+            entity.Property(e => e.Id).ValueGeneratedNever();
+
             entity.Property(e => e.ActivitiesSocieties).HasMaxLength(200);
 
             entity.Property(e => e.CreatedOn).HasColumnType("smalldatetime");

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Okurdostu.Data.Model;
+using Okurdostu.Data;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 using Okurdostu.Web.Models.NeedItem;
@@ -61,7 +61,7 @@ namespace Okurdostu.Web.Controllers
             return false;
         }
         [NonAction]
-        public async Task AddItemOnDBAndFixTotalCharge(long needId, string link, string name, decimal price, string picture, string platformName)
+        public async Task AddItemOnDBAndFixTotalCharge(Guid needId, string link, string name, decimal price, string picture, string platformName)
         {
             var NeedItem = new NeedItem
             {
@@ -83,7 +83,7 @@ namespace Okurdostu.Web.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("needcheck")]
-        public async Task<JsonResult> NeedItemsPriceAndStatus(long needId) //checking and correcting needitem status, price.
+        public async Task<JsonResult> NeedItemsPriceAndStatus(Guid needId) //checking and correcting needitem status, price.
         {
             var Need = await Context.Need.Include(need => need.NeedItem).FirstOrDefaultAsync(x => x.Id == needId && !x.IsRemoved && !x.IsCompleted && x.IsSentForConfirmation);
             bool IsPageNeedRefresh = false;
@@ -231,7 +231,7 @@ namespace Okurdostu.Web.Controllers
         #region --
         [Authorize]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task SendToConfirmation(long NeedId)
+        public async Task SendToConfirmation(Guid NeedId)
         {
             var Need = await Context.Need.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == NeedId);
 
@@ -353,7 +353,7 @@ namespace Okurdostu.Web.Controllers
         #region needitemremoveadd
         [Authorize]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task RemoveItem(long NeedItemId)
+        public async Task RemoveItem(Guid NeedItemId)
         {
             var item = await Context.NeedItem.Include(needitem => needitem.Need).FirstOrDefaultAsync(x => x.Id == NeedItemId
             && !x.Need.IsRemoved
@@ -374,7 +374,7 @@ namespace Okurdostu.Web.Controllers
         }
         [Authorize]
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task AddItem(string ItemLink, long NeedId)
+        public async Task AddItem(string ItemLink, Guid NeedId)
         {
             var Need = await Context.Need.Where(x => x.Id == NeedId
             && !x.IsRemoved
@@ -534,7 +534,7 @@ namespace Okurdostu.Web.Controllers
 
         #region view
         [Route("ihtiyac/{Id}")]
-        public async Task<IActionResult> ShortUrl(long Id)
+        public async Task<IActionResult> ShortUrl(Guid Id)
         {
             var Need = await Context.Need.Include(needuser => needuser.User).FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
 
@@ -551,7 +551,7 @@ namespace Okurdostu.Web.Controllers
 
 
         [Route("{username}/ihtiyac/{friendlytitle}/{needId}")]
-        public async Task<IActionResult> ViewNeed(string username, string friendlytitle, long needId)
+        public async Task<IActionResult> ViewNeed(string username, string friendlytitle, Guid needId)
         {
             var Need = await Context.Need
                 .Include(need => need.User)

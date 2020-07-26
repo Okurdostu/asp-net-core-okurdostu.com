@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Okurdostu.Data.Model
+namespace Okurdostu.Data
 {
     public partial class University
     {
         public University()
         {
+            Id = Guid.NewGuid();
             UserEducation = new HashSet<UserEducation>();
         }
 
-        public short Id { get; set; }
+        public Guid Id { get; private set; }
         public string Name { get; set; }
         public string LogoUrl { get; set; }
         public string FriendlyName { get; set; }

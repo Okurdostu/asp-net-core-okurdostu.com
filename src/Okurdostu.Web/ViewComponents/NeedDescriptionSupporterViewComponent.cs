@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Okurdostu.Data.Model;
+using Okurdostu.Data;
 using System.Threading.Tasks;
 
 namespace Okurdostu.Web.ViewComponents

@@ -30,14 +30,14 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
             {
                 return Redirect("/");
             }
-            var _UserPaswordReset = await Context.UserPasswordReset.FirstOrDefaultAsync(x => x.GUID == guid && !x.IsUsed);
+            var _UserPaswordReset = await Context.UserPasswordReset.FirstOrDefaultAsync(x => x.Guid == guid && !x.IsUsed);
 
             if (_UserPaswordReset != null)
             {
                 var elapsedTime = DateTime.Now - _UserPaswordReset.CreatedOn;
-                if (elapsedTime.Value.Hours < 12)
+                if (elapsedTime.Hours < 12)
                 {
-                    TempData["Guid"] = _UserPaswordReset.GUID;
+                    TempData["Guid"] = _UserPaswordReset.Guid;
                     return Page();
                 }
                 else
@@ -64,12 +64,12 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                     TempData.Clear();
                 }
 
-                var _UserPaswordReset = await Context.UserPasswordReset.FirstOrDefaultAsync(x => x.GUID == guid && !x.IsUsed);
+                var _UserPaswordReset = await Context.UserPasswordReset.FirstOrDefaultAsync(x => x.Guid == guid && !x.IsUsed);
                 if (_UserPaswordReset != null)
                 {
                     var elapsedTime = DateTime.Now - _UserPaswordReset.CreatedOn;
 
-                    if (elapsedTime.Value.Hours < 12)
+                    if (elapsedTime.Hours < 12)
                     {
                         var User = await Context.User.FirstOrDefaultAsync(x => x.Id == _UserPaswordReset.UserId);
                         if (User != null && User.IsActive)
@@ -88,7 +88,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                             {
                                 TempData["ChangePasswordMessage"] = "Þifrenizi deðiþtiremedik, lütfen tekrar deneyin<br />" +
                                     "Þuan ki þifreniz ile ayný þifreyi giriyor olabilirsiniz";
-                                return Redirect("~/account/passwordreset/changepassword/" + _UserPaswordReset.GUID);
+                                return Redirect("~/account/passwordreset/changepassword/" + _UserPaswordReset.Guid);
                             }
                         }
                     }

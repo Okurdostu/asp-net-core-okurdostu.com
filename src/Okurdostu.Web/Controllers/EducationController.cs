@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Okurdostu.Data.Model;
+using Okurdostu.Data;
 using Okurdostu.Web.Filters;
 using System;
 using System.IO;

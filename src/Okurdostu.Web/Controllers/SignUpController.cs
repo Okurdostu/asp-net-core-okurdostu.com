@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
-using Okurdostu.Data.Model;
+using Okurdostu.Data;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 using Okurdostu.Web.Services;
@@ -84,7 +84,7 @@ namespace Okurdostu.Web.Controllers
                     SenderName = "Halil İbrahim Kocaöz"
                 };
 
-                Email.Send(Email.NewUserMail(User.FullName, User.Email, _UserEmailConfirmation.GUID));
+                Email.Send(Email.NewUserMail(User.FullName, User.Email, _UserEmailConfirmation.Guid));
 
                 return string.IsNullOrEmpty(ReturnUrl) ? Redirect("/beta") : Redirect(ReturnUrl);
             }

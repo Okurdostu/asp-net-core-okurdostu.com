@@ -6,9 +6,9 @@ using System.ComponentModel.DataAnnotations;
 public class EducationModel
 {
     [Required(ErrorMessage = "Üniversitenizi seçmelisiniz")]
-    public short UniversityId { get; set; }
+    public Guid UniversityId { get; set; }
     [Required]
-    public long EducationId { get; set; } //it's for edit UserEducation[Table] : Id
+    public Guid EducationId { get; set; } //it's for edit UserEducation[Table] : Id
     [Required(ErrorMessage = "Başlangıç yılı seçmelisiniz")]
     public int Startyear { get; set; }
 

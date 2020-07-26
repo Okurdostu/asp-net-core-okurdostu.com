@@ -8,6 +8,8 @@ namespace Okurdostu.Data.Model.ModelConfiguration
         public void Configure(EntityTypeBuilder<NeedItem> entity)
         {
 
+            entity.Property(e => e.Id).ValueGeneratedNever();
+
             entity.Property(e => e.Link).IsRequired();
 
             entity.Property(e => e.Picture).IsRequired();
