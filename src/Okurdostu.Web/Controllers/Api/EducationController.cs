@@ -38,7 +38,7 @@ namespace Okurdostu.Web.Controllers.Api
             }
         }
 
-        [Authorize, HttpGet("get")]
+        [Authorize, HttpGet("get/{EducationId}")] //api/education/list/EducationId
         public async Task<IActionResult> Get(long EducationId) //get education informations
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
@@ -74,8 +74,8 @@ namespace Okurdostu.Web.Controllers.Api
             return Succes(jsonReturnModel);
         }
 
-        [ServiceFilter(typeof(ConfirmedEmailFilter))]
-        [HttpPost("post"), Authorize, ValidateAntiForgeryToken]
+        [ServiceFilter(typeof(ConfirmedEmailFilter))] //api/education/post?EducationId=....&Somevalue=...
+        [HttpPost("post"), Authorize, ValidateAntiForgeryToken] //deleting, adding, editing a education information
         public async Task<IActionResult> Post(EducationModel Model, long educationIdForRemove)
         {
             var AuthenticatedUserId = User.Identity.GetUserId();
@@ -141,7 +141,7 @@ namespace Okurdostu.Web.Controllers.Api
                 }
             }
 
-            if (Model.Startyear > Model.Finishyear) 
+            if (Model.Startyear > Model.Finishyear)
             {
                 jsonReturnModel.Message = "Başlangıç yılı, bitiş yılından büyük olamaz";
                 jsonReturnModel.Code = 200;
@@ -231,5 +231,41 @@ namespace Okurdostu.Web.Controllers.Api
                 return Error(jsonReturnModel);
             }
         }
+
+        [HttpGet("list/{username}")] //api/education/list/username
+        public async Task<IActionResult> List(string username)
+        {
+            var AppUser = await Context.User.FirstOrDefaultAsync(x => x.Username == username);
+            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+
+            if (AppUser != null)
+            {
+                var Educations = await Context.UserEducation.Where(x => x.UserId == AppUser.Id && !x.IsRemoved).Select(x => new
+                {
+                    x.Id,
+                    x.EndYear,
+                    x.StartYear,
+                    //x.IsRemoved,
+                    x.IsConfirmed,
+                    x.IsActiveEducation,
+                    x.IsSentToConfirmation,
+
+                    universityPageUrl = "/universite/" + x.University.FriendlyName,
+                    universityName = x.University.Name,
+                    x.University.LogoUrl,
+                    x.UniversityId,
+                }).ToListAsync();
+
+                if (Educations != null)
+                {
+                    jsonReturnModel.Data = Educations;
+                    return Succes(jsonReturnModel);
+                }
+            }
+
+            jsonReturnModel.Code = 404;
+            return Error(jsonReturnModel);
+        }
+
     }
 }

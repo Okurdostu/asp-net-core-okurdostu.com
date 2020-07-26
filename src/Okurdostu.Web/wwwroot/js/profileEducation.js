@@ -10,12 +10,12 @@ const Toast = Swal.mixin({
 var oldUniversityId, oldEducationId, oldDepartment, oldActivitiesSocieties, oldStartYear, oldFinishYear;
 
 function getModalToEditEducation(id) {
-    $.get("/api/education/get", { EducationId: id }).done(function (result) {
+    $.get("/api/education/get/" + id).done(function (result) {
         if (result.status === true) {
             oldUniversityId = result.data.universityId; oldActivitiesSocieties = result.data.activitiesSocieties;
             oldDepartment = result.data.department; oldEducationId = result.data.educationId;
             oldStartYear = result.data.startyear; oldFinishYear = result.data.finishyear;
-            //gelen verileri old olarak alıyoruz ki edit ederken değişiklik yapılmış mı kontrol edilip ona göre post yollasın diye.
+            //gelen verileri old olarak alıyoruz ki değiştirirken, değişiklik yapılmış mı kontrol edilip ona göre post yollasın diye.
 
             $('#education-edit-modal').modal('show');
             $('#education-edit-modal-body').load("/education/editview/?ActivitiesSocieties=" + result.data.activitiesSocieties + "&Department=" + result.data.department + "&UniversityId=" + result.data.universityId + "&EducationId=" + result.data.educationId + "&Startyear=" + result.data.startyear + "&Finishyear=" + result.data.finishyear + "&AreUniversityorDepartmentCanEditable=" + result.data.areUniversityorDepartmentCanEditable);
@@ -100,7 +100,7 @@ function apiEducationPost() {
 var _educationIdForRemove;
 
 function getModalToRemoveEducation(id) {
-    $.get("/api/education/get", { EducationId: id }).done(function (result) {
+    $.get("/api/education/get/" + id).done(function (result) {
         if (result.status === true) {
             $('#education-remove-modal').modal('show');
             _educationIdForRemove = id;
@@ -134,7 +134,7 @@ function removeEducation() {
 //remove
 
 function getModalToRemoveEducation(id) {
-    $.get("/api/education/get", { EducationId: id }).done(function (result) {
+    $.get("/api/education/get/" + id).done(function (result) {
         if (result.status === true) {
             $('#education-remove-modal').modal('show');
             _educationIdForRemove = id;
@@ -144,8 +144,8 @@ function getModalToRemoveEducation(id) {
 };
 
 var _educationIdForRemove;
-function getModalToConfirmFile(id){
-    $.get("/api/education/get", { EducationId: id }).done(function (result) {
+function getModalToConfirmFile(id) {
+    $.get("/api/education/get/" + id).done(function (result) {
         if (result.status === true) {
             $('#education-confirm-modal').modal('show');
             $('#confirmEducationId').val(id).trigger('change');

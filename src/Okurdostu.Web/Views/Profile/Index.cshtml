@@ -122,7 +122,7 @@ else
     <hr class="mb-1" />
     <h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim</h4>
 }
-@if (Model.UserEducation.Count == 0)
+@if (Model.UserEducation.Where(x=> !x.IsRemoved).ToList().Count == 0)
 {
     <h5 class="text-black-50 text-center">Eğitim bilgisi yok</h5>
 }
