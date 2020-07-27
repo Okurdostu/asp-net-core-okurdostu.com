@@ -11,6 +11,8 @@ namespace Okurdostu.Web.Controllers.Api
 {
     public class PasswordController : ApiController
     {
+
+
         public class PasswordModel
         {
             [Required(ErrorMessage = "Kimliğinizi doğrulamak için şuan ki parolanızı girmelisiniz")]
@@ -48,23 +50,17 @@ namespace Okurdostu.Web.Controllers.Api
                     AuthenticatedUser.Password = model.Password;
                     AuthenticatedUser.LastChangedOn = DateTime.Now;
                     var result = await Context.SaveChangesAsync();
-                    if (result > 0)
-                    {
-                        jsonReturnModel.Message = "Parolanız değiştirildi";
-                        return Succes(jsonReturnModel);
-                    }
-                    else
+
+                    if (result <= 0)
                     {
                         jsonReturnModel.Code = 200;
                         jsonReturnModel.Message = "Başaramadık, ne olduğunu bilmiyoruz";
                         return Error(jsonReturnModel);
                     }
                 }
-                else
-                {
-                    jsonReturnModel.Message = "Parolanız değiştirildi";
-                    return Succes(jsonReturnModel);
-                }
+
+                jsonReturnModel.Message = "Parolanız değiştirildi";
+                return Succes(jsonReturnModel);
             }
             else
             {
