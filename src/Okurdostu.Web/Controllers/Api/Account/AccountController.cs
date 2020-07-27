@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
@@ -165,6 +164,7 @@ namespace Okurdostu.Web.Controllers.Api
             public string ContactEmail { get; set; }
         }
 
+        [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost("contact")]
         public async Task<IActionResult> Contact(ContactModel model)
         {
@@ -178,18 +178,100 @@ namespace Okurdostu.Web.Controllers.Api
             }
 
             AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
-
-            AuthenticatedUser.ContactEmail = model.ContactEmail;
-            AuthenticatedUser.Twitter = model.Twitter;
-            AuthenticatedUser.Github = model.Github;
-
-            AuthenticatedUser.LastChangedOn = DateTime.Now;
-            
-            var result = await Context.SaveChangesAsync();
-            if (result > 0)
+            if (AuthenticatedUser.ContactEmail != model.ContactEmail || AuthenticatedUser.Twitter != model.Twitter || AuthenticatedUser.Github != model.Github)
             {
-                jsonReturnModel.Message = "İletişim bilgileriniz kaydedildi";
-                return Succes(jsonReturnModel);
+                if (AuthenticatedUser.ContactEmail != model.ContactEmail)
+                {
+                    AuthenticatedUser.ContactEmail = model.ContactEmail;
+                    AuthenticatedUser.LastChangedOn = DateTime.Now;
+                }
+                if (AuthenticatedUser.Twitter != model.Twitter)
+                {
+                    AuthenticatedUser.Twitter = model.Twitter;
+                    AuthenticatedUser.LastChangedOn = DateTime.Now;
+                }
+                if (AuthenticatedUser.Github != model.Github)
+                {
+                    AuthenticatedUser.Github = model.Github;
+                    AuthenticatedUser.LastChangedOn = DateTime.Now;
+                }
+
+                var result = await Context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    jsonReturnModel.Message = "İletişim bilgileriniz kaydedildi";
+                    return Succes(jsonReturnModel);
+                }
+                else
+                {
+                    jsonReturnModel.Code = 200;
+                    jsonReturnModel.Message = "Başaramadık, ne olduğunu bilmiyoruz";
+                    return Error(jsonReturnModel);
+                }
+            }
+            else
+            {
+                jsonReturnModel.Code = 200;
+                jsonReturnModel.Message = "Hiç bir değişiklik yapılmadı";
+                return Error(jsonReturnModel);
+            }
+            
+        }
+
+        public class ProfileModel
+        {
+            [Required(ErrorMessage = "Adınızı ve soyadınızı yazmalısınız")]
+            [Display(Name = "Adınız ve soyadınız")]
+            [MaxLength(50, ErrorMessage = "Çok uzun, en fazla 50 karakter")]
+            [MinLength(5, ErrorMessage = "Çok kısa")]
+            [RegularExpression(@"[a-zA-ZğüşıöçĞÜŞİÖÇ\s]+", ErrorMessage = "Gerçekten adınız ve soyadınız da harf dışında karakter mı var?")]
+            public string FullName { get; set; }
+
+            [Display(Name = "Hakkında")]
+            [MaxLength(124, ErrorMessage = "Lütfen en fazla 124 karakter giriniz.")]
+            [DataType(DataType.MultilineText)]
+            public string Biography { get; set; }
+        }
+
+        [ServiceFilter(typeof(ConfirmedEmailFilter))]
+        [HttpPost("profile")]
+        public async Task<IActionResult> Profile(ProfileModel model) //editing, adding bio and fullname
+        {
+            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+
+            if (!ModelState.IsValid)
+            {
+                jsonReturnModel.Code = 200;
+                jsonReturnModel.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
+                return Error(jsonReturnModel);
+            }
+
+            AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
+            if (AuthenticatedUser.Biography != model.Biography || AuthenticatedUser.FullName != model.FullName)
+            {
+                if (AuthenticatedUser.Biography != model.Biography)
+                {
+                    AuthenticatedUser.Biography = model.Biography;
+                    AuthenticatedUser.LastChangedOn = DateTime.Now;
+                }
+                if (AuthenticatedUser.Biography != model.FullName)
+                {
+                    AuthenticatedUser.FullName = model.FullName;
+                    AuthenticatedUser.LastChangedOn = DateTime.Now;
+                }
+
+                var result = await Context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    jsonReturnModel.Message = "Profil bilgileriniz kaydedildi";
+                    return Succes(jsonReturnModel);
+                }
+                else
+                {
+                    jsonReturnModel.Code = 200;
+                    jsonReturnModel.Message = "Başaramadık, ne olduğunu bilmiyoruz";
+                    return Error(jsonReturnModel);
+                }
             }
             else
             {
