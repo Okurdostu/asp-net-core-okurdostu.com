@@ -1,13 +1,4 @@
-﻿var validatetoken = $("input[name=__RequestVerificationToken]").val();
-const Toast = Swal.mixin({
-    toast: true,
-    position: 'top-end',
-    timer: 2000,
-    showConfirmButton: false,
-    timerProgressBar: true,
-});
-
-var oldUniversityId, oldEducationId, oldDepartment, oldActivitiesSocieties, oldStartYear, oldFinishYear;
+﻿var oldUniversityId, oldEducationId, oldDepartment, oldActivitiesSocieties, oldStartYear, oldFinishYear;
 
 function getModalToEditEducation(id) {
     $.get("/api/education/get/" + id).done(function (result) {

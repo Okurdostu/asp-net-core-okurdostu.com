@@ -1,10 +1,10 @@
-﻿var Form = $("#password-changing-form");
+﻿var Form = $("#username-changing-form");
 var AccountSettingsModal = $("#AccountSettings");
 
 Form.submit(function (e) {
     e.preventDefault();
-    var _ConfirmPassword = $("input[name='PasswordConfirmPassword']").val();
-    var _Password = $("input[name='Password']").val();
+    var _ConfirmPassword = $("input[name='UsernameConfirmPassword']").val();
+    var _Username = $("input[name='Username']").val();
 
     if (_ConfirmPassword.length <= 0) {
         Toast.fire()
@@ -15,29 +15,31 @@ Form.submit(function (e) {
             });
         }
     }
-    else if (_Password.length < 7) {
+    else if (_Username.length < 3) {
         Toast.fire({
             icon: 'warning',
-            html: '<span class="font-weight-bold text-black-50 ml-1">Yeni parola seçmelisiniz</span>'
+            html: '<span class="font-weight-bold text-black-50 ml-1">Yeni kullanıcı adı seçmelisiniz</span>'
         });
     }
     else {
-        $.post("/api/password/post", { PasswordConfirmPassword: _ConfirmPassword, Password: _Password })
+        $.post("/api/username/post", { UsernameConfirmPassword: _ConfirmPassword, Username: _Username })
             .done(function (result) {
                 if (result.status === true) {
-                    $("input[name='PasswordConfirmPassword']").val('');
-                    $("input[name='Password']").val('');
-
-                    AccountSettingsModal.modal('hide');
+                    $('#change-username-button').prop('disabled', true);
+                    $("input[name='Username']").prop('disabled', true);
                     Toast.fire({
                         icon: 'success',
                         html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
                     });
+                    setInterval(function () {
+                        window.location.href = '/' + result.data;
+                    }, 2000);
                 }
                 else {
                     if (result.message === 'Kimliğinizi doğrulayamadık: Onay parolası') {
-                        $("input[name='PasswordConfirmPassword']").focus();
+                        $("input[name='UsernameConfirmPassword']").focus();
                     }
+
                     Toast.fire({
                         icon: 'warning',
                         html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'

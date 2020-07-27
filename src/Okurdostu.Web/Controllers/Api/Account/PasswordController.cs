@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Filters;
@@ -11,8 +12,6 @@ namespace Okurdostu.Web.Controllers.Api
 {
     public class PasswordController : ApiController
     {
-
-
         public class PasswordModel
         {
             [Required(ErrorMessage = "Kimliğinizi doğrulamak için şuan ki parolanızı girmelisiniz")]
@@ -28,6 +27,7 @@ namespace Okurdostu.Web.Controllers.Api
             public string Password { get; set; }
         }
 
+        [Authorize]
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost("post")]
         public async Task<IActionResult> Post(PasswordModel model)

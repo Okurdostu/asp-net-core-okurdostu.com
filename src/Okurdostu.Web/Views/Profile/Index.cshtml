@@ -140,7 +140,7 @@
     <span style="font-size:17px;" class="pl-1"> @Html.Raw("(@" + Model.Username + ")") </span>
     <div style="font-size:15.5px;" class="pl-1">
         @if (Model.Biography != null)
-        { <span class="text-break">@Html.Raw(Model.Biography.Replace("\r\n", "<br />"))</span> }
+        {<span class="text-break">@Html.Raw(Model.Biography.Replace("\r\n", "<br />"))</span>}
     </div>
     <div>
         @if (IsAuthenticatedUserEqualModelUser)
@@ -161,9 +161,12 @@
     </div>
 }
 else
-{ <hr class="mb-1" /> <h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim</h4> }
+{
+    <hr class="mb-1" />
+    <h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim</h4>
+}
 @if (Model.UserEducation.Where(x => !x.IsRemoved).ToList().Count == 0)
-{ <h5 class="text-black-50 text-center">Eğitim bilgisi yok</h5> }
+{<h5 class="text-black-50 text-center">Eğitim bilgisi yok</h5> }
 else
 {
     @foreach (var item in Model.UserEducation.Where(x => x.IsRemoved != true).ToList().OrderByDescending(x => x.StartYear))
@@ -243,6 +246,12 @@ else
             </div>
         </div>
     </div>
+    <script>
+        var validatetoken = $("input[name=__RequestVerificationToken]").val();
+        const Toast = Swal.mixin({ toast: true, position: 'top-end', timer: 2000, showConfirmButton: false, timerProgressBar: true, });
+    </script>
     <script src="~/js/profile/Education.js"></script>
     <script src="~/js/profile/Password.js"></script>
+    <script src="~/js/profile/Username.js"></script>
+
 }
