@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Okurdostu.Web.Models;
-using System.Threading.Tasks;
 
 namespace Okurdostu.Web.ViewComponents
 {
@@ -9,8 +7,8 @@ namespace Okurdostu.Web.ViewComponents
     {
         public IViewComponentResult Invoke()
         {
-            ProfileModel Model = new ProfileModel();
-            return View(Model);
+            Controllers.Api.PasswordController.PasswordModel passwordModel = new Controllers.Api.PasswordController.PasswordModel();
+            return View(passwordModel);
         }
     }
 }
