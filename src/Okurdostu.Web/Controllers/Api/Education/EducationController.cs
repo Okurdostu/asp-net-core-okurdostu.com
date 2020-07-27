@@ -240,7 +240,7 @@ namespace Okurdostu.Web.Controllers.Api
 
             if (AppUser != null)
             {
-                var Educations = await Context.UserEducation.Where(x => x.UserId == AppUser.Id).Select(x => new
+                var Educations = await Context.UserEducation.Where(x => x.UserId == AppUser.Id && !x.IsRemoved).Select(x => new
                 {
                     x.Id,
                     x.EndYear,

@@ -22,7 +22,7 @@ Form.submit(function (e) {
         });
     }
     else {
-        $.post("/api/password/post", { PasswordConfirmPassword: _ConfirmPassword, Password: _Password })
+        $.post("/api/account/password", { PasswordConfirmPassword: _ConfirmPassword, Password: _Password })
             .done(function (result) {
                 if (result.status === true) {
                     $("input[name='PasswordConfirmPassword']").val('');

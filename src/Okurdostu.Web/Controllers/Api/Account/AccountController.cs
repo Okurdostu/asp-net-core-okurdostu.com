@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using Okurdostu.Web.Base;
+using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Filters;
 using Okurdostu.Web.Models;
 using System;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers.Api
 {
-    public class UsernameController : ApiController
+    public class AccountController : SecureApiController
     {
         public class UsernameModel
         {
@@ -28,10 +29,9 @@ namespace Okurdostu.Web.Controllers.Api
             public string Username { get; set; }
         }
 
-        [Authorize]
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
-        [HttpPost("post")]
-        public async Task<IActionResult> Post(UsernameModel model)
+        [HttpPost("username")]
+        public async Task<IActionResult> Username(UsernameModel model)
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
 
@@ -63,19 +63,14 @@ namespace Okurdostu.Web.Controllers.Api
                         {
                             if (e.InnerException.Message.Contains("Unique_Key_Username"))
                             {
-                                jsonReturnModel.Code = 200;
                                 jsonReturnModel.Message = "Bu kullanıcı adını: " + AuthenticatedUser.Username + " kullanamazsınız";
-                                return Error(jsonReturnModel);
                             }
                             else
                             {
-                                jsonReturnModel.Code = 200;
                                 jsonReturnModel.Message = "Başaramadık, ne olduğunu bilmiyoruz";
-                                return Error(jsonReturnModel);
                             }
                         }
                     }
-
                     jsonReturnModel.Code = 200;
                     jsonReturnModel.Message = "Aynı değeri girdiniz";
                     return Error(jsonReturnModel);
@@ -86,6 +81,63 @@ namespace Okurdostu.Web.Controllers.Api
                     jsonReturnModel.Message = "Bu kullanıcı adını: " + model.Username + " kullanamazsınız";
                     return Error(jsonReturnModel);
                 }
+            }
+            else
+            {
+                jsonReturnModel.Message = "Kimliğinizi doğrulayamadık: Onay parolası";
+                jsonReturnModel.Code = 200;
+                return Error(jsonReturnModel);
+            }
+        }
+
+        public class PasswordModel
+        {
+            [Required(ErrorMessage = "Kimliğinizi doğrulamak için şuan ki parolanızı girmelisiniz")]
+            [Display(Name = "Onay parolası")]
+            [DataType(DataType.Password)]
+            public string PasswordConfirmPassword { get; set; }
+
+            [Required(ErrorMessage = "Parola seçmelisiniz")]
+            [Display(Name = "Parola")]
+            [DataType(DataType.Password)]
+            [MinLength(7, ErrorMessage = "En az 7 karakterden oluşan bir şifre oluşturun")]
+            [MaxLength(30, ErrorMessage = "Çok uzun, en fazla 30 karakter")]
+            public string Password { get; set; }
+        }
+
+        [ServiceFilter(typeof(ConfirmedEmailFilter))]
+        [HttpPost("password")]
+        public async Task<IActionResult> Password(PasswordModel model)
+        {
+            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+
+            if (!ModelState.IsValid)
+            {
+                jsonReturnModel.Code = 200;
+                jsonReturnModel.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
+                return Error(jsonReturnModel);
+            }
+
+            if (await ConfirmIdentityWithPassword(model.PasswordConfirmPassword))
+            {
+                model.Password = model.Password.SHA512();
+
+                if (AuthenticatedUser.Password != model.Password)
+                {
+                    AuthenticatedUser.Password = model.Password;
+                    AuthenticatedUser.LastChangedOn = DateTime.Now;
+                    var result = await Context.SaveChangesAsync();
+
+                    if (result <= 0)
+                    {
+                        jsonReturnModel.Code = 200;
+                        jsonReturnModel.Message = "Başaramadık, ne olduğunu bilmiyoruz";
+                        return Error(jsonReturnModel);
+                    }
+                }
+
+                jsonReturnModel.Message = "Parolanız değiştirildi";
+                return Succes(jsonReturnModel);
             }
             else
             {

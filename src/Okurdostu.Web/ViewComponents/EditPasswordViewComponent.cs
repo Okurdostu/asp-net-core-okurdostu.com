@@ -7,7 +7,7 @@ namespace Okurdostu.Web.ViewComponents
     {
         public IViewComponentResult Invoke()
         {
-            Controllers.Api.PasswordController.PasswordModel passwordModel = new Controllers.Api.PasswordController.PasswordModel();
+            Controllers.Api.AccountController.PasswordModel passwordModel = new Controllers.Api.AccountController.PasswordModel();
             return View(passwordModel);
         }
     }

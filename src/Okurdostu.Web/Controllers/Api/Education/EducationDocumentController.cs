@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace Okurdostu.Web.Controllers.Api
 {
     //api/educationdocument/{actionroutename}
-    public class EducationDocumentController : ApiController
+    public class EducationDocumentController : SecureApiController
     {
 #pragma warning disable CS0618 // Type or member is obsolete
         private readonly IHostingEnvironment Environment;
@@ -38,7 +38,7 @@ namespace Okurdostu.Web.Controllers.Api
             }
         }
 
-        [Authorize, HttpPost("post")] //api/educationdocument/post?educationId=..
+        [HttpPost("post")] //api/educationdocument/post?educationId=..
         public async Task<IActionResult> Post(Guid educationId, IFormFile File)
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();

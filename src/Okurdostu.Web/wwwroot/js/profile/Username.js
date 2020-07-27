@@ -22,7 +22,7 @@ Form.submit(function (e) {
         });
     }
     else {
-        $.post("/api/username/post", { UsernameConfirmPassword: _ConfirmPassword, Username: _Username })
+        $.post("/api/account/username", { UsernameConfirmPassword: _ConfirmPassword, Username: _Username })
             .done(function (result) {
                 if (result.status === true) {
                     $('#change-username-button').prop('disabled', true);
