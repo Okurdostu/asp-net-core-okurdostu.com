@@ -16,7 +16,7 @@ namespace Okurdostu.Web.ViewComponents
             if (User.Identity.IsAuthenticated)
             {
                 var AuthUser = await Context.User.FirstOrDefaultAsync(x => x.Id.ToString() == User.Identity.GetUserId());
-                var Model = new ProfileModel
+                var Model = new Web.Controllers.Api.AccountController.ContactModel
                 {
                     ContactEmail = AuthUser.ContactEmail,
                     Github = AuthUser.Github,

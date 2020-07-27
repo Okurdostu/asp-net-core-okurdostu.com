@@ -27,7 +27,8 @@ namespace Okurdostu.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc()
-             .AddJsonOptions(options => {
+             .AddJsonOptions(options =>
+             {
                  options.JsonSerializerOptions.IgnoreNullValues = true;
              });
 
@@ -99,7 +100,7 @@ namespace Okurdostu.Web
                 var Context = (OkurdostuContext)httpContext?.RequestServices.GetService(typeof(OkurdostuContext));
 
                 string[] blockedRouteValues = {
-                    "","comment","account","confirmemail","girisyap","kaydol","ihtiyaclar","beta","arama",
+                    "api","","comment","account","confirmemail","girisyap","kaydol","ihtiyaclar","beta","arama",
                     "gizlilik-politikasi","kullanici-sozlesmesi","sss","kvkk",
                     "home", "like","logout", "ihtiyac-olustur","ihtiyac", "universiteler"
                 };

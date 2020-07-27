@@ -22,7 +22,7 @@ namespace Okurdostu.Web
         public string[] blockedUsernames = {
             "","comment","account","confirmemail","girisyap","kaydol","ihtiyaclar","beta","arama",
             "gizlilik-politikasi","kullanici-sozlesmesi","sss","kvkk",
-            "home", "like","logout", "ihtiyac-olustur","ihtiyac", "universiteler"
+            "home", "like","logout", "ihtiyac-olustur","ihtiyac", "universiteler","api"
         };
 
         public async Task SignInWithCookie(User user)

@@ -146,5 +146,57 @@ namespace Okurdostu.Web.Controllers.Api
                 return Error(jsonReturnModel);
             }
         }
+
+        public class ContactModel
+        {
+            [Display(Name = "Twitter")]
+            [MaxLength(15, ErrorMessage = "Lütfen en fazla 15 karakter giriniz.")]
+            [DataType(DataType.Text)]
+            public string Twitter { get; set; }
+
+            [Display(Name = "Github")]
+            [MaxLength(39, ErrorMessage = "Lütfen en fazla 39 karakter giriniz.")]
+            [DataType(DataType.Text)]
+            public string Github { get; set; }
+
+            [Display(Name = "E-mail")]
+            [MaxLength(50, ErrorMessage = "Lütfen en fazla 50 karakter giriniz.")]
+            [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$", ErrorMessage = "Lütfen geçerli bir e-mail adresi olsun")]
+            public string ContactEmail { get; set; }
+        }
+
+        [HttpPost("contact")]
+        public async Task<IActionResult> Contact(ContactModel model)
+        {
+            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+
+            if (!ModelState.IsValid)
+            {
+                jsonReturnModel.Code = 200;
+                jsonReturnModel.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
+                return Error(jsonReturnModel);
+            }
+
+            AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
+
+            AuthenticatedUser.ContactEmail = model.ContactEmail;
+            AuthenticatedUser.Twitter = model.Twitter;
+            AuthenticatedUser.Github = model.Github;
+
+            AuthenticatedUser.LastChangedOn = DateTime.Now;
+            
+            var result = await Context.SaveChangesAsync();
+            if (result > 0)
+            {
+                jsonReturnModel.Message = "İletişim bilgileriniz kaydedildi";
+                return Succes(jsonReturnModel);
+            }
+            else
+            {
+                jsonReturnModel.Code = 200;
+                jsonReturnModel.Message = "Hiç bir değişiklik yapılmadı";
+                return Error(jsonReturnModel);
+            }
+        }
     }
 }
