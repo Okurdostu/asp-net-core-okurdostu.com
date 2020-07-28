@@ -6,7 +6,6 @@ function getModalToEditEducation(id) {
             oldUniversityId = result.data.universityId; oldActivitiesSocieties = result.data.activitiesSocieties;
             oldDepartment = result.data.department; oldEducationId = result.data.educationId;
             oldStartYear = result.data.startyear; oldFinishYear = result.data.finishyear;
-            //gelen verileri old olarak alıyoruz ki değiştirirken, değişiklik yapılmış mı kontrol edilip ona göre post yollasın diye.
 
             $('#education-edit-modal').modal('show');
             $('#education-edit-modal-body').load("/education/editview/?ActivitiesSocieties=" + result.data.activitiesSocieties.replace(" ", "%20") + "&Department=" + result.data.department.replace(" ", "%20") + "&UniversityId=" + result.data.universityId + "&EducationId=" + result.data.educationId + "&Startyear=" + result.data.startyear + "&Finishyear=" + result.data.finishyear + "&AreUniversityorDepartmentCanEditable=" + result.data.areUniversityorDepartmentCanEditable);
@@ -164,11 +163,11 @@ function getModalToConfirmFile(id) {
 function sendDocument() {
     var formData = new FormData();
     formData.append('File', $('#educationDocument')[0].files[0]);
-    formData.append('educationId', _educationIdForDocument);
+    formData.append('Id', _educationIdForDocument);
 
     $.ajax({
         type: 'POST',
-        url: "/api/me/educationdocument",
+        url: "/api/me/educationdocuments/",
         data: formData,
         processData: false,
         contentType: false,

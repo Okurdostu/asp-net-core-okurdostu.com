@@ -10,7 +10,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Okurdostu.Web.Controllers.Api
+namespace Okurdostu.Web.Controllers.Api.Me
 {
     [Route("api/me/educations")]
     public class EducationsController : SecureApiController
@@ -79,7 +79,7 @@ namespace Okurdostu.Web.Controllers.Api
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
 
-            var Educations = await Context.UserEducation.Where(x => x.UserId == Guid.Parse(User.Identity.GetUserId()) && !x.IsRemoved).Select(x => new
+            var Educations = await Context.UserEducation.Where(x => x.UserId == Guid.Parse(User.Identity.GetUserId())).Select(x => new
             {
                 x.Id,
                 x.EndYear,
@@ -99,7 +99,6 @@ namespace Okurdostu.Web.Controllers.Api
                 jsonReturnModel.Data = Educations;
                 return Succes(jsonReturnModel);
             }
-
 
             jsonReturnModel.Code = 404;
             return Error(jsonReturnModel);

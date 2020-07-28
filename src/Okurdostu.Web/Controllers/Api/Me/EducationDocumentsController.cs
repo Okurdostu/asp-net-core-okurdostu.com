@@ -11,17 +11,17 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Okurdostu.Web.Controllers.Api
+namespace Okurdostu.Web.Controllers.Api.Me
 {
-    //api/educationdocument/{actionroutename}
-    public class EducationDocumentController : SecureApiController
+    [Route("api/me/educationdocuments")]
+    public class EducationDocumentsController : SecureApiController
     {
 #pragma warning disable CS0618 // Type or member is obsolete
         private readonly IHostingEnvironment Environment;
 #pragma warning restore CS0618 // Type or member is obsolete
 
 #pragma warning disable CS0618 // Type or member is obsolete
-        public EducationDocumentController(IHostingEnvironment env) => Environment = env;
+        public EducationDocumentsController(IHostingEnvironment env) => Environment = env;
 #pragma warning restore CS0618 // Type or member is obsolete
 
         [NonAction]
@@ -38,8 +38,8 @@ namespace Okurdostu.Web.Controllers.Api
             }
         }
 
-        [HttpPost("post")] //api/educationdocument/post?educationId=..
-        public async Task<IActionResult> Post(Guid educationId, IFormFile File)
+        [HttpPost("")] //api/me/educationdocuments
+        public async Task<IActionResult> Post(Guid Id, IFormFile File)
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
 
@@ -74,7 +74,7 @@ namespace Okurdostu.Web.Controllers.Api
             var AuthenticatedUserId = Guid.Parse(User.Identity.GetUserId());
 
             var Education = await Context.UserEducation.FirstOrDefaultAsync(
-               x => x.Id == educationId
+               x => x.Id == Id
             && x.UserId == AuthenticatedUserId
             && !x.IsRemoved
             && !x.IsSentToConfirmation);
@@ -94,7 +94,7 @@ namespace Okurdostu.Web.Controllers.Api
                     var EducationDocument = new UserEducationDoc
                     {
                         CreatedOn = DateTime.Now,
-                        UserEducationId = educationId,
+                        UserEducationId = Id,
                         FullPath = FileFullPath, // C:/application/wwwroot/documents/{guid}.extensiontype
                         PathAfterRoot = "/documents/" + DocumentName, // /documents/{guid}.extensiontype
                     };
@@ -112,23 +112,16 @@ namespace Okurdostu.Web.Controllers.Api
                     }
                     else
                     {
-                        jsonReturnModel.Message = "Başaramadık, sonra tekrar deneyin";
-                        jsonReturnModel.Code = 200;
-
                         DeleteFileFromServer(EducationDocument.PathAfterRoot);
                         return Error(jsonReturnModel);
                     }
                 }
                 else
                 {
-                    jsonReturnModel.Message = "Başaramadık, sonra tekrar deneyin";
-                    jsonReturnModel.Code = 200;
-
                     for (int i = 0; i < 3; i++)
                     {
                         Logger.LogCritical("A user is trying to send education document but file wasn't create on server");
                     }
-
                     return Error(jsonReturnModel);
                 }
             }
