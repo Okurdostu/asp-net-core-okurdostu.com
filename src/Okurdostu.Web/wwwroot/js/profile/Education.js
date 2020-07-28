@@ -1,8 +1,8 @@
 ﻿var oldUniversityId, oldEducationId, oldDepartment, oldActivitiesSocieties, oldStartYear, oldFinishYear;
 
 function getModalToEditEducation(id) {
-    $.get("/api/education/get/" + id).done(function (result) {
-        if (result.status === true) {
+    $.get("/api/me/educations/" + id).done(function (result) {
+        if (result.succes === true) {
             oldUniversityId = result.data.universityId; oldActivitiesSocieties = result.data.activitiesSocieties;
             oldDepartment = result.data.department; oldEducationId = result.data.educationId;
             oldStartYear = result.data.startyear; oldFinishYear = result.data.finishyear;
@@ -33,7 +33,7 @@ $(document).on('submit', '#edit-education-form', function (evt) {
     }
     else {
         if (universityId != oldUniversityId || department != oldDepartment || educationId != oldEducationId || activitiesSocieties != oldActivitiesSocieties || startYear != oldStartYear || finishYear != oldFinishYear) {
-            apiEducationPost();
+            apiEducationPut();
         }
         else {
             Toast.fire({
@@ -65,59 +65,76 @@ $('#add-education-form').submit(function (evt) {
 });
 
 function apiEducationPost() {
-    $.post("/api/education/post", { UniversityId: universityId, Department: department, ActivitiesSocieties: activitiesSocieties, Startyear: startYear, Finishyear: finishYear, EducationId: educationId, __RequestVerificationToken: validatetoken })
+    $.post("/api/me/educations", { UniversityId: universityId, Department: department, ActivitiesSocieties: activitiesSocieties, Startyear: startYear, Finishyear: finishYear, EducationId: educationId, })
         .done(function (result) {
-            if (result.status === true) {
-                $('#edit-education-button').prop('disabled', true);
-                $('#add-education-button').prop('disabled', true);
-                Toast.fire({
-                    icon: 'success',
-                    html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
-                });
-                //yenilemek yerine bir eğitimlerin olduğu component'i yeniden çağırmam lazım
-                setTimeout(function () { location.reload(); }, 2000)
-            }
-            else {
-                Toast.fire({
-                    icon: 'warning',
-                    html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
-                });
-            }
+            $('#edit-education-button').prop('disabled', true);
+            $('#add-education-button').prop('disabled', true);
+            Toast.fire({
+                icon: 'success',
+                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+            });
+            setInterval(function () { location.reload() }, 2000);
+        })
+        .fail(function (result) {
+            Toast.fire({
+                icon: 'error',
+                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
+            });
         });
 };
 
-
-//remove
-var _educationIdForRemove;
-
-function getModalToRemoveEducation(id) {
-    $.get("/api/education/get/" + id).done(function (result) {
-        if (result.status === true) {
-            $('#education-remove-modal').modal('show');
-            _educationIdForRemove = id;
-
-        }
-    });
-};
-
-function removeEducation() {
-    $.post("/api/education/post", { educationIdForRemove: _educationIdForRemove, __RequestVerificationToken: validatetoken }).done(function (result) {
-        if (result.status === true) {
+function apiEducationPut(){
+    $.ajax({
+        url: '/api/me/educations/' + educationId,
+        type: 'PUT',
+        data: { UniversityId: universityId, Department: department, ActivitiesSocieties: activitiesSocieties, Startyear: startYear, Finishyear: finishYear },
+        success: function (result) {
             $('#education-remove-modal').modal('hide');
             $('#education-' + _educationIdForRemove).attr('style', 'display:none;');
             Toast.fire({
                 icon: 'success',
                 html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
             });
-        }
-        else if (result.message != null) {
-
+            setInterval(function () { location.reload() }, 2000);
+        },
+        error: function (result) {
             Toast.fire({
-                icon: 'info',
+                icon: 'warning',
+                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
+            });
+        }
+    });
+};
+
+
+//remove
+var _educationIdForRemove;
+
+function getModalToRemoveEducation(id) {
+    $.get("/api/me/educations/" + id).done(function (result) {
+        $('#education-remove-modal').modal('show');
+        _educationIdForRemove = id;
+    });
+};
+
+function removeEducation() {
+    $.ajax({
+        url: '/api/me/educations/' + _educationIdForRemove,
+        type: 'DELETE',
+        data: { Id : _educationIdForRemove },
+        success: function (result) {
+            $('#education-remove-modal').modal('hide');
+            $('#education-' + _educationIdForRemove).attr('style', 'display:none;');
+            Toast.fire({
+                icon: 'success',
                 html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
             });
-
-            setTimeout(function () { location.reload(); }, 2000)
+        },
+        error: function (result) {
+            Toast.fire({
+                icon: 'warning',
+                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
+            });
         }
     });
 };
@@ -125,12 +142,9 @@ function removeEducation() {
 
 var _educationIdForRemove;
 function getModalToRemoveEducation(id) {
-    $.get("/api/education/get/" + id).done(function (result) {
-        if (result.status === true) {
-            $('#education-remove-modal').modal('show');
-            _educationIdForRemove = id;
-
-        }
+    $.get("/api/me/educations/" + id).done(function (result) {
+        $('#education-remove-modal').modal('show');
+        _educationIdForRemove = id;
     });
 };
 
@@ -138,11 +152,9 @@ var _educationIdForDocument;
 var documentFile;
 
 function getModalToConfirmFile(id) {
-    $.get("/api/education/get/" + id).done(function (result) {
-        if (result.status === true) {
-            $('#education-confirm-modal').modal('show');
-            _educationIdForDocument = id;
-        }
+    $.get("/api/me/educations/" + id).done(function (result) {
+        $('#education-confirm-modal').modal('show');
+        _educationIdForDocument = id;
     });
 }
 
@@ -152,28 +164,26 @@ function sendDocument() {
     formData.append('educationId', _educationIdForDocument);
 
     $.ajax({
-            type:'POST',
-            url: "/api/educationdocument/post",
-            data: formData,
-            processData: false,
-            contentType: false,
-            type: "POST",
-            success: function (result) {
-                if (result.status === true) {
-                    Toast.fire({
-                        icon: 'success',
-                        html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
-                    });
-                    setTimeout(function () { location.reload(); }, 2000)
-                }
-                else if(result.message != null) {
-                    Toast.fire({
-                        icon: 'error',
-                        html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
-                    });
-                }
-            }
+        type: 'POST',
+        url: "/api/me/educationdocument",
+        data: formData,
+        processData: false,
+        contentType: false,
+        type: "POST",
+        success: function (result) {
+            Toast.fire({
+                icon: 'success',
+                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+            });
+            setTimeout(function () { location.reload(); }, 2000)
+        },
+        error: function (result) {
+            Toast.fire({
+                icon: 'error',
+                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
+            });
         }
+    }
     );
 }
 

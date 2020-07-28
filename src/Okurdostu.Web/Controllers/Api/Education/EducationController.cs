@@ -8,12 +8,15 @@ using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Filters;
 using Okurdostu.Web.Models;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers.Api
 {
-    //api/education/{actionroutename}
+    [ServiceFilter(typeof(ConfirmedEmailFilter))]
+    [Authorize]
+    [Route("api/me/educations")]
     public class EducationController : ApiController
     {
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -38,12 +41,12 @@ namespace Okurdostu.Web.Controllers.Api
             }
         }
 
-        [Authorize, HttpGet("get/{EducationId}")] //api/education/get/EducationId
-        public async Task<IActionResult> Get(Guid EducationId) //get education informations
+        [HttpGet("{Id}")]
+        public async Task<IActionResult> GetIndex(Guid Id)
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
             var AuthenticatedUserId = User.Identity.GetUserId();
-            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == EducationId && !x.IsRemoved && x.UserId == Guid.Parse(AuthenticatedUserId));
+            var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && x.UserId == Guid.Parse(AuthenticatedUserId));
 
             if (Education != null)
             {
@@ -51,7 +54,7 @@ namespace Okurdostu.Web.Controllers.Api
                 {
                     UniversityId = Education.UniversityId,
                     Department = Education.Department,
-                    EducationId = EducationId,
+                    EducationId = Id,
                     ActivitiesSocieties = Education.ActivitiesSocieties,
                     Startyear = int.Parse(Education.StartYear),
                     Finishyear = int.Parse(Education.EndYear),
@@ -67,79 +70,185 @@ namespace Okurdostu.Web.Controllers.Api
             }
             else
             {
-                jsonReturnModel.Code = 404;
                 return Error(jsonReturnModel);
             }
 
             return Succes(jsonReturnModel);
         }
 
-        [ServiceFilter(typeof(ConfirmedEmailFilter))] //api/education/post?EducationId=....&Somevalue=...
-        [HttpPost("post"), Authorize, ValidateAntiForgeryToken] //deleting, adding, editing a education information
-        public async Task<IActionResult> Post(EducationModel Model, Guid educationIdForRemove)
+        [HttpGet("")]
+        public async Task<IActionResult> GetIndex()
+        {
+            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+
+            var Educations = await Context.UserEducation.Where(x => x.UserId == Guid.Parse(User.Identity.GetUserId()) && !x.IsRemoved).Select(x => new
+            {
+                x.Id,
+                x.EndYear,
+                x.StartYear,
+                x.IsConfirmed,
+                x.IsActiveEducation,
+                x.IsSentToConfirmation,
+
+                universityPageUrl = "/universite/" + x.University.FriendlyName,
+                universityName = x.University.Name,
+                x.University.LogoUrl,
+                x.UniversityId,
+            }).ToListAsync();
+
+            if (Educations != null)
+            {
+                jsonReturnModel.Data = Educations;
+                return Succes(jsonReturnModel);
+            }
+
+
+            jsonReturnModel.Code = 404;
+            return Error(jsonReturnModel);
+        }
+
+        [HttpDelete("{Id}")]
+        public async Task<IActionResult> DeleteIndex(Guid Id)
         {
             var AuthenticatedUserId = User.Identity.GetUserId();
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
 
-            if (educationIdForRemove != Guid.Empty) //deleting a education information
+            if (!ModelState.IsValid)
             {
-                var deletedEducation = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == educationIdForRemove && !x.IsRemoved && Guid.Parse(AuthenticatedUserId) == x.UserId);
+                jsonReturnModel.Message = "Silinmesi gereken eğitim bilgisine ulaşılamadı";
+                jsonReturnModel.InternalMessage = "Id is required";
+                return Error(jsonReturnModel);
+            }
 
-                if (deletedEducation != null)
+            var deletedEducation = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && Guid.Parse(AuthenticatedUserId) == x.UserId);
+
+            if (deletedEducation != null)
+            {
+                var AuthUserActiveNeedCount = Context.Need.Where(x => !x.IsRemoved && x.UserId == Guid.Parse(AuthenticatedUserId)).Count();
+                if (deletedEducation.IsActiveEducation && AuthUserActiveNeedCount > 0)
                 {
-                    var AuthUserActiveNeedCount = Context.Need.Where(x => !x.IsRemoved && x.UserId == Guid.Parse(AuthenticatedUserId)).Count();
-                    if (deletedEducation.IsActiveEducation && AuthUserActiveNeedCount > 0)
-                    {
-                        jsonReturnModel.Code = 200;
-                        jsonReturnModel.Message = "Bu eğitimi silemezsiniz";
+                    jsonReturnModel.Message = "Bu eğitimi silemezsiniz";
 
-                        TempData["ProfileMessage"] = "İhtiyaç kampanyanız olduğu için" +
-                            "<br />" +
-                            "Aktif olan eğitim bilginizi silemezsiniz." +
-                            "<br />" +
-                            "Aktif olan eğitim bilgisi, belge yollayarak hala burada okuduğunuzu iddia ettiğiniz bir eğitim bilgisidir." +
-                            "<br/>" +
-                            "Daha fazla ayrıntı ve işlem için: info@okurdostu.com";
+                    TempData["ProfileMessage"] = "İhtiyaç kampanyanız olduğu için" +
+                        "<br />" +
+                        "Aktif olan eğitim bilginizi silemezsiniz." +
+                        "<br />" +
+                        "Aktif olan eğitim bilgisi, belge yollayarak hala burada okuduğunuzu iddia ettiğiniz bir eğitim bilgisidir." +
+                        "<br/>" +
+                        "Daha fazla ayrıntı ve işlem için: info@okurdostu.com";
 
-                        return Error(jsonReturnModel);
-                    }
-                    else
-                    {
-                        deletedEducation.IsRemoved = true;
-                        var result = await Context.SaveChangesAsync();
-                        if (result > 0)
-                        {
-                            jsonReturnModel.Message = "Eğitim bilgisi kaldırıldı";
-                            try
-                            {
-                                if (deletedEducation.IsSentToConfirmation)
-                                {
-                                    var educationDocuments = await Context.UserEducationDoc.Where(x => x.UserEducationId == deletedEducation.Id).ToListAsync();
-                                    foreach (var item in educationDocuments)
-                                    {
-                                        if (DeleteFileFromServer(item.PathAfterRoot))
-                                        {
-                                            Context.Remove(item);
-                                        }
-                                    }
-                                    await Context.SaveChangesAsync();
-                                }
-                            }
-                            catch (Exception)
-                            {
-
-                            }
-
-                            return Succes(jsonReturnModel);
-                        }
-                    }
+                    return Error(jsonReturnModel);
                 }
                 else
                 {
-                    jsonReturnModel.Code = 404;
+                    deletedEducation.IsRemoved = true;
+                    var result = await Context.SaveChangesAsync();
+
+                    if (result > 0)
+                    {
+                        jsonReturnModel.Message = "Eğitim bilgisi kaldırıldı";
+                        if (deletedEducation.IsSentToConfirmation)
+                        {
+                            var educationDocuments = await Context.UserEducationDoc.Where(x => x.UserEducationId == deletedEducation.Id).ToListAsync();
+                            foreach (var item in educationDocuments)
+                            {
+                                if (DeleteFileFromServer(item.PathAfterRoot))
+                                {
+                                    Context.Remove(item);
+                                }
+                            }
+                            await Context.SaveChangesAsync();
+                        }
+                        return Succes(jsonReturnModel);
+                    }
+                    else
+                    {
+                        jsonReturnModel.Message = "Başaramadık, ne olduğunu bilmiyoruz";
+                        jsonReturnModel.InternalMessage = "Changes aren't save";
+                        return Error(jsonReturnModel);
+                    }
+                }
+            }
+            else
+            {
+                jsonReturnModel.Message = "Böyle bir eğitiminiz yok";
+                jsonReturnModel.InternalMessage = "Education is null";
+                return Error(jsonReturnModel);
+            }
+        }
+
+        [HttpPut("{Id}")]
+        public async Task<IActionResult> PutIndex(Guid Id, EducationModel Model)
+        {
+            var AuthenticatedUserId = User.Identity.GetUserId();
+            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+
+            var editedEducation = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && Guid.Parse(AuthenticatedUserId) == x.UserId);
+
+            if (editedEducation != null)
+            {
+                editedEducation.StartYear = Model.Startyear.ToString();
+                editedEducation.EndYear = Model.Finishyear.ToString();
+                editedEducation.ActivitiesSocieties = Model.ActivitiesSocieties;
+
+                if (editedEducation.AreUniversityorDepartmentCanEditable())
+                {
+                    editedEducation.UniversityId = Model.UniversityId;
+                    editedEducation.Department = Model.Department;
+                }
+            }
+            else
+            {
+                jsonReturnModel.Message = "Böyle bir eğitiminiz yok";
+                jsonReturnModel.InternalMessage = "Education is null";
+
+                return Error(jsonReturnModel);
+            }
+
+            try
+            {
+                var result = await Context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    jsonReturnModel.Message = "Eğitim bilgisi kaydedildi";
+                    return Succes(jsonReturnModel);
+                }
+                else
+                {
+                    jsonReturnModel.Message = "Bir işlem yapılmadı";
                     return Error(jsonReturnModel);
                 }
             }
+            catch (Exception e)
+            {
+                string innerMessage = (e.InnerException != null) ? e.InnerException.Message.ToLower() : "";
+
+                if (innerMessage.Contains("department"))
+                {
+                    jsonReturnModel.Message = "Bölüm bilgilerine ulaşamadık veya eksik";
+                }
+                else if (innerMessage.Contains("university"))
+                {
+                    jsonReturnModel.Message = "Üniversite bilgilerine ulaşamadık veya eksik";
+                }
+                else if (innerMessage.Contains("startyear") || innerMessage.Contains("endyear"))
+                {
+                    jsonReturnModel.Message = "Başlangıç veya bitiş yılını kontrol edin";
+                }
+                else
+                {
+                    jsonReturnModel.Message = "Başaramadık ve ne olduğunu bilmiyoruz, tekrar deneyin";
+                }
+
+                return Error(jsonReturnModel);
+            }
+        }
+
+        [HttpPost("")]
+        public async Task<IActionResult> PostIndex(EducationModel Model)
+        {
+            var AuthenticatedUserId = User.Identity.GetUserId();
+            JsonReturnModel jsonReturnModel = new JsonReturnModel();
 
             if (Model.Startyear > Model.Finishyear)
             {
@@ -154,43 +263,19 @@ namespace Okurdostu.Web.Controllers.Api
                 return Error(jsonReturnModel);
             }
 
-            if (Model.EducationId != Guid.Empty) //editing a education information
+
+            var NewEducation = new UserEducation
             {
-                var editedEducation = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Model.EducationId && !x.IsRemoved && Guid.Parse(AuthenticatedUserId) == x.UserId);
+                UserId = Guid.Parse(AuthenticatedUserId),
+                UniversityId = Model.UniversityId,
+                Department = Model.Department,
+                ActivitiesSocieties = Model.ActivitiesSocieties,
+                StartYear = Model.Startyear.ToString(),
+                EndYear = Model.Finishyear.ToString(),
+            };
+            await Context.AddAsync(NewEducation);
 
-                if (editedEducation != null)
-                {
-                    editedEducation.StartYear = Model.Startyear.ToString();
-                    editedEducation.EndYear = Model.Finishyear.ToString();
-                    editedEducation.ActivitiesSocieties = Model.ActivitiesSocieties;
-
-                    if (editedEducation.AreUniversityorDepartmentCanEditable())
-                    {
-                        editedEducation.UniversityId = Model.UniversityId;
-                        editedEducation.Department = Model.Department;
-                    }
-                }
-                else
-                {
-                    jsonReturnModel.Code = 404;
-                    return Error(jsonReturnModel);
-                }
-            }
-            else //adding a new education information
-            {
-                var NewEducation = new UserEducation
-                {
-                    UserId = Guid.Parse(AuthenticatedUserId),
-                    UniversityId = Model.UniversityId,
-                    Department = Model.Department,
-                    ActivitiesSocieties = Model.ActivitiesSocieties,
-                    StartYear = Model.Startyear.ToString(),
-                    EndYear = Model.Finishyear.ToString(),
-                };
-                await Context.AddAsync(NewEducation);
-            }
-
-            try //db savechanges, editing and adding
+            try
             {
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
@@ -230,41 +315,6 @@ namespace Okurdostu.Web.Controllers.Api
 
                 return Error(jsonReturnModel);
             }
-        }
-
-        [HttpGet("list/{username}")] //api/education/list/username
-        public async Task<IActionResult> List(string username)
-        {
-            var AppUser = await Context.User.FirstOrDefaultAsync(x => x.Username == username);
-            JsonReturnModel jsonReturnModel = new JsonReturnModel();
-
-            if (AppUser != null)
-            {
-                var Educations = await Context.UserEducation.Where(x => x.UserId == AppUser.Id && !x.IsRemoved).Select(x => new
-                {
-                    x.Id,
-                    x.EndYear,
-                    x.StartYear,
-                    x.IsRemoved,
-                    x.IsConfirmed,
-                    x.IsActiveEducation,
-                    x.IsSentToConfirmation,
-
-                    universityPageUrl = "/universite/" + x.University.FriendlyName,
-                    universityName = x.University.Name,
-                    x.University.LogoUrl,
-                    x.UniversityId,
-                }).ToListAsync();
-
-                if (Educations != null)
-                {
-                    jsonReturnModel.Data = Educations;
-                    return Succes(jsonReturnModel);
-                }
-            }
-
-            jsonReturnModel.Code = 404;
-            return Error(jsonReturnModel);
         }
 
     }
