@@ -7,8 +7,11 @@ Form.submit(function (e) {
     var _Github = $("input[name='Github']").val();
     var _ContactEmail = $("input[name='ContactEmail']").val();
 
-    $.post("/api/me/contact", { Twitter: _Twitter, Github: _Github, ContactEmail: _ContactEmail })
-        .done(function (result) {
+    $.ajax({
+        url: '/api/me/contact',
+        type: 'PATCH',
+        data: { Twitter: _Twitter, Github: _Github, ContactEmail: _ContactEmail },
+        success: function (result) {
             Toast.fire({
                 icon: 'success',
                 html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
@@ -16,11 +19,12 @@ Form.submit(function (e) {
             setInterval(function () {
                 location.reload();
             }, 2000);
-
-        }).fail(function (result) {
+        },
+        error: function (result) {
             Toast.fire({
                 icon: 'error',
                 html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
             });
-        });
+        }
+    });
 });

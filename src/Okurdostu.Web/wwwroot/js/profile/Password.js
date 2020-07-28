@@ -7,6 +7,7 @@ Form.submit(function (e) {
     var _Password = $("input[name='Password']").val();
 
     if (_ConfirmPassword.length <= 0) {
+
         Toast.fire()
         {
             Toast.fire({
@@ -22,24 +23,20 @@ Form.submit(function (e) {
         });
     }
     else {
-        $.post("/api/me/password", { PasswordConfirmPassword: _ConfirmPassword, Password: _Password })
-            .done(function (result) {
-                if (result.succes === true) {
-                    $("input[name='PasswordConfirmPassword']").val('');
-                    $("input[name='Password']").val('');
-
-                    AccountSettingsModal.modal('hide');
-                    Toast.fire({
-                        icon: 'success',
-                        html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
-                    });
-                }
-                else {
-                    
-                    
-                }
-            })
-            .fail(function (result) {
+        $.ajax({
+            url: '/api/me/password',
+            type: 'PATCH',
+            data: { PasswordConfirmPassword: _ConfirmPassword, Password: _Password },
+            success: function (result) {
+                $("input[name='PasswordConfirmPassword']").val('');
+                $("input[name='Password']").val('');
+                AccountSettingsModal.modal('hide');
+                Toast.fire({
+                    icon: 'success',
+                    html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+                });
+            },
+            error: function (result) {
                 if (result.responseJSON.message === 'Kimliğinizi doğrulayamadık: Onay parolası') {
                     $("input[name='PasswordConfirmPassword']").focus();
                 }
@@ -47,6 +44,7 @@ Form.submit(function (e) {
                     icon: 'warning',
                     html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
                 });
-            });
+            }
+        });
     }
 });

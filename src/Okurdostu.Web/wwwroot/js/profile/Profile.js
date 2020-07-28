@@ -24,20 +24,23 @@ Form.submit(function (e) {
         }
     }
     else {
-        $.post("/api/me/profile", { FullName: _Fullname, Biography: _Biography })
-            .fail(function (result) {
-                Toast.fire({
-                    icon: 'warning',
-                    html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
-                });
-            }).done(function (result) {
+        $.ajax({
+            url: '/api/me/profile/',
+            type: 'PATCH',
+            data: { FullName: _Fullname, Biography: _Biography },
+            success: function (result) {
                 Toast.fire({
                     icon: 'success',
                     html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
                 });
-                setInterval(function () {
-                    location.reload();
-                }, 2000);
-            });
+                setInterval(function () { location.reload() }, 2000);
+            },
+            error: function (result) {
+                Toast.fire({
+                    icon: 'warning',
+                    html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
+                });
+            }
+        });
     }
 });

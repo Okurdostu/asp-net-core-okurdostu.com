@@ -29,7 +29,7 @@ namespace Okurdostu.Web.Controllers.Api
             public string Username { get; set; }
         }
 
-        [HttpPut("username")]
+        [HttpPatch("username")]
         public async Task<IActionResult> Username(UsernameModel model)
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
@@ -101,8 +101,7 @@ namespace Okurdostu.Web.Controllers.Api
             public string Password { get; set; }
         }
 
-        [ServiceFilter(typeof(ConfirmedEmailFilter))]
-        [HttpPut("password")]
+        [HttpPatch("password")]
         public async Task<IActionResult> Password(PasswordModel model)
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
@@ -152,8 +151,7 @@ namespace Okurdostu.Web.Controllers.Api
             public string ContactEmail { get; set; }
         }
 
-        [ServiceFilter(typeof(ConfirmedEmailFilter))]
-        [HttpPost("contact")]
+        [HttpPatch("contact")]
         public async Task<IActionResult> Contact(ContactModel model)
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
@@ -211,8 +209,7 @@ namespace Okurdostu.Web.Controllers.Api
             public string Biography { get; set; }
         }
 
-        [ServiceFilter(typeof(ConfirmedEmailFilter))]
-        [HttpPost("profile")]
+        [HttpPatch("profile")]
         public async Task<IActionResult> Profile(ProfileModel model) //editing, adding bio and fullname
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();

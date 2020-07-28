@@ -15,9 +15,8 @@ using System.Threading.Tasks;
 namespace Okurdostu.Web.Controllers.Api
 {
     [ServiceFilter(typeof(ConfirmedEmailFilter))]
-    [Authorize]
     [Route("api/me/educations")]
-    public class EducationController : ApiController
+    public class EducationController : SecureApiController
     {
 #pragma warning disable CS0618 // Type or member is obsolete
         private readonly IHostingEnvironment Environment;
