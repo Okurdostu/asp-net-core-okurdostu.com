@@ -70,7 +70,7 @@
                             }
                             else
                             {
-                                <p class="mb-0" style="font-size:13.5px">@mainComment.Comment.ToString()</p>
+                                <p id="@mainComment.Id" class="mb-0" style="font-size:13.5px">@mainComment.Comment.ToString()</p>
                             }
                         </div>
                         <!-- İşlemler -->
@@ -95,96 +95,6 @@
             <br />
         }
     </div>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-    @if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
-    {
-        <script>
-            var EditingCommentId;
-            var EditingOldComment;
-            var NewComment;
-
-            function getEditDialog(id) {
-                EditingCommentId = id;
-                $.get("/Comment/GetContent", { Id: EditingCommentId }).done(function (data) {
-                    if (data.state === true) {
-                        $("#edit-comment-input").val(data.comment);
-                        EditingOldComment = data.comment;
-                        $('#edit-comment-modal').modal('show');
-                    }
-                });
-            };
-            $("#edit-comment").click(function () {
-                NewComment = $('#edit-comment-input').val();
-                if (NewComment.length === 0) {
-                    swal("Yorum düzenleme", "Boş bir girdi ile düzenleme yapamazsın", "info", {
-                        button: "Tamam",
-                        timer: 2500
-                    });
-                }
-                else if (NewComment.length > 100) {
-                    swal("Yorum düzenleme", "En fazla 100 karakter", "info", {
-                        button: "Tamam",
-                        timer: 2500
-                    });
-                }
-                else if (NewComment === EditingOldComment) {
-                    swal("Yorum düzenleme", "Aynı içeriği giriyorsunuz", "info", {
-                        button: "Tamam",
-                        timer: 2500
-                    });
-                }
-                else {
-                    $.post("/Comment/EditComment", { Id: EditingCommentId, EditCommentInput: NewComment, __RequestVerificationToken: validatetoken })
-                        .done(function (response) {
-                            if (response.state == true) {
-                                $('#edit-comment-modal').modal('hide');
-                                GetComments(null);
-                            }
-                            else if (response.state == false && response.errorMessage.length > 0) {
-                                swal("Yorum düzenleme", response.errorMessage, "error", {
-                                    button: "Tamam",
-                                    timer: 2500
-                                });
-                            }
-                            else if (response.state == false && response.infoMessage.length > 0) {
-                                swal("Yorum düzenleme", response.infoMessage, "info", {
-                                    button: "Tamam",
-                                    timer: 2500
-                                });
-                            }
-                        });
-                }
-            });
-
-            var DeletingCommentId;
-            function getDeleteDialog(id) {
-                DeletingCommentId = id;
-                $('#delete-comment').modal('show');
-            };
-            $("#delete").click(function () {
-                $.post("/Comment/DeleteComment", { Id: DeletingCommentId, __RequestVerificationToken: validatetoken })
-                    .done(function (bool) {
-                        if (bool) {
-                            GetComments(null);
-                        }
-                        $('#delete-comment').modal('hide');
-                    });
-            });
-
-            var ReplyingCommentId;
-            function getReplyDialog(id) {
-                ReplyingCommentId = id;
-                $.get("/Comment/GetContent", { Id: ReplyingCommentId }).done(function (_data) {
-                    if (_data.state) {
-                        $("#replying-comment").html(_data.comment);
-                        $("#replying-user-fullname").html(_data.fullname);
-                        $("#repyling-user-username").html('(\u0040' + _data.username + ')');
-                        $('#reply-comment-modal').modal('show');
-                    }
-                });
-            };
-        </script>
-    }
 }
 else
 {

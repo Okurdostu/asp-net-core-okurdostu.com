@@ -81,8 +81,6 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
         }
         @await Component.InvokeAsync("NeedDescriptionSupporter", new { need = Model })
     </div>
-
-
     <script type="text/javascript">
         var oldDataFromComments = "oldDataFromComments"; var newDataFromComments = "newDataFromComments";
         function GetComments(scrollingTargetId) {
@@ -104,11 +102,10 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
             GetComments();
         });
 
-        setInterval(function () { GetComments(); }, 15000);
+        setInterval(function () { GetComments(); }, 30000);
 
         $("#ShowLikers").on("click", function () {$.post("/Like/Likers", { id: '@Model.Id', username: '@Model.User.Username', __RequestVerificationToken: validatetoken }).done(function (likers) { $("#Likers").html(likers) }); });
     </script>
-
     @if (!HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
     {
         <script>
@@ -129,9 +126,63 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
     }
     else
     {
-        <partial name="~/Views/Comment/_EditCommentPartial.cshtml" model="null" />
-        <partial name="~/Views/Comment/_DoReplyPartial.cshtml" model="null" />
-        <div class="modal fade" id="delete-comment" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog modal-sm modal-dialog-centered" role="document"> <div class="modal-content" style="background: transparent;"> <div class="modal-body bg-light text-center" style="border-radius: 25px;"> <p class="font-weight-bold text-black-50"> Sildiğiniz içerik sonsuza kadar yok olacak </p><button id="delete" class="btn btn-block btn-danger rounded-custom font-weight-bold mb-1 mt-1">Sil</button> <button class="btn btn-block btn-outline-secondary rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button> </div></div></div></div>
+        <div class="modal fade" id="delete-comment-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+                <div class="modal-content" style="background: transparent;">
+                    <div class="modal-body bg-light text-center" style="border-radius: 25px;">
+                        <p class="font-weight-bold text-black-50">Sildiğiniz içerik sonsuza kadar yok olacak</p>
+                        <button onclick="DeleteComment()" class="btn btn-block btn-danger rounded-custom font-weight-bold mb-1 mt-1">Sil</button>
+                        <button class="btn btn-block btn-outline-secondary rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="edit-comment-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content" style="background: transparent;">
+                    <div class="modal-body bg-light" style="border-radius: 25px;">
+                        <h4 class="font-weight-bold text-center text-black-50">Yorumunu düzenleme</h4>
+                        <div class="form-horizontal">
+                            <div class="form-group"><textarea class="form-control" id="edit-comment-input" maxlength="100" name="edit-comment-input" style="height: 100px;" autocomplete="off"></textarea></div>
+
+                            <div class="modal-footer pb-0 pt-1">
+                                <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
+                                <button onclick="EditComment()" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold">Düzenle</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="reply-comment-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content" style="background: transparent;">
+                    <div class="modal-body bg-light" style="border-radius: 25px;">
+                        <h4 class="font-weight-bold text-center text-black-50">Cevaplıyorsun</h4>
+                        <div id="replycomment-div">
+                            <input id="RelatedCommentId" name="RelatedCommentId" hidden="hidden" value="" />
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-auto small">
+                                            <span id="replying-user-fullname" class="font-weight-bold mb-1 od"></span> <span id="repyling-user-username" class="text-black-50 font-weight-bold"></span> <br />
+                                            <p id="replying-comment" class="font-weight-bold text-black-50 text-break" style="font-size: 13.5px;"></p>
+                                        </div>
+                                    </div>
+                                    <span class="font-weight-bold text-black-50 mt-2">Senin cevabın:</span>
+                                    <textarea class="form-control" id="ReplyComment" name="ReplyComment" required="required" style="height: 100px;" autocomplete="off" maxlength="100"></textarea>
+                                </div>
+                                <div class="modal-footer pb-0 pt-1">
+                                    <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
+                                    <button onclick="ReplyComment()" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold">Cevapla</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script type="text/javascript">
             function LikeRefresh() {
                 $.ajax({
@@ -146,78 +197,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
             };
             LikeRefresh();
 
-            setInterval(function () { LikeRefresh(); }, 10000);
-
-            //do comment (post, controller: Comment, Action: Comment)
-            $("#DoComment").click(function () {
-                if ($("#Comment").val().length <= 100) {
-                    $.post("/Comment/Comment", { NeedId: '@Model.Id', Comment: $("#Comment").val(), __RequestVerificationToken: validatetoken })
-                        .done(function (result) {
-                            if (result.id.length > 0) {
-                                GetComments(result.id);
-                                $("#Comment").val("");
-                            }
-                            else if (result.errorMesage.length > 0) {
-                                swal("Tartışma başlatma", result.errorMesage, "error", {
-                                    button: "Tamam",
-                                    timer: 2500
-                                });
-                            }
-                            else if (result.infoMessage.length > 0) {
-                                swal("Tartışma başlatma", result.infoMessage, "info", {
-                                    button: "Tamam",
-                                    timer: 2500
-                                });
-                            }
-                        });
-                }
-                else {
-                    swal("Tartışma başlatma", "En fazla 100 karakter", "info", {
-                        button: "Tamam",
-                        timer: 2500
-                    });
-                }
-            });
-
-            //do reply (post, controller: Comment, Action: Comment)
-            $("#DoReply").click(function () {
-                var ReplyComment = $("#ReplyComment").val();
-                if (ReplyComment.length > 100) {
-                    swal("Cevaplama", "En fazla 100 karakter", "info", {
-                        button: "Tamam",
-                        timer: 2500
-                    });
-                }
-                else if (ReplyComment.length === 0) {
-                    swal("Cevaplama", "Boş bir girdi ile cevaplayamazsınız", "info", {
-                        button: "Tamam",
-                        timer: 2500
-                    });
-                }
-
-                else {
-                    $.post("/Comment/Comment", { RelatedCommentId: ReplyingCommentId, Comment: $("#ReplyComment").val(), __RequestVerificationToken: validatetoken })
-                        .done(function (result) {
-                            if (result.id.length > 0) {
-                                GetComments(result.id);
-                                $('#reply-comment-modal').modal('hide');
-                                $("#ReplyComment").val("");
-                            }
-                            else if (result.errorMesage.length > 0) {
-                                swal("Cevaplama", result.errorMesage, "error", {
-                                    button: "Tamam",
-                                    timer: 2500
-                                });
-                            }
-                            else if (result.infoMessage.length > 0) {
-                                swal("Cevaplama", result.infoMessage, "info", {
-                                    button: "Tamam",
-                                    timer: 2500
-                                });
-                            }
-                        });
-                }
-            });
+            setInterval(function () { LikeRefresh(); }, 15000);
 
             $("#Like").on("click", function () {
                 $.ajax({
@@ -228,6 +208,11 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                     success() { LikeRefresh(); },
                 });
             });
+        </script>
+        <script src="~/js/comment/comment.js"></script>
+        <script src="~/lib/sweetalert/sweetalert2.all.min.js"></script>
+        <script>
+            const Toast = Swal.mixin({ toast: true, position: 'top-end', timer: 2000, showConfirmButton: false, timerProgressBar: true, });
         </script>
     }
 }

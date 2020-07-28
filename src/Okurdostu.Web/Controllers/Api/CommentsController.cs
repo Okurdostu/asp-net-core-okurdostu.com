@@ -44,6 +44,7 @@ namespace Okurdostu.Web.Controllers.Api
             [DataType(DataType.MultilineText)]
             public string Comment { get; set; }
         }
+
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost("")]
         public async Task<IActionResult> PostAdd(CommentModel model) //doing comment or reply
@@ -73,7 +74,7 @@ namespace Okurdostu.Web.Controllers.Api
                 return Error(jsonReturnModel);
             }
 
-            if (model.NeedId != Guid.Empty) // add new comment
+            if (model.NeedId != Guid.Empty && model.NeedId != null) // add new comment
             {
                 var commentedNeed = await Context.Need.AnyAsync(x => x.Id == model.NeedId && !x.IsRemoved && x.IsConfirmed);
 
@@ -166,7 +167,7 @@ namespace Okurdostu.Web.Controllers.Api
                 DeletedComment.Comment = ""; // aynı şekilde içerik yok edilmeli
                 await Context.SaveChangesAsync();
 
-                jsonReturnModel.Message = "Başarılı, yorumunuz silindi";
+                jsonReturnModel.Message = "Yorumunuz silindi";
                 return Succes(jsonReturnModel);
             }
             else
