@@ -14,7 +14,7 @@ namespace Okurdostu.Web.Controllers.Api
     {
         //api/comments/{Id} -- get single comment
         [HttpGet("{Id}")]
-        public async Task<IActionResult> Index(Guid Id)
+        public async Task<IActionResult> GetSingle(Guid Id)
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
             //when user does reply a comment or wants to edit their comment, it works to view comment that will be edited or replied.
@@ -46,7 +46,7 @@ namespace Okurdostu.Web.Controllers.Api
         }
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost("")]
-        public async Task<IActionResult> PostIndex(CommentModel model) //doing comment or reply
+        public async Task<IActionResult> PostAdd(CommentModel model) //doing comment or reply
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
 
@@ -147,7 +147,7 @@ namespace Okurdostu.Web.Controllers.Api
 
         //api/comments/remove/{Id}
         [HttpPatch("remove/{Id}")]
-        public async Task<IActionResult> RemoveIndex(Guid Id)
+        public async Task<IActionResult> PatchRemove(Guid Id)
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
             if (Id == null || Id == Guid.Empty)
@@ -188,7 +188,7 @@ namespace Okurdostu.Web.Controllers.Api
             public string Comment { get; set; }
         }
         [HttpPatch("{Id}")]
-        public async Task<IActionResult> PatchIndex(EditCommentModel model)
+        public async Task<IActionResult> PatchEdit(EditCommentModel model)
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
             var EditedComment = await Context.NeedComment.FirstOrDefaultAsync(x => x.Id == model.Id && !x.IsRemoved && x.UserId == Guid.Parse(User.Identity.GetUserId()));

@@ -120,7 +120,7 @@ function getModalToRemoveEducation(id) {
 function removeEducation() {
     $.ajax({
         url: '/api/me/educations/' + _educationIdForRemove,
-        type: 'DELETE',
+        type: 'PATCH',
         data: { Id : _educationIdForRemove },
         success: function (result) {
             $('#education-remove-modal').modal('hide');

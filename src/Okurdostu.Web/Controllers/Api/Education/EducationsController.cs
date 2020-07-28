@@ -12,16 +12,15 @@ using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers.Api
 {
-    [ServiceFilter(typeof(ConfirmedEmailFilter))]
     [Route("api/me/educations")]
-    public class EducationController : SecureApiController
+    public class EducationsController : SecureApiController
     {
 #pragma warning disable CS0618 // Type or member is obsolete
         private readonly IHostingEnvironment Environment;
 #pragma warning restore CS0618 // Type or member is obsolete
 
 #pragma warning disable CS0618 // Type or member is obsolete
-        public EducationController(IHostingEnvironment env) => Environment = env;
+        public EducationsController(IHostingEnvironment env) => Environment = env;
 #pragma warning restore CS0618 // Type or member is obsolete
 
         [NonAction]
@@ -38,8 +37,9 @@ namespace Okurdostu.Web.Controllers.Api
             }
         }
 
+        // /api/me/educations/{Id} : get single education
         [HttpGet("{Id}")]
-        public async Task<IActionResult> GetIndex(Guid Id)
+        public async Task<IActionResult> GetSingle(Guid Id)
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
             var AuthenticatedUserId = User.Identity.GetUserId();
@@ -73,8 +73,9 @@ namespace Okurdostu.Web.Controllers.Api
             return Succes(jsonReturnModel);
         }
 
+        // /api/me/educations : get all educations
         [HttpGet("")]
-        public async Task<IActionResult> GetIndex()
+        public async Task<IActionResult> GetList()
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
 
@@ -104,8 +105,9 @@ namespace Okurdostu.Web.Controllers.Api
             return Error(jsonReturnModel);
         }
 
-        [HttpDelete("{Id}")]
-        public async Task<IActionResult> DeleteIndex(Guid Id)
+        // /api/me/educations/{Id} -- isRemoved = true
+        [HttpPatch("{Id}")]
+        public async Task<IActionResult> PatchRemove(Guid Id)
         {
             var AuthenticatedUserId = User.Identity.GetUserId();
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
@@ -174,8 +176,9 @@ namespace Okurdostu.Web.Controllers.Api
             }
         }
 
+        // /api/me/educations/{Id} -- edit all columns
         [HttpPut("{Id}")]
-        public async Task<IActionResult> PutIndex(Guid Id, EducationModel Model)
+        public async Task<IActionResult> PutEdit(Guid Id, EducationModel Model)
         {
             var AuthenticatedUserId = User.Identity.GetUserId();
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
@@ -241,8 +244,10 @@ namespace Okurdostu.Web.Controllers.Api
             }
         }
 
+        // /api/me/educations -- add a new education
+        [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost("")]
-        public async Task<IActionResult> PostIndex(EducationModel Model)
+        public async Task<IActionResult> PostAdd(EducationModel Model)
         {
             var AuthenticatedUserId = User.Identity.GetUserId();
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
@@ -260,7 +265,6 @@ namespace Okurdostu.Web.Controllers.Api
                 return Error(jsonReturnModel);
             }
 
-
             var NewEducation = new UserEducation
             {
                 UserId = Guid.Parse(AuthenticatedUserId),
@@ -271,7 +275,6 @@ namespace Okurdostu.Web.Controllers.Api
                 EndYear = Model.Finishyear.ToString(),
             };
             await Context.AddAsync(NewEducation);
-
             try
             {
                 var result = await Context.SaveChangesAsync();
@@ -313,6 +316,5 @@ namespace Okurdostu.Web.Controllers.Api
                 return Error(jsonReturnModel);
             }
         }
-
     }
 }
