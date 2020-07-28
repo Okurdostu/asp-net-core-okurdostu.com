@@ -11,7 +11,8 @@ using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers.Api
 {
-    public class AccountController : SecureApiController
+    [ServiceFilter(typeof(ConfirmedEmailFilter))]
+    public class MeController : SecureApiController
     {
         public class UsernameModel
         {
@@ -28,15 +29,13 @@ namespace Okurdostu.Web.Controllers.Api
             public string Username { get; set; }
         }
 
-        [ServiceFilter(typeof(ConfirmedEmailFilter))]
-        [HttpPost("username")]
+        [HttpPut("username")]
         public async Task<IActionResult> Username(UsernameModel model)
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
 
             if (!ModelState.IsValid)
             {
-                jsonReturnModel.Code = 200;
                 jsonReturnModel.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
                 return Error(jsonReturnModel);
             }
@@ -70,13 +69,12 @@ namespace Okurdostu.Web.Controllers.Api
                             }
                         }
                     }
-                    jsonReturnModel.Code = 200;
+
                     jsonReturnModel.Message = "Aynı değeri girdiniz";
                     return Error(jsonReturnModel);
                 }
                 else
                 {
-                    jsonReturnModel.Code = 200;
                     jsonReturnModel.Message = "Bu kullanıcı adını: " + model.Username + " kullanamazsınız";
                     return Error(jsonReturnModel);
                 }
@@ -84,7 +82,6 @@ namespace Okurdostu.Web.Controllers.Api
             else
             {
                 jsonReturnModel.Message = "Kimliğinizi doğrulayamadık: Onay parolası";
-                jsonReturnModel.Code = 200;
                 return Error(jsonReturnModel);
             }
         }
@@ -105,14 +102,13 @@ namespace Okurdostu.Web.Controllers.Api
         }
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
-        [HttpPost("password")]
+        [HttpPut("password")]
         public async Task<IActionResult> Password(PasswordModel model)
         {
             JsonReturnModel jsonReturnModel = new JsonReturnModel();
 
             if (!ModelState.IsValid)
             {
-                jsonReturnModel.Code = 200;
                 jsonReturnModel.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
                 return Error(jsonReturnModel);
             }
@@ -125,14 +121,7 @@ namespace Okurdostu.Web.Controllers.Api
                 {
                     AuthenticatedUser.Password = model.Password;
                     AuthenticatedUser.LastChangedOn = DateTime.Now;
-                    var result = await Context.SaveChangesAsync();
-
-                    if (result <= 0)
-                    {
-                        jsonReturnModel.Code = 200;
-                        jsonReturnModel.Message = "Başaramadık, ne olduğunu bilmiyoruz";
-                        return Error(jsonReturnModel);
-                    }
+                    await Context.SaveChangesAsync();
                 }
 
                 jsonReturnModel.Message = "Parolanız değiştirildi";
@@ -141,7 +130,6 @@ namespace Okurdostu.Web.Controllers.Api
             else
             {
                 jsonReturnModel.Message = "Kimliğinizi doğrulayamadık: Onay parolası";
-                jsonReturnModel.Code = 200;
                 return Error(jsonReturnModel);
             }
         }
@@ -172,7 +160,6 @@ namespace Okurdostu.Web.Controllers.Api
 
             if (!ModelState.IsValid)
             {
-                jsonReturnModel.Code = 200;
                 jsonReturnModel.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
                 return Error(jsonReturnModel);
             }
@@ -196,26 +183,17 @@ namespace Okurdostu.Web.Controllers.Api
                     AuthenticatedUser.LastChangedOn = DateTime.Now;
                 }
 
-                var result = await Context.SaveChangesAsync();
-                if (result > 0)
-                {
-                    jsonReturnModel.Message = "İletişim bilgileriniz kaydedildi";
-                    return Succes(jsonReturnModel);
-                }
-                else
-                {
-                    jsonReturnModel.Code = 200;
-                    jsonReturnModel.Message = "Başaramadık, ne olduğunu bilmiyoruz";
-                    return Error(jsonReturnModel);
-                }
+                await Context.SaveChangesAsync();
+                jsonReturnModel.Message = "İletişim bilgileriniz kaydedildi";
+                return Succes(jsonReturnModel);
+
             }
             else
             {
-                jsonReturnModel.Code = 200;
-                jsonReturnModel.Message = "Hiç bir değişiklik yapılmadı";
+                jsonReturnModel.Message = "Aynı içeriklerle değişiklik yapamazsınız";
                 return Error(jsonReturnModel);
             }
-            
+
         }
 
         public class ProfileModel
@@ -241,7 +219,6 @@ namespace Okurdostu.Web.Controllers.Api
 
             if (!ModelState.IsValid)
             {
-                jsonReturnModel.Code = 200;
                 jsonReturnModel.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
                 return Error(jsonReturnModel);
             }
@@ -268,14 +245,12 @@ namespace Okurdostu.Web.Controllers.Api
                 }
                 else
                 {
-                    jsonReturnModel.Code = 200;
                     jsonReturnModel.Message = "Başaramadık, ne olduğunu bilmiyoruz";
                     return Error(jsonReturnModel);
                 }
             }
             else
             {
-                jsonReturnModel.Code = 200;
                 jsonReturnModel.Message = "Hiç bir değişiklik yapılmadı";
                 return Error(jsonReturnModel);
             }

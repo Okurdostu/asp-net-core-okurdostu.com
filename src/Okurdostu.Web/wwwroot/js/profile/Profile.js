@@ -14,8 +14,7 @@ Form.submit(function (e) {
             });
         }
     }
-    else if (_Fullname > 50)
-    {
+    else if (_Fullname > 50) {
         Toast.fire()
         {
             Toast.fire({
@@ -25,23 +24,20 @@ Form.submit(function (e) {
         }
     }
     else {
-        $.post("/api/account/profile", { FullName: _Fullname, Biography: _Biography })
-            .done(function (result) {
-                if (result.status === true) {
-                    Toast.fire({
-                        icon: 'success',
-                        html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
-                    });
-                    setInterval(function () {
-                        location.reload();
-                    }, 2000);
-                }
-                else {
-                    Toast.fire({
-                        icon: 'warning',
-                        html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
-                    });
-                }
+        $.post("/api/me/profile", { FullName: _Fullname, Biography: _Biography })
+            .fail(function (result) {
+                Toast.fire({
+                    icon: 'warning',
+                    html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
+                });
+            }).done(function (result) {
+                Toast.fire({
+                    icon: 'success',
+                    html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+                });
+                setInterval(function () {
+                    location.reload();
+                }, 2000);
             });
     }
 });

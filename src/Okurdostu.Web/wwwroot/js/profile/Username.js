@@ -22,29 +22,26 @@ Form.submit(function (e) {
         });
     }
     else {
-        $.post("/api/account/username", { UsernameConfirmPassword: _ConfirmPassword, Username: _Username })
+        $.post("/api/me/username", { UsernameConfirmPassword: _ConfirmPassword, Username: _Username })
             .done(function (result) {
-                if (result.status === true) {
-                    $('#change-username-button').prop('disabled', true);
-                    $("input[name='Username']").prop('disabled', true);
-                    Toast.fire({
-                        icon: 'success',
-                        html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
-                    });
-                    setInterval(function () {
-                        window.location.href = '/' + result.data;
-                    }, 2000);
+                $('#change-username-button').prop('disabled', true);
+                $("input[name='Username']").prop('disabled', true);
+                Toast.fire({
+                    icon: 'success',
+                    html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+                });
+                setInterval(function () {
+                    window.location.href = '/' + result.data;
+                }, 2000);
+            })
+            .fail(function (result) {
+                if (result.responseJSON.message === 'Kimliğinizi doğrulayamadık: Onay parolası') {
+                    $("input[name='UsernameConfirmPassword']").focus();
                 }
-                else {
-                    if (result.message === 'Kimliğinizi doğrulayamadık: Onay parolası') {
-                        $("input[name='UsernameConfirmPassword']").focus();
-                    }
-
-                    Toast.fire({
-                        icon: 'warning',
-                        html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
-                    });
-                }
+                Toast.fire({
+                    icon: 'warning',
+                    html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
+                });
             });
     }
 });

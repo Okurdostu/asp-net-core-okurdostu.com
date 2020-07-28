@@ -22,9 +22,9 @@ Form.submit(function (e) {
         });
     }
     else {
-        $.post("/api/account/password", { PasswordConfirmPassword: _ConfirmPassword, Password: _Password })
+        $.post("/api/me/password", { PasswordConfirmPassword: _ConfirmPassword, Password: _Password })
             .done(function (result) {
-                if (result.status === true) {
+                if (result.succes === true) {
                     $("input[name='PasswordConfirmPassword']").val('');
                     $("input[name='Password']").val('');
 
@@ -35,14 +35,18 @@ Form.submit(function (e) {
                     });
                 }
                 else {
-                    if (result.message === 'Kimliğinizi doğrulayamadık: Onay parolası') {
-                        $("input[name='PasswordConfirmPassword']").focus();
-                    }
-                    Toast.fire({
-                        icon: 'warning',
-                        html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
-                    });
+                    
+                    
                 }
+            })
+            .fail(function (result) {
+                if (result.responseJSON.message === 'Kimliğinizi doğrulayamadık: Onay parolası') {
+                    $("input[name='PasswordConfirmPassword']").focus();
+                }
+                Toast.fire({
+                    icon: 'warning',
+                    html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
+                });
             });
     }
 });

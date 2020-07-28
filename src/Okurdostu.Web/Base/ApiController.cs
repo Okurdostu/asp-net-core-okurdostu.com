@@ -22,31 +22,31 @@ namespace Okurdostu.Web.Base
         public ActionResult Succes(JsonReturnModel jsonReturnModel)
         {
             jsonReturnModel.Code = 200;
-            jsonReturnModel.Status = true;
+            jsonReturnModel.Succes = true;
 
             return Ok(jsonReturnModel);
         }
         public ActionResult Error(JsonReturnModel jsonReturnModel)
         {
-            jsonReturnModel.Status = false;
+            jsonReturnModel.Succes = false;
 
+            if (jsonReturnModel.Code == 500)
+            {
+                return StatusCode(500, jsonReturnModel);
+            }
             if (jsonReturnModel.Code == 401)
             {
                 return Unauthorized();
             }
-            else if (jsonReturnModel.Code == 403)
+            if (jsonReturnModel.Code == 403)
             {
                 return Forbid();
             }
-            else if (jsonReturnModel.Code == 404)
+            if (jsonReturnModel.Code == 404)
             {
-                return NotFound(jsonReturnModel);
+                return NotFound();
             }
-            else if (jsonReturnModel.Code == 1001 || jsonReturnModel.Code == 200)
-            {
-                //10001: db'de değişiklik yapmaya çalışılırken hiç bir verinin değiştirilmediğini durumu: db.savechanges resultının 0 gelmesi.
-                return Ok(jsonReturnModel);
-            }
+            
 
             jsonReturnModel.Code = 400;
             return BadRequest(jsonReturnModel);

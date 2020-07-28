@@ -9,7 +9,7 @@ namespace Okurdostu.Web.ViewComponents
     {
         public IViewComponentResult Invoke()
         {
-            Controllers.Api.AccountController.UsernameModel Model = new Controllers.Api.AccountController.UsernameModel();
+            Controllers.Api.MeController.UsernameModel Model = new Controllers.Api.MeController.UsernameModel();
             return View(Model);
         }
     }
