@@ -135,6 +135,9 @@ function removeEducation() {
                 icon: 'warning',
                 html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
             });
+            setInterval(function () {
+                location.reload();
+            },2000);
         }
     });
 };

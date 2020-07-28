@@ -105,6 +105,19 @@ namespace Okurdostu.Web.Controllers.Api
             return Error(jsonReturnModel);
         }
 
+        public async Task<bool> IsCanRemovable(UserEducation edu)
+        {
+            if (edu.IsConfirmed || edu.IsActiveEducation)
+            {
+                var EducationUserUnRemovedNeed = await Context.Need.AnyAsync(x => !x.IsRemoved && x.UserId == edu.UserId);
+                return !EducationUserUnRemovedNeed;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         // /api/me/educations/{Id} -- isRemoved = true
         [HttpPatch("{Id}")]
         public async Task<IActionResult> PatchRemove(Guid Id)
@@ -123,22 +136,7 @@ namespace Okurdostu.Web.Controllers.Api
 
             if (deletedEducation != null)
             {
-                var AuthUserActiveNeedCount = Context.Need.Where(x => !x.IsRemoved && x.UserId == Guid.Parse(AuthenticatedUserId)).Count();
-                if (deletedEducation.IsActiveEducation && AuthUserActiveNeedCount > 0)
-                {
-                    jsonReturnModel.Message = "Bu eğitimi silemezsiniz";
-
-                    TempData["ProfileMessage"] = "İhtiyaç kampanyanız olduğu için" +
-                        "<br />" +
-                        "Aktif olan eğitim bilginizi silemezsiniz." +
-                        "<br />" +
-                        "Aktif olan eğitim bilgisi, belge yollayarak hala burada okuduğunuzu iddia ettiğiniz bir eğitim bilgisidir." +
-                        "<br/>" +
-                        "Daha fazla ayrıntı ve işlem için: info@okurdostu.com";
-
-                    return Error(jsonReturnModel);
-                }
-                else
+                if (await IsCanRemovable(deletedEducation))
                 {
                     deletedEducation.IsRemoved = true;
                     var result = await Context.SaveChangesAsync();
@@ -166,6 +164,20 @@ namespace Okurdostu.Web.Controllers.Api
                         jsonReturnModel.InternalMessage = "Changes aren't save";
                         return Error(jsonReturnModel);
                     }
+                }
+                else
+                {
+                    jsonReturnModel.Message = "Bu eğitimi silemezsiniz";
+
+                    TempData["ProfileMessage"] = "İhtiyaç kampanyanız olduğu için" +
+                        "<br />" +
+                        "Aktif olan eğitim bilginizi silemezsiniz." +
+                        "<br />" +
+                        "Aktif olan eğitim bilgisi, belge yollayarak hala burada okuduğunuzu iddia ettiğiniz bir eğitim bilgisidir." +
+                        "<br/>" +
+                        "Daha fazla ayrıntı ve işlem için: info@okurdostu.com";
+
+                    return Error(jsonReturnModel);
                 }
             }
             else
