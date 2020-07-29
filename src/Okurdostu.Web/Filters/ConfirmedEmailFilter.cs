@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Okurdostu.Web.Models;
 
 namespace Okurdostu.Web.Filters
 {
@@ -15,10 +16,14 @@ namespace Okurdostu.Web.Filters
             }
             else
             {
-                controller.TempData["ProfileMessage"] = "Bu işlemi yapabilmeniz için e-mail adresinizi onaylamalısınız" +
-                    "<br>" +
-                    "<a class='od' href='/beta'>Daha fazla bilgi için tıklayınız</a>";
-                actionContext.Result = new RedirectResult("/" + controller.User.Identity.GetUsername(), false);
+                JsonReturnModel jsonReturnModel = new JsonReturnModel
+                {
+                    Succes = false,
+                    Message = "Email adresinizi onaylamanız gerekli",
+                    InternalMessage = "The email confirmation is required to do that."
+                };
+
+                actionContext.Result =  new BadRequestObjectResult(jsonReturnModel); 
             }
         }
     }
