@@ -67,6 +67,7 @@ namespace Okurdostu.Web.Controllers.Api
                             {
                                 jsonReturnModel.Message = "Başaramadık, ne olduğunu bilmiyoruz";
                             }
+                            return Error(jsonReturnModel);
                         }
                     }
 

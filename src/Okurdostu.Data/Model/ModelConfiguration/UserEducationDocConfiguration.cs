@@ -14,13 +14,11 @@ namespace Okurdostu.Data.ModelConfiguration
 
             entity.Property(e => e.FullPath).IsRequired();
 
-            entity.Property(e => e.PathAfterRoot).IsRequired();
-
-            entity.Property(e => e.UserEducationId)
-                .IsRequired()
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasDefaultValueSql("((0))");
+            entity.HasOne(d => d.UserEducation)
+                .WithMany(p => p.UserEducationDoc)
+                .HasForeignKey(d => d.UserEducationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_UserEducationDoc_UserEducation");
 
         }
     }
