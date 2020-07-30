@@ -30,6 +30,7 @@ namespace Okurdostu.Web
              .AddJsonOptions(options =>
              {
                  options.JsonSerializerOptions.IgnoreNullValues = true;
+                 options.JsonSerializerOptions.MaxDepth = 64;
              });
 
             services.AddRazorPages();
