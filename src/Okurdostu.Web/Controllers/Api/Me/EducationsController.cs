@@ -83,6 +83,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
             {
                 x.Id,
                 x.EndYear,
+                x.IsRemoved,
                 x.StartYear,
                 x.IsConfirmed,
                 x.IsActiveEducation,
@@ -90,8 +91,8 @@ namespace Okurdostu.Web.Controllers.Api.Me
 
                 universityPageUrl = "/universite/" + x.University.FriendlyName,
                 universityName = x.University.Name,
-                x.University.LogoUrl,
-                x.UniversityId,
+                universityLogoUrl = x.University.LogoUrl,
+                universityId = x.UniversityId,
             }).ToListAsync();
 
             if (Educations != null)
