@@ -1,3 +1,7 @@
 ﻿@model Okurdostu.Data.Need
+@if (Model.User.PictureUrl != null)
+{
+    ViewData["OGImage"] = "https://okurdostu.com" + Model.User.PictureUrl;
+}
 @{ ViewData["Title"] = Model.Title + " @" + Model.User.Username + " | Okurdostu"; ViewData["OGDescription"] = "Bir öğrencinin ihtiyaç kampanyası: " + Model.Title; ViewData["Description"] = "Bir öğrencinin ihtiyaç kampanyası: " + Model.Title; Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml"; ViewBag.Meta = "<meta http-equiv='refresh' content='0; URL =" + TempData["MetaRouteLink"] + "'>"; }
 <a href="@TempData["MetaRouteLink"]" class="od"><h1 class="od text-center">Routing...</h1></a>

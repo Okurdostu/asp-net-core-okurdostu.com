@@ -9,7 +9,12 @@
         { IsAuthenticatedUserEqualModelUser = true; }
     }
 }
-@{ ViewData["Title"] = Model.Title + " @" + Model.User.Username + " | Okurdostu"; ViewData["OGDescription"] = "Bir öğrencinin ihtiyaç kampanyası: " + Model.Title; ViewData["Description"] = "Bir öğrencinin ihtiyaç kampanyası: " + Model.Title; Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml"; }
+@if (Model.User.PictureUrl != null)
+{
+    ViewData["OGImage"] = "https://okurdostu.com" + Model.User.PictureUrl;
+}
+
+@{ ViewData["Title"] = Model.Title + " @" + Model.User.Username + " | Okurdostu"; ViewData["OGDescription"] = "Bir öğrencinin ihtiyaç kampanyası: " + Model.Title; ViewData["Description"] = "Bir öğrencinin ihtiyaç kampanyası: " + Model.Title; Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";}
 @Html.AntiForgeryToken()
 <script>
     var validatetoken = $("input[name=__RequestVerificationToken]").val();
@@ -97,7 +102,6 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                     oldDataFromComments = newDataFromComments;
                 });
         };
-
         $('#pills-comment-tab').click(function () {
             GetComments();
         });
@@ -141,7 +145,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
             <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                 <div class="modal-content" style="background: transparent;">
                     <div class="modal-body bg-light" style="border-radius: 25px;">
-                        <h4 class="font-weight-bold text-center text-black-50">Yorumunu düzenleme</h4>
+                        <h4 class="font-weight-bold text-center text-black-50">Yorum düzenleme</h4>
                         <div class="form-horizontal">
                             <div class="form-group"><textarea class="form-control" id="edit-comment-input" maxlength="100" name="edit-comment-input" style="height: 100px;" autocomplete="off"></textarea></div>
 
@@ -166,11 +170,11 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                                     <div class="row">
                                         <div class="col-auto small">
                                             <span id="replying-user-fullname" class="font-weight-bold mb-1 od"></span> <span id="repyling-user-username" class="text-black-50 font-weight-bold"></span> <br />
-                                            <p id="replying-comment" class="font-weight-bold text-black-50 text-break" style="font-size: 13.5px;"></p>
+                                            <p id="replying-comment" class="font-weight-bold text-black-50 text-break m-0" style="font-size: 13.5px;"></p>
                                         </div>
                                     </div>
-                                    <span class="font-weight-bold text-black-50 mt-2">Senin cevabın:</span>
-                                    <textarea class="form-control" id="ReplyComment" name="ReplyComment" required="required" style="height: 100px;" autocomplete="off" maxlength="100"></textarea>
+                                    <hr class="mr-2 ml-2 mt-1 mb-1" />
+                                    <textarea class="form-control" placeholder="Cevabınız" id="ReplyComment" name="ReplyComment" required="required" style="height: 100px;" autocomplete="off" maxlength="100"></textarea>
                                 </div>
                                 <div class="modal-footer pb-0 pt-1">
                                     <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
@@ -196,9 +200,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                     $("#LikeCount").load("/like/count/@Model.Id");
             };
             LikeRefresh();
-
-            setInterval(function () { LikeRefresh(); }, 15000);
-
+            setInterval(function () { LikeRefresh(); }, 30000);
             $("#Like").on("click", function () {
                 $.ajax({
                     type: "POST",
@@ -209,7 +211,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
                 });
             });
         </script>
-        <script src="~/js/comment/comment.js"></script>
+        <script src="~/js/Need/Comment.js"></script>
         <script src="~/lib/sweetalert/sweetalert2.all.min.js"></script>
         <script>
             const Toast = Swal.mixin({ toast: true, position: 'top-end', timer: 2000, showConfirmButton: false, timerProgressBar: true, });

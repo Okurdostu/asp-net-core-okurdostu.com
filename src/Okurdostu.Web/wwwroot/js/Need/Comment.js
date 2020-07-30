@@ -4,19 +4,19 @@
 
     if (_NeedId.length <= 0) {
         Toast.fire({
-            icon: 'error',
-            html: '<span class="font-weight-bold text-black-50 ml-1">' + 'Bazı şeylere ulaşamadık, sonra tekrar deneyin' + '</span>'
+            icon: 'info',
+            html: '<span class="font-weight-bold text-black-50 ml-1">' + 'Bazı şeylere ulaşamadık. Sayfayı yenileyin, tekrar deneyin' + '</span>'
         });
     }
     else if (_Comment.length <= 0) {
         Toast.fire({
-            icon: 'error',
+            icon: 'info',
             html: '<span class="font-weight-bold text-black-50 ml-1">' + 'Tartışma başlatmak istiyorsanız bir içerik girmelisiniz' + '</span>'
         });
     }
     else if (_Comment.length > 100) {
         Toast.fire({
-            icon: 'error',
+            icon: 'info',
             html: '<span class="font-weight-bold text-black-50 ml-1">' + 'En fazla 100 karakter' + '</span>'
         });
     }
@@ -49,19 +49,19 @@ function ReplyComment() {
 
     if (_RelatedCommentId.length <= 0) {
         Toast.fire({
-            icon: 'error',
-            html: '<span class="font-weight-bold text-black-50 ml-1">' + 'Bazı şeylere ulaşamadık, sonra tekrar deneyin' + '</span>'
+            icon: 'info',
+            html: '<span class="font-weight-bold text-black-50 ml-1">' + 'Bazı şeylere ulaşamadık. Sayfayı yenileyin, tekrar deneyin' + '</span>'
         });
     }
     else if (_Comment.length <= 0) {
         Toast.fire({
-            icon: 'error',
+            icon: 'info',
             html: '<span class="font-weight-bold text-black-50 ml-1">' + 'Cevap yazmak istiyorsanız bir içerik girmelisiniz' + '</span>'
         });
     }
     else if (_Comment.length > 100) {
         Toast.fire({
-            icon: 'error',
+            icon: 'info',
             html: '<span class="font-weight-bold text-black-50 ml-1">' + 'En fazla 100 karakter' + '</span>'
         });
     }
@@ -102,13 +102,13 @@ function EditComment() {
     }
     else if (NewComment.length <= 0) {
         Toast.fire({
-            icon: 'warning',
+            icon: 'info',
             html: '<span class="font-weight-bold text-black-50 ml-1">' + 'Düzenlemek istiyorsanız bir içerik girmelisiniz' + '</span>'
         });
     }
     else if (NewComment.length > 100) {
         Toast.fire({
-            icon: 'warning',
+            icon: 'info',
             html: '<span class="font-weight-bold text-black-50 ml-1">' + 'En fazla 100 karakter' + '</span>'
         });
     }
@@ -127,7 +127,7 @@ function EditComment() {
             },
             error: function () {
                 Toast.fire({
-                    icon: 'success',
+                    icon: 'error',
                     html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
                 });
             }
@@ -155,7 +155,7 @@ function DeleteComment() {
         },
         error: function () {
             Toast.fire({
-                icon: 'success',
+                icon: 'error',
                 html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
             });
         }

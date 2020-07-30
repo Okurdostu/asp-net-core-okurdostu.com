@@ -11,14 +11,14 @@ Form.submit(function (e) {
         Toast.fire()
         {
             Toast.fire({
-                icon: 'warning',
+                icon: 'info',
                 html: '<span class="font-weight-bold text-black-50 ml-1">Kimliğinizi doğrulamak için parolanızı girmelisiniz</span>'
             });
         }
     }
     else if (_Password.length < 7) {
         Toast.fire({
-            icon: 'warning',
+            icon: 'info',
             html: '<span class="font-weight-bold text-black-50 ml-1">Yeni parola seçmelisiniz</span>'
         });
     }

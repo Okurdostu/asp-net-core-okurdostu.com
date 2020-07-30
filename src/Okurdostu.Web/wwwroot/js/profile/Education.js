@@ -26,7 +26,7 @@ $(document).on('submit', '#edit-education-form', function (evt) {
 
     if (department != null && department.length <= 0) {
         Toast.fire({
-            icon: 'warning',
+            icon: 'info',
             html: '<span class="font-weight-bold text-black-50 ml-1">Bölümünüzü yazmalısınız</span>'
         });
     }
@@ -36,7 +36,7 @@ $(document).on('submit', '#edit-education-form', function (evt) {
         }
         else {
             Toast.fire({
-                icon: 'error',
+                icon: 'info',
                 html: '<span class="font-weight-bold text-black-50 ml-1">Bir değişiklik yapmadınız</span>'
             });
         }
@@ -54,7 +54,7 @@ $('#add-education-form').submit(function (evt) {
 
     if (department != null && department.length <= 0) {
         Toast.fire({
-            icon: 'warning',
+            icon: 'info',
             html: '<span class="font-weight-bold text-black-50 ml-1">Bölümünüzü yazmalısınız</span>'
         });
     }
@@ -76,7 +76,7 @@ function apiEducationPost() {
         })
         .fail(function (result) {
             Toast.fire({
-                icon: 'error',
+                icon: 'warning',
                 html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
             });
         });
@@ -181,7 +181,7 @@ function sendDocument() {
         },
         error: function (result) {
             Toast.fire({
-                icon: 'error',
+                icon: 'warning',
                 html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
             });
         }
@@ -197,7 +197,7 @@ $('#send-education-document').click(function () {
     }
     else {
         Toast.fire({
-            icon: 'warning',
+            icon: 'info',
             html: '<span class="font-weight-bold text-black-50 ml-1">' + 'Dosya seçmelisiniz' + '</span>'
         });
     }

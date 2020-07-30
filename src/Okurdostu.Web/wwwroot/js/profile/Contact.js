@@ -22,7 +22,7 @@ Form.submit(function (e) {
         },
         error: function (result) {
             Toast.fire({
-                icon: 'error',
+                icon: 'warning',
                 html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
             });
         }

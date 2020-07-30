@@ -9,7 +9,7 @@ Form.submit(function (e) {
         Toast.fire()
         {
             Toast.fire({
-                icon: 'warning',
+                icon: 'info',
                 html: '<span class="font-weight-bold text-black-50 ml-1">Ad ve soyad için en az 5 karakter girmelisin</span>'
             });
         }
@@ -18,7 +18,7 @@ Form.submit(function (e) {
         Toast.fire()
         {
             Toast.fire({
-                icon: 'warning',
+                icon: 'info',
                 html: '<span class="font-weight-bold text-black-50 ml-1">Ad ve soyad: Çok uzun, en fazla 50 karakter</span>'
             });
         }
