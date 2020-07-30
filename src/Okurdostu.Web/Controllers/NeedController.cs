@@ -49,7 +49,7 @@ namespace Okurdostu.Web.Controllers
                         TempData["CreateNeedError"] = "Hedefine ulaşmamış bir kampanyanız var <br/> Aynı anda iki kampanya sergiletemezsiniz";
                     }
 
-                    TempData["CausingErrorNeedLink"] = "/" + ErrorNeed.User.Username + "/ihtiyac/" + ErrorNeed.FriendlyTitle + "/" + ErrorNeed.Id;
+                    TempData["CausingErrorNeedLink"] = ErrorNeed.Link;
                     return true;
                 }
             }
@@ -267,7 +267,7 @@ namespace Okurdostu.Web.Controllers
                         TempData["NeedMessage"] = "Kampanyanızı onaya yollamak için en az bir, en fazla üç hedef belirlemelisiniz";
                     }
 
-                    Response.Redirect("/" + Need.User.Username.ToLower() + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id);
+                    Response.Redirect("/" + Need.Link);
                 }
             }
         }
@@ -316,17 +316,14 @@ namespace Okurdostu.Web.Controllers
                         var result = await Context.SaveChangesAsync();
                         if (result > 0)
                         {
-
-                            string link = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id;
-                            return Redirect(link);
-
+                            return Redirect("/" + Need.Link);
                         }
 
                     }
                     catch (Exception e)
                     {
 
-                        if (e.InnerException.Message.Contains("Unique_Key_Title"))
+                        if (e.InnerException.Message.Contains("Unique_Key_Title") || e.InnerException.Message.Contains("Unique_Key_FriendlyTitle"))
                         {
                             TempData["CreateNeedError"] = "Bu başlığı seçemezsiniz";
                         }
@@ -376,7 +373,7 @@ namespace Okurdostu.Web.Controllers
                     item.IsRemoved = true;
                     item.Need.TotalCharge -= item.Price;
                     await Context.SaveChangesAsync();
-                    Response.Redirect("/" + item.Need.User.Username.ToLower() + "/ihtiyac/" + item.Need.FriendlyTitle + "/" + item.Need.Id);
+                    Response.Redirect("/" + item.Need.Link);
                 }
             }
         }
@@ -449,7 +446,7 @@ namespace Okurdostu.Web.Controllers
                     {
                         TempData["MesajHata"] = "İhtiyacınızın linkini verirken desteklenen platformları kullanın";
                     }
-                    Response.Redirect("/" + Need.User.Username.ToLower() + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id);
+                    Response.Redirect("/" + Need.Link);
                 }
             }
         }
@@ -473,11 +470,14 @@ namespace Okurdostu.Web.Controllers
                     {
                         if (Model.Title != Need.Title)
                         {
+                            string oldTitle = Need.Title;
+                            string oldFriendlyTitle = Need.FriendlyTitle;
                             Model.Title = Model.Title.ClearSpaces();
                             Model.Title = Model.Title.ToLower().UppercaseFirstCharacters();
 
                             Need.Title = Model.Title;
                             Need.FriendlyTitle = Need.Title.FriendlyUrl();
+                            
                             try
                             {
                                 await Context.SaveChangesAsync();
@@ -485,10 +485,12 @@ namespace Okurdostu.Web.Controllers
                             }
                             catch (Exception e)
                             {
-                                if (e.InnerException.Message.Contains("Unique_Key_Title"))
+                                if (e.InnerException.Message.Contains("Unique_Key_Title") || e.InnerException.Message.Contains("Unique_Key_FriendlyTitle"))
                                 {
                                     TempData["NeedMessage"] = "Bu başlığı seçemezsiniz";
                                 }
+                                Need.Title = oldTitle;
+                                Need.FriendlyTitle = oldFriendlyTitle;
                             }
                         }
                     }
@@ -497,8 +499,7 @@ namespace Okurdostu.Web.Controllers
                         TempData["NeedMessage"] = "Başlık boş olamaz.<br />" +
                             "En fazla 75 karakter ";
                     }
-                    string link = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id;
-                    Response.Redirect(link);
+                    Response.Redirect("/" + Need.Link);
                 }
             }
         }
@@ -531,8 +532,7 @@ namespace Okurdostu.Web.Controllers
                             "En az: 100, en fazla 10 bin karakter";
                     }
 
-                    string link = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id;
-                    Response.Redirect(link);
+                    Response.Redirect("/" + Need.Link);
                 }
 
             }
@@ -541,45 +541,44 @@ namespace Okurdostu.Web.Controllers
 
 
         #region view
-        [Route("ihtiyac/{Id}")]
-        public async Task<IActionResult> ShortUrl(Guid Id)
+        [Route("{friendlytitle}")]
+        public async Task<IActionResult> ShortUrl(string friendlytitle)
         {
-            var Need = await Context.Need.Include(needuser => needuser.User).FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
+            var Need = await Context.Need.Include(needuser => needuser.User).FirstOrDefaultAsync(x => x.FriendlyTitle == friendlytitle && !x.IsRemoved);
 
             if (Need != null)
             {
-                TempData["MetaRouteLink"] = "/" + Need.User.Username + "/ihtiyac/" + Need.FriendlyTitle + "/" + Need.Id.ToString();
+                TempData["MetaRouteLink"] = Need.Link;
                 return View(Need);
             }
             else
             {
+                //böyle bir ihtiyaç kampanyasının olmadığını söyleyen bir sayfa yapılacak
                 return Redirect("/ihtiyaclar");
             }
         }
 
 
-        [Route("{username}/ihtiyac/{friendlytitle}/{needId}")]
-        public async Task<IActionResult> ViewNeed(string username, string friendlytitle, Guid needId)
+        [Route("{username}/ihtiyac/{friendlytitle}")]
+        public async Task<IActionResult> ViewNeed(string username, string friendlytitle)
         {
             var Need = await Context.Need
                 .Include(need => need.User)
                         .ThenInclude(needuser => needuser.UserEducation)
                             .ThenInclude(x => x.University)
                 .Include(need => need.NeedItem)
-                .FirstOrDefaultAsync(x => x.Id == needId && !x.IsRemoved);
+                .FirstOrDefaultAsync(x => x.User.Username == username && x.FriendlyTitle == friendlytitle && !x.IsRemoved);
 
             if (Need != null)
             {
-
                 TempData["activeihtiyac"] = "active";
-                if (Need.User.Username.ToLower() != username.ToLower() || Need.FriendlyTitle.ToLower() != friendlytitle.ToLower())
-                {
-                    return Redirect("/" + Need.User.Username.ToLower() + "/ihtiyac/" + Need.FriendlyTitle.ToLower() + "/" + Need.Id);
-                }
                 return View(Need);
             }
-
-            return NotFound();
+            else
+            {
+                //böyle bir ihtiyaç kampanyasının olmadığını söyleyen bir sayfa yapılacak
+                return Redirect("/ihtiyaclar");
+            }
         }
         #endregion
     }

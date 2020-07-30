@@ -13,6 +13,10 @@ namespace Okurdostu.Data.ModelConfiguration
                     .HasName("Unique_Key_Title")
                     .IsUnique();
 
+            entity.HasIndex(e => e.Title)
+                    .HasName("Unique_Key_FriendlyTitle")
+                    .IsUnique();
+
             entity.Property(e => e.Id).ValueGeneratedNever();
 
             entity.Property(e => e.CreatedOn).HasColumnType("smalldatetime");

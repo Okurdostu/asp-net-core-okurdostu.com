@@ -51,6 +51,15 @@ namespace Okurdostu.Data
                 return LastCheckOn == null || PassedTime.Value.TotalMinutes > 60; // en son kontrolunun üzerinden 60 dakika'dan fazla geçtiyse veya o ana kadar hiç kontrol edilmediyse tekrar kontrol edilmeli.
             }
         }
+
+        public string Link
+        {
+            get
+            {
+                return User.Username + "/ihtiyac/" + FriendlyTitle;
+            }
+        }
+
         public decimal? CompletedPercentage => 100 - (TotalCharge - TotalCollectedMoney) * 100 / TotalCharge;
 
         public virtual User User { get; set; }
