@@ -75,7 +75,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
             }
             else
             {
-                var UserPaswordReset = new UserPasswordReset()
+                var UserPaswordReset = new UserPasswordReset
                 {
                     UserId = AppUser.Id
                 };

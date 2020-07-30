@@ -75,7 +75,7 @@ namespace Okurdostu.Web.Controllers
                     SenderName = "Halil İbrahim Kocaöz"
                 };
 
-                Guid confirmationGuid = Guid.Empty;
+                Guid confirmationGuid;
                 if (_UserEmailConfirmation != null)
                 {
                     confirmationGuid = _UserEmailConfirmation.GUID;
@@ -103,7 +103,7 @@ namespace Okurdostu.Web.Controllers
         {
             //authuser must confirm their identity with password if user doesn't this, 
             //user can't show 'CreateEmailChangeRequest' and can't do httppost to 'CreateEmailChangeRequest'.
-            if (await ConfirmIdentityWithPassword(Model.ConfirmPassword))
+            if (await ConfirmIdentityWithPassword(Model.ConfirmPassword).ConfigureAwait(false))
             {
                 TempData.Set("IsEmailChangingConfirmedwithPassword", true);
                 return Redirect("/account/changeemail");

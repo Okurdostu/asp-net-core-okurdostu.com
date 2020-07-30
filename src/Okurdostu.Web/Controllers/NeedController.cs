@@ -196,17 +196,12 @@ namespace Okurdostu.Web.Controllers
 
             if (!string.IsNullOrEmpty(filtreText))
             {
-                if (_ != "jquery")
-                    Logger.LogInformation("Searching needs with tag:{tag}, {now}", filtreText, DateTime.Now.ToString());
-
-
                 var University = await Context.University.Where(x => x.FriendlyName == filtreText).FirstOrDefaultAsync();
                 if (University != null) //gelen filtre bir okula uyuyorsa okula göre listele
                 {
                     NeedDefaultList = NeedDefaultList.Where(x => x.User.UserEducation.Any(a => a.University.Name == University.Name && a.IsRemoved != true)).ToList();
                     TempData["ListelePageTitle"] = University.Name + " öğrencilerinin ihtiyaçları | Okurdostu";
                     ViewBag.tagUniversityName = University.Name;
-                    //ViewBag.Tag = University.name;
                     ViewBag.University = University;
                 }
                 else // uymuyorsa, diğer containslere göre listele:
@@ -253,7 +248,9 @@ namespace Okurdostu.Web.Controllers
                         decimal TotalCharge = 0;
 
                         foreach (var item in UnRemovedItems)
+                        {
                             TotalCharge += item.Price;
+                        }
 
                         Need.TotalCollectedMoney = 0;
                         Need.TotalCharge = TotalCharge;
@@ -278,7 +275,7 @@ namespace Okurdostu.Web.Controllers
         {
             AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
 
-            if (await IsThereAnyProblemtoCreateNeed() && TempData["CreateNeedError"] != null && TempData["CreateNeedError"].ToString() == "Active education")
+            if (await IsThereAnyProblemtoCreateNeed().ConfigureAwait(false) && TempData["CreateNeedError"] != null && TempData["CreateNeedError"].ToString() == "Active education")
             {
                 TempData["ProfileMessage"] = "İhtiyaç kampanyası oluşturmak için onaylanmış bir eğitim bilgisine ihtiyacınız vardır.";
                 return Redirect("/" + AuthUser.Username);
@@ -296,7 +293,7 @@ namespace Okurdostu.Web.Controllers
             {
                 AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
 
-                if (!await IsThereAnyProblemtoCreateNeed())
+                if (!await IsThereAnyProblemtoCreateNeed().ConfigureAwait(false))
                 {
                     Model.Title = Model.Title.ClearSpaces();
                     Model.Title = Model.Title.ToLower().UppercaseFirstCharacters();
@@ -399,7 +396,7 @@ namespace Okurdostu.Web.Controllers
                         Udemy = Udemy.Product(ItemLink);
                         if (Udemy.Error == null)
                         {
-                            await AddNeedItemAndFixTotalCharge(Need.Id, Udemy.Link, Udemy.Name, Udemy.Price, "/image/udemy.png", "Udemy");
+                            await AddNeedItemAndFixTotalCharge(Need.Id, Udemy.Link, Udemy.Name, Udemy.Price, "/image/udemy.png", "Udemy").ConfigureAwait(false);
                         }
                         else
                         {
@@ -415,7 +412,7 @@ namespace Okurdostu.Web.Controllers
                             Pandora = Pandora.Product(ItemLink);
                             if (Pandora.Error == null)
                             {
-                                await AddNeedItemAndFixTotalCharge(Need.Id, Pandora.Link, Pandora.Name, Pandora.Price, Pandora.Picture, "Pandora");
+                                await AddNeedItemAndFixTotalCharge(Need.Id, Pandora.Link, Pandora.Name, Pandora.Price, Pandora.Picture, "Pandora").ConfigureAwait(false);
                             }
                             else
                             {
@@ -434,7 +431,7 @@ namespace Okurdostu.Web.Controllers
                         Amazon = Amazon.Product(ItemLink);
                         if (Amazon.Error == null)
                         {
-                            await AddNeedItemAndFixTotalCharge(Need.Id, Amazon.Link, Amazon.Name, Amazon.Price, "/image/amazon.png", "Amazon");
+                            await AddNeedItemAndFixTotalCharge(Need.Id, Amazon.Link, Amazon.Name, Amazon.Price, "/image/amazon.png", "Amazon").ConfigureAwait(false);
                         }
                         else
                         {

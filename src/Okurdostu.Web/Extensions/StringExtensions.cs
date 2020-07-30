@@ -23,8 +23,12 @@ namespace Okurdostu.Web.Extensions
         public static string UppercaseFirstCharacters(this String str)
         {
             char[] charArray = str.ToCharArray();
-            if (char.IsLower(charArray[0])) charArray[0] = char.ToUpper(charArray[0]);
+            if (char.IsLower(charArray[0]))
+            {
+                charArray[0] = char.ToUpper(charArray[0]);
+            }
             for (int i = 1; i < charArray.Length; i++)
+            {
                 if (charArray[i - 1] == ' ' && char.IsLower(charArray[i]))
                 {
 
@@ -62,6 +66,7 @@ namespace Okurdostu.Web.Extensions
                     }
 
                 }
+            }
             return new string(charArray);
         }
 
@@ -70,18 +75,27 @@ namespace Okurdostu.Web.Extensions
             //example input: "            asd       asd              asd           "
             char[] charArray = str.ToCharArray();
             for (int i = 0; i < charArray.Length - 1; i++)
-                if (charArray[i] == ' ' && charArray[i + 1] == ' ') // 
+            {
+                if (charArray[i] == ' ' && charArray[i + 1] == ' ')
+                {
                     charArray[i] = '_'; // converts spaces to _
+                }
+            }
+                
 
             //" asd asd asd "
             str = new string(charArray).Replace("_", ""); // delete '_' [space] characters
 
             charArray = str.ToCharArray();
             if (charArray[0] == ' ')
+            {
                 charArray[0] = '_';
+            }
 
             if (charArray[^1] == ' ')
+            {
                 charArray[^1] = '_';
+            }
 
             //last output: "asd asd asd"
             return new string(charArray).Replace("_", ""); // delete '_' [space] characters and return
@@ -91,7 +105,10 @@ namespace Okurdostu.Web.Extensions
         //http://www.borakasmer.com/net-core-mvcde-bir-haber-basligini-urle-koyma/
         public static string FriendlyUrl(this String url)
         {
-            if (string.IsNullOrEmpty(url)) return "";
+            if (string.IsNullOrEmpty(url))
+            {
+                return "";
+            }
             url = url.ToLower();
             url = url.Trim();
             if (url.Length > 100)
@@ -128,7 +145,9 @@ namespace Okurdostu.Web.Extensions
             Regex r = new Regex("[^a-zA-Z0-9_-]");
             url = r.Replace(url, "-");
             while (url.IndexOf("--") > -1)
+            {
                 url = url.Replace("--", "-");
+            }
             return url;
         }
 

@@ -27,7 +27,9 @@ namespace Okurdostu.Web.ViewComponents
             {
 
                 if (StudentList.Where(x => x.ID == Education.UserId).FirstOrDefault() != null)
+                {
                     continue;
+                }
                 var Student = new UniversityStudentsModel
                 {
                     ID = Education.UserId,

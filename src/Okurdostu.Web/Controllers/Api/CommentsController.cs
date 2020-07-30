@@ -80,7 +80,7 @@ namespace Okurdostu.Web.Controllers.Api
 
                 if (commentedNeed)
                 {
-                    var NewComment = new NeedComment()
+                    var NewComment = new NeedComment
                     {
                         Comment = model.Comment,
                         NeedId = (Guid)model.NeedId,
@@ -113,7 +113,7 @@ namespace Okurdostu.Web.Controllers.Api
 
                 if (repliedComment != null)
                 {
-                    var NewReply = new NeedComment()
+                    var NewReply = new NeedComment
                     {
                         Comment = model.Comment,
                         UserId = Guid.Parse(User.Identity.GetUserId()),

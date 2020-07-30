@@ -38,9 +38,13 @@ public class EducationModel
         List<SelectListItem> _FinishYears = new List<SelectListItem>();
 
         for (int i = DateTime.Now.Year; i >= 1980; i--)
+        {
             _StartYears.Add(new SelectListItem { Text = i.ToString(), Value = i.ToString() });
+        }
         for (int i = DateTime.Now.Year + 7; i >= 1980; i--)
+        {
             _FinishYears.Add(new SelectListItem { Text = i.ToString(), Value = i.ToString() });
+        }
 
         this.StartYears = _StartYears;
         this.FinishYears = _FinishYears;

@@ -71,7 +71,7 @@ namespace Okurdostu.Web.Controllers
             {
                 await SignInWithCookie(User);
 
-                var _UserEmailConfirmation = new UserEmailConfirmation()
+                var _UserEmailConfirmation = new UserEmailConfirmation
                 {
                     UserId = User.Id
                 };

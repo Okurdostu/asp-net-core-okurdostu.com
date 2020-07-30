@@ -109,8 +109,6 @@ namespace Okurdostu.Web.Models.NeedItem
                 _Price = double.Parse(pandoraProduct.DiscountedPrice);
             }
 
-            //if (_Price < pandoraUcretsizKargo)
-            //    _Price += pandoraKargoUcreti;
 
             pandoraProduct.Price = _Price;
             return pandoraProduct;

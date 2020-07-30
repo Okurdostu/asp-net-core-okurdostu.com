@@ -7,6 +7,7 @@ namespace Okurdostu.Web.Controllers
 {
     public class ProfileController : BaseController<ProfileController>
     {
+        [HttpGet("{username}")]
         public async Task<IActionResult> Index(string username)
         {
             if (!string.IsNullOrEmpty(username))
@@ -16,7 +17,10 @@ namespace Okurdostu.Web.Controllers
                     ThenInclude(x => x.University).
                     FirstOrDefaultAsync(x => x.Username == username && x.IsActive);
 
-                if (_User != null) return View(_User);
+                if (_User != null)
+                {
+                    return View(_User);
+                }
             }
 
             return NotFound();

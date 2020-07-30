@@ -30,7 +30,7 @@ namespace Okurdostu.Web.Controllers
                 return Redirect("/");
             }
 
-            var User = await AuthenticateAsync(Model);
+            var User = await AuthenticateAsync(Model).ConfigureAwait(false);
             if (User != null)
             {
                 await SignInWithCookie(User);

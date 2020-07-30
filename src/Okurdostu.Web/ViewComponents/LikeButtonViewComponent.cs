@@ -17,7 +17,9 @@ namespace Okurdostu.Web.ViewComponents
             var AuthUser = await Context.User.FirstOrDefaultAsync(x => x.Id.ToString() == User.Identity.GetUserId());
             bool isLiked = false;
             if (Context.NeedLike.Where(x => x.IsCurrentLiked == true && x.NeedId == id && x.UserId == AuthUser.Id).FirstOrDefault() != null)
+            {
                 isLiked = true;
+            }
 
             return View(isLiked);
         }

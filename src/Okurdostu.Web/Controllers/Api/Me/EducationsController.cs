@@ -136,7 +136,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
 
             if (deletedEducation != null)
             {
-                if (await IsCanRemovable(deletedEducation))
+                if (await IsCanRemovable(deletedEducation).ConfigureAwait(false))
                 {
                     deletedEducation.IsRemoved = true;
                     var result = await Context.SaveChangesAsync();
