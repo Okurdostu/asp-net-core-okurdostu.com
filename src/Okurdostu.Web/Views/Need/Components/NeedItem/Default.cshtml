@@ -114,35 +114,29 @@
                     <div class="modal-content" style="background: transparent;">
                         <div class="modal-body bg-light" style="border-radius: 25px;">
                             <h3 class="font-weight-bold text-center text-black-50">
-                                Hedef (İhtiyaç) ekleme
+                                Hedef, ihtiyaç ekleme
                             </h3>
                             <hr />
-                            @{
-                                @using (Html.BeginForm("AddItem", "Need", FormMethod.Post))
-                                {
-                                    @Html.Hidden("NeedId", Model.Id)
-                                    <div class="form-horizontal">
-                                        <div class="form-group">
-                                            <span class="control-label pl-2 pr-0 font-weight-bold text-black-50">İhtiyaç linki</span>
-                                            <div>
-                                                <input type="text" class="form-control" autocomplete="off" name="ItemLink" required />
-                                            </div>
-                                        </div>
-                                        <p class="small font-weight-bold">
-                                            İhtiyacınız olan hedefleri aşağıda belirtilen platformlardan seçip sayfa linkini buraya yazarak ekleyebilirsiniz.
-                                        </p>
-                                        <p class="small font-weight-bold text-danger">
-                                            *Teknolojik ürün veya diğerleri: Amazon.com.tr<br />
-                                            *Kitap: Pandora.com.tr<br />
-                                            *Kurs: Udemy.com
-                                        </p>
-                                        <div class="modal-footer pb-0 pt-1">
-                                            <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
-                                            <input type="submit" value="Ekle" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" />
-                                        </div>
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <span class="control-label pl-2 pr-0 font-weight-bold text-black-50">İhtiyacın olan ürünün internet adresi</span>
+                                    <div>
+                                        <input type="text" class="form-control" autocomplete="off" id="linkInput" name="linkInput" />
                                     </div>
-                                }
-                            }
+                                </div>
+                                <p class="small font-weight-bold">
+                                    İhtiyacınız olan hedefleri aşağıda belirtilen platformlardan seçip sayfa adreslerini buraya yazarak ekleyebilirsiniz.
+                                </p>
+                                <p class="small font-weight-bold text-danger">
+                                    *Teknolojik ürün veya diğerleri: Amazon.com.tr<br />
+                                    *Kitap: Pandora.com.tr<br />
+                                    *Kurs: Udemy.com
+                                </p>
+                                <div class="modal-footer pb-0 pt-1">
+                                    <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button>
+                                    <input onclick="AddItem('@Model.Id')" type="submit" value="Ekle" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -150,11 +144,4 @@
         }
     }
 </div>
-@*@if (Model.isConfirmed == true)
-    {
-        @:
-        <div class="text-center">
-            <span class="small text-black-50 font-weight-bold">Kampanya sahibine nakit para değil, burada görünen hedefleri(ihtiyaçları) verilecek</span>
-        </div>
-    }*@
-
+<script src="~/js/need/item.js"></script>

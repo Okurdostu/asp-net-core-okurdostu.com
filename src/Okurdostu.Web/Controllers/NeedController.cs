@@ -61,26 +61,6 @@ namespace Okurdostu.Web.Controllers
 
             return false;
         }
-        [NonAction]
-        public async Task AddNeedItemAndFixTotalCharge(Guid needId, string link, string name, double price, string picture, string platformName)
-        {
-            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-            var NeedItem = new NeedItem
-            {
-                NeedId = needId,
-                Link = link,
-                Name = name,
-                Price = (decimal)price,
-                Picture = picture,
-                PlatformName = platformName,
-                IsRemoved = false,
-                IsWrong = false
-            };
-
-            await Context.AddAsync(NeedItem);
-            NeedItem.Need.TotalCharge += NeedItem.Price;
-            await Context.SaveChangesAsync();
-        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -374,79 +354,7 @@ namespace Okurdostu.Web.Controllers
                 }
             }
         }
-        [Authorize]
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task AddItem(string ItemLink, Guid NeedId)
-        {
-            var Need = await Context.Need.Where(x => x.Id == NeedId
-            && !x.IsRemoved
-            && !x.IsSentForConfirmation
-            && x.NeedItem.Where(a => a.IsRemoved != true).Count() < 3) // en fazla 3 tane item(ihtiyaç) ekleyebilir.
-                .FirstOrDefaultAsync();
-            // Kampanya(need) onaylanma için yollandıysa bir item ekleyemecek: onaylanma için gönderdiyse 
-            //(completed ve confirmed kontrol etmeye gerek yok çünkü onaylandıysa veya bittiyse de isSentForConfirmation hep true kalacak.)
-            if (Need != null)
-            {
-                AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-                if (Need.UserId == AuthUser.Id) //item(ihtiyaç) eklemeye çalıştığı kampanya Authenticated olmuş üzere aitse..
-                {
-                    if (ItemLink.ToLower().Contains("udemy.com"))
-                    {
-                        Udemy Udemy = new Udemy();
-                        Udemy = Udemy.Product(ItemLink);
-                        if (Udemy.Error == null)
-                        {
-                            await AddNeedItemAndFixTotalCharge(Need.Id, Udemy.Link, Udemy.Name, Udemy.Price, "/image/udemy.png", "Udemy").ConfigureAwait(false);
-                        }
-                        else
-                        {
-                            Logger.LogError("Udemy Error:{error}, Link:{link}", Udemy.Error, ItemLink);
-                            TempData["NeedMessage"] = Udemy.Error;
-                        }
-                    }
-                    else if (ItemLink.ToLower().Contains("pandora.com.tr"))
-                    {
-                        if (ItemLink.ToLower().Contains("/kitap/"))
-                        {
-                            Pandora Pandora = new Pandora();
-                            Pandora = Pandora.Product(ItemLink);
-                            if (Pandora.Error == null)
-                            {
-                                await AddNeedItemAndFixTotalCharge(Need.Id, Pandora.Link, Pandora.Name, Pandora.Price, Pandora.Picture, "Pandora").ConfigureAwait(false);
-                            }
-                            else
-                            {
-                                Logger.LogError("Pandora Error:{error}, Link:{link}", Pandora.Error, ItemLink);
-                                TempData["NeedMessage"] = Pandora.Error;
-                            }
-                        }
-                        else
-                        {
-                            TempData["MesajHata"] = "Pandora.com.tr'den sadece kitap seçebilirsiniz";
-                        }
-                    }
-                    else if (ItemLink.ToLower().Contains("amazon.com.tr"))
-                    {
-                        Amazon Amazon = new Amazon();
-                        Amazon = Amazon.Product(ItemLink);
-                        if (Amazon.Error == null)
-                        {
-                            await AddNeedItemAndFixTotalCharge(Need.Id, Amazon.Link, Amazon.Name, Amazon.Price, "/image/amazon.png", "Amazon").ConfigureAwait(false);
-                        }
-                        else
-                        {
-                            Logger.LogError("Amazon Error:{error}, Link:{link}", Amazon.Error, ItemLink);
-                            TempData["NeedMessage"] = Amazon.Error;
-                        }
-                    }
-                    else
-                    {
-                        TempData["MesajHata"] = "İhtiyacınızın linkini verirken desteklenen platformları kullanın";
-                    }
-                    Response.Redirect("/" + Need.Link);
-                }
-            }
-        }
+
         #endregion
 
 

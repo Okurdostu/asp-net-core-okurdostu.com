@@ -10,7 +10,7 @@ namespace Okurdostu.Web.Tests
         //expected product brand name is for amazon,expected book name is for pandora,expected course name is for udemy
         private string customExpectedName = "";
 
-        private double customExpectedPrice = 0;
+        private double customExpectedPrice;
 
         [Fact]
         public void Amazon()
