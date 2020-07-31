@@ -11,15 +11,15 @@ Form.submit(function (e) {
         Toast.fire()
         {
             Toast.fire({
-                icon: 'info',
-                html: '<span class="font-weight-bold text-black-50 ml-1">Kimliğinizi doğrulamak için parolanızı girmelisiniz</span>'
+                icon: "info",
+                html: "<span class=\"font-weight-bold text-black-50 ml-1\">Kimliğinizi doğrulamak için parolanızı girmelisiniz</span>"
             });
         }
     }
     else if (_Password.length < 7) {
         Toast.fire({
-            icon: 'info',
-            html: '<span class="font-weight-bold text-black-50 ml-1">Yeni parola seçmelisiniz</span>'
+            icon: "info",
+            html: "<span class=\"font-weight-bold text-black-50 ml-1\">Yeni parola seçmelisiniz</span>"
         });
     }
     else {
@@ -32,8 +32,8 @@ Form.submit(function (e) {
                 $("input[name='Password']").val('');
                 AccountSettingsModal.modal('hide');
                 Toast.fire({
-                    icon: 'success',
-                    html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+                    icon: "success",
+                    html: "<span class=\"font-weight-bold text-black-50 ml-1\">" + result.message + "</span>"
                 });
             },
             error: function (result) {
@@ -41,8 +41,8 @@ Form.submit(function (e) {
                     $("input[name='PasswordConfirmPassword']").focus();
                 }
                 Toast.fire({
-                    icon: 'warning',
-                    html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
+                    icon: "warning",
+                    html: "<span class=\"font-weight-bold text-black-50 ml-1 \">" + result.responseJSON.message + "</span>"
                 });
             }
         });

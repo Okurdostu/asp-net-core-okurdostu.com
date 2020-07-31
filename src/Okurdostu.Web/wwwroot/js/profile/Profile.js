@@ -9,8 +9,8 @@ Form.submit(function (e) {
         Toast.fire()
         {
             Toast.fire({
-                icon: 'info',
-                html: '<span class="font-weight-bold text-black-50 ml-1">Ad ve soyad için en az 5 karakter girmelisin</span>'
+                icon: "info",
+                html: "<span class=\"font-weight-bold text-black-50 ml-1\">Ad ve soyad için en az 5 karakter girmelisin</span>"
             });
         }
     }
@@ -18,8 +18,8 @@ Form.submit(function (e) {
         Toast.fire()
         {
             Toast.fire({
-                icon: 'info',
-                html: '<span class="font-weight-bold text-black-50 ml-1">Ad ve soyad: Çok uzun, en fazla 50 karakter</span>'
+                icon: "info",
+                html: "<span class=\"font-weight-bold text-black-50 ml-1\">Ad ve soyad: Çok uzun, en fazla 50 karakter</span>"
             });
         }
     }
@@ -30,15 +30,15 @@ Form.submit(function (e) {
             data: { FullName: _Fullname, Biography: _Biography },
             success: function (result) {
                 Toast.fire({
-                    icon: 'success',
-                    html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+                    icon: "success",
+                    html: "<span class=\"font-weight-bold text-black-50 ml-1\">" + result.message + "</span>"
                 });
                 setInterval(function () { location.reload() }, 2000);
             },
             error: function (result) {
                 Toast.fire({
-                    icon: 'warning',
-                    html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
+                    icon: "warning",
+                    html: "<span class=\"font-weight-bold text-black-50 ml-1 \">" + result.responseJSON.message + "</span>"
                 });
             }
         });

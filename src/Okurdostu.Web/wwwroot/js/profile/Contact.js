@@ -13,8 +13,8 @@ Form.submit(function (e) {
         data: { Twitter: _Twitter, Github: _Github, ContactEmail: _ContactEmail },
         success: function (result) {
             Toast.fire({
-                icon: 'success',
-                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+                icon: "success",
+                html: "<span class=\"font-weight-bold text-black-50 ml-1\">" + result.message + "</span>"
             });
             setInterval(function () {
                 location.reload();
@@ -22,8 +22,8 @@ Form.submit(function (e) {
         },
         error: function (result) {
             Toast.fire({
-                icon: 'warning',
-                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
+                icon: "warning",
+                html: "<span class=\"font-weight-bold text-black-50 ml-1 \">" + result.responseJSON.message + "</span>"
             });
         }
     });

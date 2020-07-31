@@ -26,8 +26,8 @@ $(document).on('submit', '#edit-education-form', function (evt) {
 
     if (department != null && department.length <= 0) {
         Toast.fire({
-            icon: 'info',
-            html: '<span class="font-weight-bold text-black-50 ml-1">Bölümünüzü yazmalısınız</span>'
+            icon: "info",
+            html: "<span class=\"font-weight-bold text-black-50 ml-1\">Bölümünüzü yazmalısınız</span>"
         });
     }
     else {
@@ -36,7 +36,7 @@ $(document).on('submit', '#edit-education-form', function (evt) {
         }
         else {
             Toast.fire({
-                icon: 'info',
+                icon: "info",
                 html: '<span class="font-weight-bold text-black-50 ml-1">Bir değişiklik yapmadınız</span>'
             });
         }
@@ -54,7 +54,7 @@ $('#add-education-form').submit(function (evt) {
 
     if (department != null && department.length <= 0) {
         Toast.fire({
-            icon: 'info',
+            icon: "info",
             html: '<span class="font-weight-bold text-black-50 ml-1">Bölümünüzü yazmalısınız</span>'
         });
     }
@@ -69,15 +69,15 @@ function apiEducationPost() {
             $('#edit-education-button').prop('disabled', true);
             $('#add-education-button').prop('disabled', true);
             Toast.fire({
-                icon: 'success',
-                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+                icon: "success",
+                html: "<span class=\"font-weight-bold text-black-50 ml-1\">" + result.message + "</span>"
             });
             setInterval(function () { location.reload() }, 2000);
         })
         .fail(function (result) {
             Toast.fire({
-                icon: 'warning',
-                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
+                icon: "warning",
+                html: "<span class=\"font-weight-bold text-black-50 ml-1 \">" + result.responseJSON.message + "</span>"
             });
         });
 };
@@ -91,15 +91,15 @@ function apiEducationPut(){
             $('#education-remove-modal').modal('hide');
             $('#education-' + _educationIdForRemove).attr('style', 'display:none;');
             Toast.fire({
-                icon: 'success',
-                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+                icon: "success",
+                html: "<span class=\"font-weight-bold text-black-50 ml-1\">" + result.message + "</span>"
             });
             setInterval(function () { location.reload() }, 2000);
         },
         error: function (result) {
             Toast.fire({
-                icon: 'warning',
-                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
+                icon: "warning",
+                html: "<span class=\"font-weight-bold text-black-50 ml-1 \">" + result.responseJSON.message + "</span>"
             });
         }
     });
@@ -125,14 +125,14 @@ function removeEducation() {
             $('#education-remove-modal').modal('hide');
             $('#education-' + _educationIdForRemove).attr('style', 'display:none;');
             Toast.fire({
-                icon: 'success',
-                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+                icon: "success",
+                html: "<span class=\"font-weight-bold text-black-50 ml-1\">" + result.message + "</span>"
             });
         },
         error: function (result) {
             Toast.fire({
-                icon: 'warning',
-                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
+                icon: "warning",
+                html: "<span class=\"font-weight-bold text-black-50 ml-1 \">" + result.responseJSON.message + "</span>"
             });
             setInterval(function () {
                 location.reload();
@@ -145,7 +145,7 @@ function removeEducation() {
 var _educationIdForRemove;
 function getModalToRemoveEducation(id) {
     $.get("/api/me/educations/" + id).done(function (result) {
-        $('#education-remove-modal').modal('show');
+        $("#education-remove-modal").modal('show');
         _educationIdForRemove = id;
     });
 };
@@ -155,34 +155,33 @@ var documentFile;
 
 function getModalToConfirmFile(id) {
     $.get("/api/me/educations/" + id).done(function (result) {
-        $('#education-confirm-modal').modal('show');
+        $("#education-confirm-modal").modal('show');
         _educationIdForDocument = id;
     });
 }
 
 function sendDocument() {
     var formData = new FormData();
-    formData.append('File', $('#educationDocument')[0].files[0]);
-    formData.append('Id', _educationIdForDocument);
+    formData.append("File", $('#educationDocument')[0].files[0]);
+    formData.append("Id", _educationIdForDocument);
 
     $.ajax({
-        type: 'POST',
+        type: "POST",
         url: "/api/me/educationdocuments/",
         data: formData,
         processData: false,
         contentType: false,
-        type: "POST",
         success: function (result) {
             Toast.fire({
-                icon: 'success',
-                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.message + '</span>'
+                icon: "success",
+                html: "<span class=\"font-weight-bold text-black-50 ml-1\">" + result.message + "</span>"
             });
             setTimeout(function () { location.reload(); }, 2000)
         },
         error: function (result) {
             Toast.fire({
-                icon: 'warning',
-                html: '<span class="font-weight-bold text-black-50 ml-1">' + result.responseJSON.message + '</span>'
+                icon: "warning",
+                html: "<span class=\"font-weight-bold text-black-50 ml-1 \">" + result.responseJSON.message + "</span>"
             });
         }
     }
@@ -197,8 +196,8 @@ $('#send-education-document').click(function () {
     }
     else {
         Toast.fire({
-            icon: 'info',
-            html: '<span class="font-weight-bold text-black-50 ml-1">' + 'Dosya seçmelisiniz' + '</span>'
+            icon: "info",
+            html: "<span class=\"font-weight-bold text-black-50 ml-1\">Dosya seçmelisiniz</span>"
         });
     }
 });
