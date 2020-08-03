@@ -19,37 +19,37 @@ namespace Okurdostu.Web.Base
             return ConfirmPassword == AuthenticatedUser.Password;
         }
 
-        public ActionResult Succes(JsonReturnModel jsonReturnModel)
+        public ActionResult Succes(ReturnModel rm)
         {
-            jsonReturnModel.Code = 200;
-            jsonReturnModel.Succes = true;
+            rm.Code = 200;
+            rm.Succes = true;
 
-            return Ok(jsonReturnModel);
+            return Ok(rm);
         }
-        public ActionResult Error(JsonReturnModel jsonReturnModel)
+        public ActionResult Error(ReturnModel rm)
         {
-            jsonReturnModel.Succes = false;
+            rm.Succes = false;
 
-            if (jsonReturnModel.Code == 500)
+            if (rm.Code == 500)
             {
-                return StatusCode(500, jsonReturnModel);
+                return StatusCode(500, rm);
             }
-            if (jsonReturnModel.Code == 401)
+            if (rm.Code == 401)
             {
                 return Unauthorized();
             }
-            if (jsonReturnModel.Code == 403)
+            if (rm.Code == 403)
             {
                 return Forbid();
             }
-            if (jsonReturnModel.Code == 404)
+            if (rm.Code == 404)
             {
                 return NotFound();
             }
             
 
-            jsonReturnModel.Code = 400;
-            return BadRequest(jsonReturnModel);
+            rm.Code = 400;
+            return BadRequest(rm);
         }
     }
 }

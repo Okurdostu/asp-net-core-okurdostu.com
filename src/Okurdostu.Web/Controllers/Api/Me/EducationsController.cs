@@ -41,7 +41,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
         [HttpGet("{Id}")]
         public async Task<IActionResult> GetSingle(Guid Id)
         {
-            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+            ReturnModel rm = new ReturnModel();
             var AuthenticatedUserId = User.Identity.GetUserId();
             var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && x.UserId == Guid.Parse(AuthenticatedUserId));
 
@@ -63,21 +63,21 @@ namespace Okurdostu.Web.Controllers.Api.Me
                     educationModel.ActivitiesSocieties = "";
                 }
 
-                jsonReturnModel.Data = educationModel;
+                rm.Data = educationModel;
             }
             else
             {
-                return Error(jsonReturnModel);
+                return Error(rm);
             }
 
-            return Succes(jsonReturnModel);
+            return Succes(rm);
         }
 
         // /api/me/educations : get all educations
         [HttpGet("")]
         public async Task<IActionResult> GetList()
         {
-            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+            ReturnModel rm = new ReturnModel();
 
             var Educations = await Context.UserEducation.Where(x => x.UserId == Guid.Parse(User.Identity.GetUserId())).Select(x => new
             {
@@ -97,12 +97,12 @@ namespace Okurdostu.Web.Controllers.Api.Me
 
             if (Educations != null)
             {
-                jsonReturnModel.Data = Educations;
-                return Succes(jsonReturnModel);
+                rm.Data = Educations;
+                return Succes(rm);
             }
 
-            jsonReturnModel.Code = 404;
-            return Error(jsonReturnModel);
+            rm.Code = 404;
+            return Error(rm);
         }
 
         public async Task<bool> IsCanRemovable(UserEducation edu)
@@ -123,13 +123,13 @@ namespace Okurdostu.Web.Controllers.Api.Me
         public async Task<IActionResult> PatchRemove(Guid Id)
         {
             var AuthenticatedUserId = User.Identity.GetUserId();
-            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+            ReturnModel rm = new ReturnModel();
 
             if (!ModelState.IsValid)
             {
-                jsonReturnModel.Message = "Silinmesi gereken eğitim bilgisine ulaşılamadı";
-                jsonReturnModel.InternalMessage = "Id is required";
-                return Error(jsonReturnModel);
+                rm.Message = "Silinmesi gereken eğitim bilgisine ulaşılamadı";
+                rm.InternalMessage = "Id is required";
+                return Error(rm);
             }
 
             var deletedEducation = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && Guid.Parse(AuthenticatedUserId) == x.UserId);
@@ -143,7 +143,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
 
                     if (result > 0)
                     {
-                        jsonReturnModel.Message = "Eğitim bilgisi kaldırıldı";
+                        rm.Message = "Eğitim bilgisi kaldırıldı";
                         if (deletedEducation.IsSentToConfirmation)
                         {
                             var educationDocuments = await Context.UserEducationDoc.Where(x => x.UserEducationId == deletedEducation.Id).ToListAsync();
@@ -156,18 +156,18 @@ namespace Okurdostu.Web.Controllers.Api.Me
                             }
                             await Context.SaveChangesAsync();
                         }
-                        return Succes(jsonReturnModel);
+                        return Succes(rm);
                     }
                     else
                     {
-                        jsonReturnModel.Message = "Başaramadık, ne olduğunu bilmiyoruz";
-                        jsonReturnModel.InternalMessage = "Changes aren't save";
-                        return Error(jsonReturnModel);
+                        rm.Message = "Başaramadık, ne olduğunu bilmiyoruz";
+                        rm.InternalMessage = "Changes aren't save";
+                        return Error(rm);
                     }
                 }
                 else
                 {
-                    jsonReturnModel.Message = "Bu eğitimi silemezsiniz";
+                    rm.Message = "Bu eğitimi silemezsiniz";
 
                     TempData["ProfileMessage"] = "İhtiyaç kampanyanız olduğu için" +
                         "<br />" +
@@ -177,14 +177,14 @@ namespace Okurdostu.Web.Controllers.Api.Me
                         "<br/>" +
                         "Daha fazla ayrıntı ve işlem için: info@okurdostu.com";
 
-                    return Error(jsonReturnModel);
+                    return Error(rm);
                 }
             }
             else
             {
-                jsonReturnModel.Message = "Böyle bir eğitiminiz yok";
-                jsonReturnModel.InternalMessage = "Education is null";
-                return Error(jsonReturnModel);
+                rm.Message = "Böyle bir eğitiminiz yok";
+                rm.InternalMessage = "Education is null";
+                return Error(rm);
             }
         }
 
@@ -193,7 +193,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
         public async Task<IActionResult> PutEdit(Guid Id, EducationModel Model)
         {
             var AuthenticatedUserId = User.Identity.GetUserId();
-            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+            ReturnModel rm = new ReturnModel();
 
             var editedEducation = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && Guid.Parse(AuthenticatedUserId) == x.UserId);
 
@@ -211,10 +211,10 @@ namespace Okurdostu.Web.Controllers.Api.Me
             }
             else
             {
-                jsonReturnModel.Message = "Böyle bir eğitiminiz yok";
-                jsonReturnModel.InternalMessage = "Education is null";
+                rm.Message = "Böyle bir eğitiminiz yok";
+                rm.InternalMessage = "Education is null";
 
-                return Error(jsonReturnModel);
+                return Error(rm);
             }
 
             try
@@ -222,13 +222,13 @@ namespace Okurdostu.Web.Controllers.Api.Me
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
                 {
-                    jsonReturnModel.Message = "Eğitim bilgisi kaydedildi";
-                    return Succes(jsonReturnModel);
+                    rm.Message = "Eğitim bilgisi kaydedildi";
+                    return Succes(rm);
                 }
                 else
                 {
-                    jsonReturnModel.Message = "Bir işlem yapılmadı";
-                    return Error(jsonReturnModel);
+                    rm.Message = "Bir işlem yapılmadı";
+                    return Error(rm);
                 }
             }
             catch (Exception e)
@@ -237,22 +237,22 @@ namespace Okurdostu.Web.Controllers.Api.Me
 
                 if (innerMessage.Contains("department"))
                 {
-                    jsonReturnModel.Message = "Bölüm bilgilerine ulaşamadık veya eksik";
+                    rm.Message = "Bölüm bilgilerine ulaşamadık veya eksik";
                 }
                 else if (innerMessage.Contains("university"))
                 {
-                    jsonReturnModel.Message = "Üniversite bilgilerine ulaşamadık veya eksik";
+                    rm.Message = "Üniversite bilgilerine ulaşamadık veya eksik";
                 }
                 else if (innerMessage.Contains("startyear") || innerMessage.Contains("endyear"))
                 {
-                    jsonReturnModel.Message = "Başlangıç veya bitiş yılını kontrol edin";
+                    rm.Message = "Başlangıç veya bitiş yılını kontrol edin";
                 }
                 else
                 {
-                    jsonReturnModel.Message = "Başaramadık ve ne olduğunu bilmiyoruz, tekrar deneyin";
+                    rm.Message = "Başaramadık ve ne olduğunu bilmiyoruz, tekrar deneyin";
                 }
 
-                return Error(jsonReturnModel);
+                return Error(rm);
             }
         }
 
@@ -262,19 +262,19 @@ namespace Okurdostu.Web.Controllers.Api.Me
         public async Task<IActionResult> PostAdd(EducationModel Model)
         {
             var AuthenticatedUserId = User.Identity.GetUserId();
-            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+            ReturnModel rm = new ReturnModel();
 
             if (Model.Startyear > Model.Finishyear)
             {
-                jsonReturnModel.Message = "Başlangıç yılı, bitiş yılından büyük olamaz";
-                jsonReturnModel.Code = 200;
-                return Error(jsonReturnModel);
+                rm.Message = "Başlangıç yılı, bitiş yılından büyük olamaz";
+                rm.Code = 200;
+                return Error(rm);
             }
             else if (Model.Startyear < 1980 || Model.Startyear > DateTime.Now.Year || Model.Finishyear < 1980 || Model.Startyear > DateTime.Now.Year + 7)
             {
-                jsonReturnModel.Message = "Başlangıç yılı, bitiş yılı ile alakalı bilgileri kontrol edip, tekrar deneyin";
-                jsonReturnModel.Code = 200;
-                return Error(jsonReturnModel);
+                rm.Message = "Başlangıç yılı, bitiş yılı ile alakalı bilgileri kontrol edip, tekrar deneyin";
+                rm.Code = 200;
+                return Error(rm);
             }
 
             var NewEducation = new UserEducation
@@ -292,40 +292,40 @@ namespace Okurdostu.Web.Controllers.Api.Me
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
                 {
-                    jsonReturnModel.Message = "Eğitim bilgisi kaydedildi";
-                    return Succes(jsonReturnModel);
+                    rm.Message = "Eğitim bilgisi kaydedildi";
+                    return Succes(rm);
                 }
                 else
                 {
-                    jsonReturnModel.Message = "Bir işlem yapılmadı";
-                    jsonReturnModel.Code = 1001;
-                    return Error(jsonReturnModel);
+                    rm.Message = "Bir işlem yapılmadı";
+                    rm.Code = 1001;
+                    return Error(rm);
                 }
             }
             catch (Exception e)
             {
-                jsonReturnModel.Code = 200;
+                rm.Code = 200;
 
                 string innerMessage = (e.InnerException != null) ? e.InnerException.Message.ToLower() : "";
 
                 if (innerMessage.Contains("department"))
                 {
-                    jsonReturnModel.Message = "Bölüm bilgilerine ulaşamadık veya eksik";
+                    rm.Message = "Bölüm bilgilerine ulaşamadık veya eksik";
                 }
                 else if (innerMessage.Contains("university"))
                 {
-                    jsonReturnModel.Message = "Üniversite bilgilerine ulaşamadık veya eksik";
+                    rm.Message = "Üniversite bilgilerine ulaşamadık veya eksik";
                 }
                 else if (innerMessage.Contains("startyear") || innerMessage.Contains("endyear"))
                 {
-                    jsonReturnModel.Message = "Başlangıç veya bitiş yılını kontrol edin";
+                    rm.Message = "Başlangıç veya bitiş yılını kontrol edin";
                 }
                 else
                 {
-                    jsonReturnModel.Message = "Başaramadık ve ne olduğunu bilmiyoruz, tekrar deneyin";
+                    rm.Message = "Başaramadık ve ne olduğunu bilmiyoruz, tekrar deneyin";
                 }
 
-                return Error(jsonReturnModel);
+                return Error(rm);
             }
         }
     }

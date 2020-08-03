@@ -41,34 +41,34 @@ namespace Okurdostu.Web.Controllers.Api.Me
         [HttpPost("")] //api/me/educationdocuments
         public async Task<IActionResult> Post(Guid Id, IFormFile File)
         {
-            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+            ReturnModel rm = new ReturnModel();
 
             if (File != null && File.Length <= 10485767 / 2 && File.Length > 0)
             {
                 if (File.ContentType != "application/pdf" && File.ContentType != "image/png" && File.ContentType != "image/jpg" && File.ContentType != "image/jpeg")
                 {
-                    jsonReturnModel.Code = 200;
-                    jsonReturnModel.Message = "PDF, PNG, JPG veya JPEG türünde dosya yollayabilirsin";
-                    return Error(jsonReturnModel);
+                    rm.Code = 200;
+                    rm.Message = "PDF, PNG, JPG veya JPEG türünde dosya yollayabilirsin";
+                    return Error(rm);
                 }
             }
             else if (File != null && File.Length > 10485767 / 2)
             {
-                jsonReturnModel.Code = 200;
-                jsonReturnModel.Message = "En fazla 500 kilobyte boyutunda dosya yollayabilirsin";
-                return Error(jsonReturnModel);
+                rm.Code = 200;
+                rm.Message = "En fazla 500 kilobyte boyutunda dosya yollayabilirsin";
+                return Error(rm);
             }
             else if (File != null && File.Length! > 0)
             {
-                jsonReturnModel.Code = 200;
-                jsonReturnModel.Message = "Yolladığınız dosya görüntülenemez";
-                return Error(jsonReturnModel);
+                rm.Code = 200;
+                rm.Message = "Yolladığınız dosya görüntülenemez";
+                return Error(rm);
             }
             else // file is null
             {
-                jsonReturnModel.Code = 200;
-                jsonReturnModel.Message = "Dosya yollamadınız";
-                return Error(jsonReturnModel);
+                rm.Code = 200;
+                rm.Message = "Dosya yollamadınız";
+                return Error(rm);
             }
 
             var AuthenticatedUserId = Guid.Parse(User.Identity.GetUserId());
@@ -106,14 +106,14 @@ namespace Okurdostu.Web.Controllers.Api.Me
                     var result = await Context.SaveChangesAsync();
                     if (result > 0)
                     {
-                        jsonReturnModel.Message = "Eğitim dökümanınız teslim alındı";
+                        rm.Message = "Eğitim dökümanınız teslim alındı";
                         TempData["ProfileMessage"] = "Eğitim dökümanınız yollandı, en geç 48 saat içinde geri dönüş yapılacak";
-                        return Succes(jsonReturnModel);
+                        return Succes(rm);
                     }
                     else
                     {
                         DeleteFileFromServer(EducationDocument.PathAfterRoot);
-                        return Error(jsonReturnModel);
+                        return Error(rm);
                     }
                 }
                 else
@@ -122,12 +122,12 @@ namespace Okurdostu.Web.Controllers.Api.Me
                     {
                         Logger.LogCritical("A user is trying to send education document but file wasn't create on server");
                     }
-                    return Error(jsonReturnModel);
+                    return Error(rm);
                 }
             }
 
-            jsonReturnModel.Code = 404;
-            return Error(jsonReturnModel);
+            rm.Code = 404;
+            return Error(rm);
         }
     }
 }

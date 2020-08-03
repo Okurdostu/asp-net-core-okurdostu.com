@@ -169,12 +169,7 @@ namespace Okurdostu.Web.Controllers
                             var UserEmailConfirmation = new UserEmailConfirmation() //UserEmailConfirmation'u oluştur
                             {
                                 UserId = AuthUser.Id,
-                                NewEmail = Model.Email, //değiştirilmesini istediği email newemail olarak kolona al
-
-                                //bu veri kolonu emailconfirmation/guid ile geldiği zaman
-                                //newemail kolonu yakalanıp veri varsa kullanıcıya direkt olarak o e-maili atayıp
-                                //onay mailini de yeni e-maile yolladığımız için e-mail adresini onaylayacak.
-                                //yani aslında buralarda e-mailini değiştirmiyoruz confirmemail aşamasında e-mail adresi değişiyor.
+                                NewEmail = Model.Email,
                             };
 
                             await Context.AddAsync(UserEmailConfirmation);
@@ -195,7 +190,6 @@ namespace Okurdostu.Web.Controllers
                             Email.Send(Email.EmailAddressChangeMail(AuthUser.FullName, RequestWithSameEmailandUser.NewEmail, RequestWithSameEmailandUser.GUID));
                             TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + RequestWithSameEmailandUser.NewEmail + ") onaylamanız için bir e-mail gönderildi";
                         }
-
                     }
                     else
                     {

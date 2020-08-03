@@ -32,12 +32,12 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPatch("username")]
         public async Task<IActionResult> Username(UsernameModel model)
         {
-            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+            ReturnModel rm = new ReturnModel();
 
             if (!ModelState.IsValid)
             {
-                jsonReturnModel.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
-                return Error(jsonReturnModel);
+                rm.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
+                return Error(rm);
             }
 
             if (await ConfirmIdentityWithPassword(model.UsernameConfirmPassword))
@@ -53,37 +53,37 @@ namespace Okurdostu.Web.Controllers.Api
                             AuthenticatedUser.LastChangedOn = DateTime.Now;
                             await Context.SaveChangesAsync();
                             await SignInWithCookie(AuthenticatedUser);
-                            jsonReturnModel.Data = AuthenticatedUser.Username;
-                            jsonReturnModel.Message = "Yeni kullanıcı adınız: " + AuthenticatedUser.Username;
-                            return Succes(jsonReturnModel);
+                            rm.Data = AuthenticatedUser.Username;
+                            rm.Message = "Yeni kullanıcı adınız: " + AuthenticatedUser.Username;
+                            return Succes(rm);
                         }
                         catch (Exception e)
                         {
                             if (e.InnerException.Message.Contains("Unique_Key_Username"))
                             {
-                                jsonReturnModel.Message = "Bu kullanıcı adını: " + AuthenticatedUser.Username + " kullanamazsınız";
+                                rm.Message = "Bu kullanıcı adını: " + AuthenticatedUser.Username + " kullanamazsınız";
                             }
                             else
                             {
-                                jsonReturnModel.Message = "Başaramadık, ne olduğunu bilmiyoruz";
+                                rm.Message = "Başaramadık, ne olduğunu bilmiyoruz";
                             }
-                            return Error(jsonReturnModel);
+                            return Error(rm);
                         }
                     }
 
-                    jsonReturnModel.Message = "Aynı değeri girdiniz";
-                    return Error(jsonReturnModel);
+                    rm.Message = "Aynı değeri girdiniz";
+                    return Error(rm);
                 }
                 else
                 {
-                    jsonReturnModel.Message = "Bu kullanıcı adını: " + model.Username + " kullanamazsınız";
-                    return Error(jsonReturnModel);
+                    rm.Message = "Bu kullanıcı adını: " + model.Username + " kullanamazsınız";
+                    return Error(rm);
                 }
             }
             else
             {
-                jsonReturnModel.Message = "Kimliğinizi doğrulayamadık: Onay parolası";
-                return Error(jsonReturnModel);
+                rm.Message = "Kimliğinizi doğrulayamadık: Onay parolası";
+                return Error(rm);
             }
         }
 
@@ -105,12 +105,12 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPatch("password")]
         public async Task<IActionResult> Password(PasswordModel model)
         {
-            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+            ReturnModel rm = new ReturnModel();
 
             if (!ModelState.IsValid)
             {
-                jsonReturnModel.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
-                return Error(jsonReturnModel);
+                rm.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
+                return Error(rm);
             }
 
             if (await ConfirmIdentityWithPassword(model.PasswordConfirmPassword))
@@ -124,13 +124,13 @@ namespace Okurdostu.Web.Controllers.Api
                     await Context.SaveChangesAsync();
                 }
 
-                jsonReturnModel.Message = "Parolanız değiştirildi";
-                return Succes(jsonReturnModel);
+                rm.Message = "Parolanız değiştirildi";
+                return Succes(rm);
             }
             else
             {
-                jsonReturnModel.Message = "Kimliğinizi doğrulayamadık: Onay parolası";
-                return Error(jsonReturnModel);
+                rm.Message = "Kimliğinizi doğrulayamadık: Onay parolası";
+                return Error(rm);
             }
         }
 
@@ -155,12 +155,12 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPatch("contact")]
         public async Task<IActionResult> Contact(ContactModel model)
         {
-            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+            ReturnModel rm = new ReturnModel();
 
             if (!ModelState.IsValid)
             {
-                jsonReturnModel.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
-                return Error(jsonReturnModel);
+                rm.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
+                return Error(rm);
             }
 
             AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
@@ -183,14 +183,14 @@ namespace Okurdostu.Web.Controllers.Api
                 }
 
                 await Context.SaveChangesAsync();
-                jsonReturnModel.Message = "İletişim bilgileriniz kaydedildi";
-                return Succes(jsonReturnModel);
+                rm.Message = "İletişim bilgileriniz kaydedildi";
+                return Succes(rm);
 
             }
             else
             {
-                jsonReturnModel.Message = "Aynı içeriklerle değişiklik yapamazsınız";
-                return Error(jsonReturnModel);
+                rm.Message = "Aynı içeriklerle değişiklik yapamazsınız";
+                return Error(rm);
             }
 
         }
@@ -213,12 +213,12 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPatch("profile")]
         public async Task<IActionResult> Profile(ProfileModel model) //editing, adding bio and fullname
         {
-            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+            ReturnModel rm = new ReturnModel();
 
             if (!ModelState.IsValid)
             {
-                jsonReturnModel.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
-                return Error(jsonReturnModel);
+                rm.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
+                return Error(rm);
             }
 
             AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
@@ -238,19 +238,19 @@ namespace Okurdostu.Web.Controllers.Api
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
                 {
-                    jsonReturnModel.Message = "Profil bilgileriniz kaydedildi";
-                    return Succes(jsonReturnModel);
+                    rm.Message = "Profil bilgileriniz kaydedildi";
+                    return Succes(rm);
                 }
                 else
                 {
-                    jsonReturnModel.Message = "Başaramadık, ne olduğunu bilmiyoruz";
-                    return Error(jsonReturnModel);
+                    rm.Message = "Başaramadık, ne olduğunu bilmiyoruz";
+                    return Error(rm);
                 }
             }
             else
             {
-                jsonReturnModel.Message = "Hiç bir değişiklik yapılmadı";
-                return Error(jsonReturnModel);
+                rm.Message = "Hiç bir değişiklik yapılmadı";
+                return Error(rm);
             }
         }
     }

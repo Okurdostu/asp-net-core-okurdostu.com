@@ -16,14 +16,14 @@ namespace Okurdostu.Web.Filters
             }
             else
             {
-                JsonReturnModel jsonReturnModel = new JsonReturnModel
+                ReturnModel rm = new ReturnModel
                 {
                     Succes = false,
                     Message = "Email adresinizi onaylamanız gerekli",
                     InternalMessage = "The email confirmation is required to do that."
                 };
 
-                actionContext.Result =  new BadRequestObjectResult(jsonReturnModel); 
+                actionContext.Result =  new BadRequestObjectResult(rm); 
             }
         }
     }

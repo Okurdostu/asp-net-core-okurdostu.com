@@ -16,20 +16,20 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpGet("{Id}")]
         public async Task<IActionResult> GetSingle(Guid Id)
         {
-            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+            ReturnModel rm = new ReturnModel();
             //when user does reply a comment or wants to edit their comment, it works to view comment that will be edited or replied.
             var RequestedComment = await Context.NeedComment.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
 
             if (RequestedComment != null)
             {
-                jsonReturnModel.Data = new { comment = RequestedComment.Comment, username = RequestedComment.User.Username, fullname = RequestedComment.User.FullName };
-                return Succes(jsonReturnModel);
+                rm.Data = new { comment = RequestedComment.Comment, username = RequestedComment.User.Username, fullname = RequestedComment.User.FullName };
+                return Succes(rm);
             }
             else
             {
-                jsonReturnModel.Code = 200;
-                jsonReturnModel.Message = "Böyle bir yorum yok";
-                return Error(jsonReturnModel);
+                rm.Code = 200;
+                rm.Message = "Böyle bir yorum yok";
+                return Error(rm);
             }
         }
 
@@ -49,29 +49,29 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPost("")]
         public async Task<IActionResult> PostAdd(CommentModel model) //doing comment or reply
         {
-            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+            ReturnModel rm = new ReturnModel();
 
             if (!ModelState.IsValid)
             {
                 if (model.Comment == null)
                 {
-                    jsonReturnModel.Message = "Bir şeyler yazmalısın";
+                    rm.Message = "Bir şeyler yazmalısın";
                 }
                 else if (model.Comment.Length > 100)
                 {
-                    jsonReturnModel.Message = "En fazla 100 karakter";
+                    rm.Message = "En fazla 100 karakter";
                 }
-                jsonReturnModel.InternalMessage = "Comment is required";
+                rm.InternalMessage = "Comment is required";
 
-                return Error(jsonReturnModel);
+                return Error(rm);
             }
 
             if (model.NeedId == null && model.RelatedCommentId == null || model.NeedId == Guid.Empty && model.RelatedCommentId == null)
             {
-                jsonReturnModel.Message = "Yorum yapmak istediğiniz içeriği veya cevabı kontrol edin";
-                jsonReturnModel.InternalMessage = "If you doing main comment on a need, NeedId is required. If you try to reply, RelatedCommentId is required";
+                rm.Message = "Yorum yapmak istediğiniz içeriği veya cevabı kontrol edin";
+                rm.InternalMessage = "If you doing main comment on a need, NeedId is required. If you try to reply, RelatedCommentId is required";
 
-                return Error(jsonReturnModel);
+                return Error(rm);
             }
 
             if (model.NeedId != Guid.Empty && model.NeedId != null) // add new comment
@@ -92,19 +92,19 @@ namespace Okurdostu.Web.Controllers.Api
 
                     if (result > 0)
                     {
-                        jsonReturnModel.Data = NewComment.Id;
-                        return Succes(jsonReturnModel);
+                        rm.Data = NewComment.Id;
+                        return Succes(rm);
                     }
                     else
                     {
-                        jsonReturnModel.Message = "Yorumunuz kaydolmadı";
-                        return Error(jsonReturnModel);
+                        rm.Message = "Yorumunuz kaydolmadı";
+                        return Error(rm);
                     }
                 }
                 else
                 {
-                    jsonReturnModel.Message = "Tartışmanın başlatılacağı kampanya yok veya burada tartışma başlatılamaz";
-                    return Error(jsonReturnModel);
+                    rm.Message = "Tartışmanın başlatılacağı kampanya yok veya burada tartışma başlatılamaz";
+                    return Error(rm);
                 }
             }
             else  //[reply] add relational comment
@@ -126,22 +126,22 @@ namespace Okurdostu.Web.Controllers.Api
 
                     if (result > 0)
                     {
-                        jsonReturnModel.Data = NewReply.Id;
-                        jsonReturnModel.Message = "Cevapladınız";
-                        return Succes(jsonReturnModel);
+                        rm.Data = NewReply.Id;
+                        rm.Message = "Cevapladınız";
+                        return Succes(rm);
                     }
                     else
                     {
-                        jsonReturnModel.Code = 200;
-                        jsonReturnModel.Message = "Başaramadık, ne olduğunu bilmiyoruz";
-                        return Error(jsonReturnModel);
+                        rm.Code = 200;
+                        rm.Message = "Başaramadık, ne olduğunu bilmiyoruz";
+                        return Error(rm);
                     }
                 }
                 else
                 {
-                    jsonReturnModel.Code = 200;
-                    jsonReturnModel.Message = "Cevaplanacak yorum yok, silinmiş veya burada cevap verilemez";
-                    return Error(jsonReturnModel);
+                    rm.Code = 200;
+                    rm.Message = "Cevaplanacak yorum yok, silinmiş veya burada cevap verilemez";
+                    return Error(rm);
                 }
             }
         }
@@ -150,12 +150,12 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPatch("remove/{Id}")]
         public async Task<IActionResult> PatchRemove(Guid Id)
         {
-            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+            ReturnModel rm = new ReturnModel();
             if (Id == null || Id == Guid.Empty)
             {
-                jsonReturnModel.Message = "Silmek için yorum seçmediniz";
-                jsonReturnModel.InternalMessage = "Id is required";
-                return Error(jsonReturnModel);
+                rm.Message = "Silmek için yorum seçmediniz";
+                rm.InternalMessage = "Id is required";
+                return Error(rm);
             }
 
             var DeletedComment = await Context.NeedComment.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && x.UserId == Guid.Parse(User.Identity.GetUserId()));
@@ -167,13 +167,13 @@ namespace Okurdostu.Web.Controllers.Api
                 DeletedComment.Comment = ""; // aynı şekilde içerik yok edilmeli
                 await Context.SaveChangesAsync();
 
-                jsonReturnModel.Message = "Yorumunuz silindi";
-                return Succes(jsonReturnModel);
+                rm.Message = "Yorumunuz silindi";
+                return Succes(rm);
             }
             else
             {
-                jsonReturnModel.Message = "Silmeye çalıştığınız yorum yok";
-                return Error(jsonReturnModel);
+                rm.Message = "Silmeye çalıştığınız yorum yok";
+                return Error(rm);
             }
         }
 
@@ -191,23 +191,23 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPatch("{Id}")]
         public async Task<IActionResult> PatchEdit(EditCommentModel model)
         {
-            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+            ReturnModel rm = new ReturnModel();
             var EditedComment = await Context.NeedComment.FirstOrDefaultAsync(x => x.Id == model.Id && !x.IsRemoved && x.UserId == Guid.Parse(User.Identity.GetUserId()));
 
             if (!ModelState.IsValid)
             {
                 if (model.Comment == null)
                 {
-                    jsonReturnModel.Message = "Bir şeyler yazmalısın";
+                    rm.Message = "Bir şeyler yazmalısın";
                 }
                 else if (model.Comment.Length > 100)
                 {
-                    jsonReturnModel.Message = "En fazla 100 karakter";
+                    rm.Message = "En fazla 100 karakter";
                 }
 
-                jsonReturnModel.InternalMessage = "Id and comment are required";
+                rm.InternalMessage = "Id and comment are required";
 
-                return Error(jsonReturnModel);
+                return Error(rm);
             }
 
             if (EditedComment != null)
@@ -216,19 +216,19 @@ namespace Okurdostu.Web.Controllers.Api
                 {
                     EditedComment.Comment = model.Comment;
                     await Context.SaveChangesAsync();
-                    jsonReturnModel.Message = "Yorum içeriğiniz düzenlendi";
-                    return Succes(jsonReturnModel);
+                    rm.Message = "Yorum içeriğiniz düzenlendi";
+                    return Succes(rm);
                 }
                 else
                 {
-                    jsonReturnModel.Message = "Aynı içerik ile düzenlemeye çalıştınız";
-                    return Error(jsonReturnModel);
+                    rm.Message = "Aynı içerik ile düzenlemeye çalıştınız";
+                    return Error(rm);
                 }
             }
             else
             {
-                jsonReturnModel.Message = "Düzenlemeye çalıştığınız yorum yok";
-                return Error(jsonReturnModel);
+                rm.Message = "Düzenlemeye çalıştığınız yorum yok";
+                return Error(rm);
             }
         }
     }

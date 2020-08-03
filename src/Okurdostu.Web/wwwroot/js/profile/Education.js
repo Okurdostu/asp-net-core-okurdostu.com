@@ -82,7 +82,7 @@ function apiEducationPost() {
         });
 };
 
-function apiEducationPut(){
+function apiEducationPut() {
     $.ajax({
         url: '/api/me/educations/' + educationId,
         type: 'PUT',
@@ -108,19 +108,16 @@ function apiEducationPut(){
 
 //remove
 var _educationIdForRemove;
-
 function getModalToRemoveEducation(id) {
-    $.get("/api/me/educations/" + id).done(function (result) {
-        $('#education-remove-modal').modal('show');
-        _educationIdForRemove = id;
-    });
+    $("#education-remove-modal").modal('show');
+    _educationIdForRemove = id;
 };
 
 function removeEducation() {
     $.ajax({
         url: '/api/me/educations/' + _educationIdForRemove,
         type: 'PATCH',
-        data: { Id : _educationIdForRemove },
+        data: { Id: _educationIdForRemove },
         success: function (result) {
             $('#education-remove-modal').modal('hide');
             $('#education-' + _educationIdForRemove).attr('style', 'display:none;');
@@ -136,19 +133,13 @@ function removeEducation() {
             });
             setInterval(function () {
                 location.reload();
-            },2000);
+            }, 2000);
         }
     });
 };
 //remove
 
-var _educationIdForRemove;
-function getModalToRemoveEducation(id) {
-    $.get("/api/me/educations/" + id).done(function (result) {
-        $("#education-remove-modal").modal('show');
-        _educationIdForRemove = id;
-    });
-};
+
 
 var _educationIdForDocument;
 var documentFile;

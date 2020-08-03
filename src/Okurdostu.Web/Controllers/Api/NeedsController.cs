@@ -15,7 +15,7 @@ namespace Okurdostu.Web.Controllers.Api
     public class NeedsController : SecureApiController
     {
         [NonAction]
-        public async Task AddNeedItemAndFixTotalCharge(Guid needId, string link, string name, double price, string picture, string platformName)
+        public async Task AddNeedItem(Guid needId, string link, string name, double price, string picture, string platformName)
         {
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             var NeedItem = new NeedItem
@@ -39,7 +39,7 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPost("item")]
         public async Task<IActionResult> AddItem(string itemLink, Guid needId)
         {
-            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+            ReturnModel rm = new ReturnModel();
             sbyte maxItemCount = 3;
             var AuthenticatedUserId = Guid.Parse(User.Identity.GetUserId());
 
@@ -58,16 +58,16 @@ namespace Okurdostu.Web.Controllers.Api
                     Udemy = Udemy.Product(itemLink);
                     if (Udemy.Error == null)
                     {
-                        await AddNeedItemAndFixTotalCharge(Need.Id, Udemy.Link, Udemy.Name, Udemy.Price, "/image/udemy.png", "Udemy").ConfigureAwait(false);
+                        await AddNeedItem(Need.Id, Udemy.Link, Udemy.Name, Udemy.Price, "/image/udemy.png", "Udemy").ConfigureAwait(false);
 
-                        //jsonReturnModel.Data = Udemy;
-                        return Succes(jsonReturnModel);
+                        //rm.Data = Udemy;
+                        return Succes(rm);
                     }
                     else
                     {
                         Logger.LogError("Udemy Error:{error}, Link:{link}", Udemy.Error, itemLink);
-                        jsonReturnModel.Message = Udemy.Error;
-                        return Error(jsonReturnModel);
+                        rm.Message = Udemy.Error;
+                        return Error(rm);
                     }
                 }
                 else if (itemLink.Contains("amazon.com.tr"))
@@ -76,16 +76,16 @@ namespace Okurdostu.Web.Controllers.Api
                     Amazon = Amazon.Product(itemLink);
                     if (Amazon.Error == null)
                     {
-                        await AddNeedItemAndFixTotalCharge(Need.Id, Amazon.Link, Amazon.Name, Amazon.Price, "/image/amazon.png", "Amazon").ConfigureAwait(false);
+                        await AddNeedItem(Need.Id, Amazon.Link, Amazon.Name, Amazon.Price, "/image/amazon.png", "Amazon").ConfigureAwait(false);
 
-                        //jsonReturnModel.Data = Amazon;
-                        return Succes(jsonReturnModel);
+                        //rm.Data = Amazon;
+                        return Succes(rm);
                     }
                     else
                     {
                         Logger.LogError("Amazon Error:{error}, Link:{link}", Amazon.Error, itemLink);
-                        jsonReturnModel.Message = Amazon.Error;
-                        return Error(jsonReturnModel);
+                        rm.Message = Amazon.Error;
+                        return Error(rm);
                     }
                 }
                 else if (itemLink.Contains("pandora.com.tr"))
@@ -96,36 +96,36 @@ namespace Okurdostu.Web.Controllers.Api
                         Pandora = Pandora.Product(itemLink);
                         if (Pandora.Error == null)
                         {
-                            await AddNeedItemAndFixTotalCharge(Need.Id, Pandora.Link, Pandora.Name, Pandora.Price, Pandora.Picture, "Pandora").ConfigureAwait(false);
+                            await AddNeedItem(Need.Id, Pandora.Link, Pandora.Name, Pandora.Price, Pandora.Picture, "Pandora").ConfigureAwait(false);
 
-                            //jsonReturnModel.Data = Pandora;
-                            return Succes(jsonReturnModel);
+                            //rm.Data = Pandora;
+                            return Succes(rm);
                         }
                         else
                         {
                             Logger.LogError("Pandora Error:{error}, Link:{link}", Pandora.Error, itemLink);
-                            jsonReturnModel.Message = Pandora.Error;
-                            return Error(jsonReturnModel);
+                            rm.Message = Pandora.Error;
+                            return Error(rm);
                         }
                     }
                     else
                     {
-                        jsonReturnModel.Message = "Pandora.com.tr'den sadece kitap seçebilirsiniz";
-                        return Error(jsonReturnModel);
+                        rm.Message = "Pandora.com.tr'den sadece kitap seçebilirsiniz";
+                        return Error(rm);
                     }
                 }
                 else
                 {
-                    jsonReturnModel.Message = "İhtiyaç duyduğunuz ürünü seçerken desteklenen platformları kullanın";
-                    return Error(jsonReturnModel);
+                    rm.Message = "İhtiyaç duyduğunuz ürünü seçerken desteklenen platformları kullanın";
+                    return Error(rm);
                 }
             }
             else
             {
-                jsonReturnModel.Message = "Kampanyanıza ulaşamadık, tekrar deneyin";
-                jsonReturnModel.InternalMessage = "There isn't campaign to add a new item";
+                rm.Message = "Kampanyanıza ulaşamadık, tekrar deneyin";
+                rm.InternalMessage = "There isn't campaign to add a new item";
 
-                return Error(jsonReturnModel);
+                return Error(rm);
             }
         }
     }

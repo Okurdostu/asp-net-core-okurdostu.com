@@ -12,17 +12,16 @@ namespace Okurdostu.Web.Controllers.Api.Me
     public class CommentsController : SecureApiController
     {
         const int RecordPerPage = 10;
-
-        [HttpGet("{selectedPage}")]
+        // /api/me/comments/{SelectedPage}
+        [HttpGet("{SelectedPage}")]
         public async Task<IActionResult> GetComments(int SelectedPage)
         {
-            JsonReturnModel jsonReturnModel = new JsonReturnModel();
+            ReturnModel rm = new ReturnModel();
 
             if (!(SelectedPage >= 1))
             {
-                jsonReturnModel.Message = "Sayfa seçilmedi";
-                jsonReturnModel.InternalMessage = "Page number is required";
-                return Error(jsonReturnModel);
+                rm.InternalMessage = "Page number is required";
+                return Error(rm);
             }
             else
             {
@@ -36,8 +35,12 @@ namespace Okurdostu.Web.Controllers.Api.Me
 
                 if (SelectedPage > TotalPage)
                 {
-                    jsonReturnModel.InternalMessage = "There isn't any page more than: " + TotalPage;
-                    return Error(jsonReturnModel);
+                    rm.InternalMessage = "There's no page more than: " + TotalPage;
+                    if (TotalPage == 0)
+                    {
+                        rm.Data = new { count = 0 };
+                    }
+                    return Error(rm);
                 }
 
 
@@ -47,7 +50,6 @@ namespace Okurdostu.Web.Controllers.Api.Me
                     .Select(s => new
                     {
                         s.Id,
-                        s.NeedId,
                         s.Comment,
                         s.CreatedOn
                     })
@@ -64,8 +66,8 @@ namespace Okurdostu.Web.Controllers.Api.Me
                     ViewingRecordCount
                 };
 
-                jsonReturnModel.Data = new { Comments, Information };
-                return Succes(jsonReturnModel);
+                rm.Data = new { Comments, Information };
+                return Succes(rm);
             }
         }
     }
