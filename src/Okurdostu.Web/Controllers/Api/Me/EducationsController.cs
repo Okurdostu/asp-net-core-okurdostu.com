@@ -23,20 +23,6 @@ namespace Okurdostu.Web.Controllers.Api.Me
         public EducationsController(IHostingEnvironment env) => Environment = env;
 #pragma warning restore CS0618 // Type or member is obsolete
 
-        [NonAction]
-        public bool DeleteFileFromServer(string filePathAfterRootPath)
-        {
-            if (System.IO.File.Exists(Environment.WebRootPath + filePathAfterRootPath))
-            {
-                System.IO.File.Delete(Environment.WebRootPath + filePathAfterRootPath);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
         // /api/me/educations/{Id} : get single education
         [HttpGet("{Id}")]
         public async Task<IActionResult> GetSingle(Guid Id)
@@ -149,7 +135,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
                             var educationDocuments = await Context.UserEducationDoc.Where(x => x.UserEducationId == deletedEducation.Id).ToListAsync();
                             foreach (var item in educationDocuments)
                             {
-                                if (DeleteFileFromServer(item.PathAfterRoot))
+                                if (DeleteFileFromServer(Environment.WebRootPath + item.PathAfterRoot))
                                 {
                                     Context.Remove(item);
                                 }

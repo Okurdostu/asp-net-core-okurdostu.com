@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,20 +22,6 @@ namespace Okurdostu.Web.Controllers.Api.Me
 #pragma warning disable CS0618 // Type or member is obsolete
         public EducationDocumentsController(IHostingEnvironment env) => Environment = env;
 #pragma warning restore CS0618 // Type or member is obsolete
-
-        [NonAction]
-        public bool DeleteFileFromServer(string filePathAfterRootPath)
-        {
-            if (System.IO.File.Exists(Environment.WebRootPath + filePathAfterRootPath))
-            {
-                System.IO.File.Delete(Environment.WebRootPath + filePathAfterRootPath);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
 
         [HttpPost("")] //api/me/educationdocuments
         public async Task<IActionResult> Post(Guid Id, IFormFile File)
@@ -106,13 +91,13 @@ namespace Okurdostu.Web.Controllers.Api.Me
                     var result = await Context.SaveChangesAsync();
                     if (result > 0)
                     {
-                        rm.Message = "Eğitim dökümanınız teslim alındı";
+                        rm.Message = "Eğitim dökümanınız yollandı";
                         TempData["ProfileMessage"] = "Eğitim dökümanınız yollandı, en geç 48 saat içinde geri dönüş yapılacak";
                         return Succes(rm);
                     }
                     else
                     {
-                        DeleteFileFromServer(EducationDocument.PathAfterRoot);
+                        DeleteFileFromServer(Environment.WebRootPath + EducationDocument.PathAfterRoot);
                         return Error(rm);
                     }
                 }

@@ -1,11 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Filters;
 using Okurdostu.Web.Models;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,6 +19,13 @@ namespace Okurdostu.Web.Controllers.Api
     [ServiceFilter(typeof(ConfirmedEmailFilter))]
     public class MeController : SecureApiController
     {
+#pragma warning disable CS0618 // Type or member is obsolete
+        private readonly IHostingEnvironment Environment;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        public MeController(IHostingEnvironment env) => Environment = env;
+#pragma warning restore CS0618 // Type or member is obsolete
         public class UsernameModel
         {
             [Required(ErrorMessage = "Kimliğinizi doğrulamak için şuan ki parolanızı girmelisiniz")]
@@ -252,6 +264,93 @@ namespace Okurdostu.Web.Controllers.Api
                 rm.Message = "Hiç bir değişiklik yapılmadı";
                 return Error(rm);
             }
+        }
+
+        [HttpPatch("photo")]
+        public async Task<IActionResult> Photo(IFormFile File)
+        {
+            ReturnModel rm = new ReturnModel();
+            if (File != null && File.Length <= 10485767 && File.Length > 0)
+            {
+                if (File.ContentType != "image/png" && File.ContentType != "image/jpg" && File.ContentType != "image/jpeg")
+                {
+                    rm.Message = "Sadece fotoğraf seçiniz";
+                    return Error(rm);
+                }
+            }
+            else if (File != null && File.Length > 10485767)
+            {
+                rm.Message = "Kabul edilen boyutları aştı";
+                return Error(rm);
+            }
+            else if (File != null && File.Length! > 0)
+            {
+                rm.Message = "Seçtiğiniz fotoğraf görüntülenemez";
+                return Error(rm);
+            }
+            else // file is null
+            {
+                rm.Message = "Fotoğraf seçmediniz";
+                return Error(rm);
+            }
+
+            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(File.FileName);
+            string pathToSave = Environment.WebRootPath + "/image/profile/" + fileName;
+
+            using var imageSharp = Image.Load(File.OpenReadStream());
+            if (imageSharp.Width > 200)
+            {
+                imageSharp.Mutate(x => x.Resize(200, 200));
+            }
+            imageSharp.Save(pathToSave);
+
+            string oldPhotoPath = AuthenticatedUser.PictureUrl;
+            AuthenticatedUser.PictureUrl = "/image/profile/" + fileName;
+            AuthenticatedUser.LastChangedOn = DateTime.Now;
+
+            var result = await Context.SaveChangesAsync();
+            if (result > 0)
+            {
+                await SignInWithCookie(AuthenticatedUser);
+
+                if (oldPhotoPath != null)
+                {
+                    DeleteFileFromServer(Environment.WebRootPath + oldPhotoPath);
+                }
+
+                rm.Data = new { photo = "/image/profile/" + fileName };
+                return Succes(rm);
+            }
+            else
+            {
+                DeleteFileFromServer(pathToSave);
+                rm.Message = "Yaptığınız değişiklikler kaydedilemedi";
+                return Error(rm);
+            }
+        }
+
+        [HttpPatch("photo/remove")]
+        public async Task<IActionResult> RemovePhoto()
+        {
+            ReturnModel rm = new ReturnModel();
+
+            if (User.Identity.GetPhoto() != null)
+            {
+                AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
+
+                string OldPhoto = AuthenticatedUser.PictureUrl;
+
+                AuthenticatedUser.PictureUrl = null;
+                AuthenticatedUser.LastChangedOn = DateTime.Now;
+
+                await Context.SaveChangesAsync();
+                await SignInWithCookie(AuthenticatedUser);
+
+                DeleteFileFromServer(Environment.WebRootPath + OldPhoto);
+                return Succes(rm);
+            }
+
+            return Error(rm);
         }
     }
 }

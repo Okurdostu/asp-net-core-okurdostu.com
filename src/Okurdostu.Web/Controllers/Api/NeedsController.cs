@@ -35,7 +35,6 @@ namespace Okurdostu.Web.Controllers.Api
             await Context.SaveChangesAsync();
         }
 
-        //post: /api/needs/item
         [HttpPost("item")]
         public async Task<IActionResult> AddItem(string itemLink, Guid needId)
         {
@@ -123,8 +122,7 @@ namespace Okurdostu.Web.Controllers.Api
             else
             {
                 rm.Message = "Kampanyanıza ulaşamadık, tekrar deneyin";
-                rm.InternalMessage = "There isn't campaign to add a new item";
-
+                rm.InternalMessage = "There is no campaign to add a new item";
                 return Error(rm);
             }
         }

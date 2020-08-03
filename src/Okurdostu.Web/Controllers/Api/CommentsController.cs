@@ -12,7 +12,6 @@ namespace Okurdostu.Web.Controllers.Api
 {
     public class CommentsController : SecureApiController
     {
-        //api/comments/{Id} -- get single comment
         [HttpGet("{Id}")]
         public async Task<IActionResult> GetSingle(Guid Id)
         {
@@ -33,7 +32,6 @@ namespace Okurdostu.Web.Controllers.Api
             }
         }
 
-        //api/comments -- add a new comment or add a reply comment
         public class CommentModel
         {
             public Guid? NeedId { get; set; }
@@ -44,12 +42,17 @@ namespace Okurdostu.Web.Controllers.Api
             [DataType(DataType.MultilineText)]
             public string Comment { get; set; }
         }
-
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost("")]
         public async Task<IActionResult> PostAdd(CommentModel model) //doing comment or reply
         {
             ReturnModel rm = new ReturnModel();
+
+            if (model.NeedId == null && model.RelatedCommentId == null || model.NeedId == Guid.Empty && model.RelatedCommentId == null)
+            {
+                rm.Message = "Yorum yapmak istediğiniz kampanyayı veya cevaplamak istedğiniz yorumu kontrol edin";
+                return Error(rm);
+            }
 
             if (!ModelState.IsValid)
             {
@@ -62,14 +65,6 @@ namespace Okurdostu.Web.Controllers.Api
                     rm.Message = "En fazla 100 karakter";
                 }
                 rm.InternalMessage = "Comment is required";
-
-                return Error(rm);
-            }
-
-            if (model.NeedId == null && model.RelatedCommentId == null || model.NeedId == Guid.Empty && model.RelatedCommentId == null)
-            {
-                rm.Message = "Yorum yapmak istediğiniz içeriği veya cevabı kontrol edin";
-                rm.InternalMessage = "If you doing main comment on a need, NeedId is required. If you try to reply, RelatedCommentId is required";
 
                 return Error(rm);
             }
@@ -145,8 +140,6 @@ namespace Okurdostu.Web.Controllers.Api
                 }
             }
         }
-
-        //api/comments/remove/{Id}
         [HttpPatch("remove/{Id}")]
         public async Task<IActionResult> PatchRemove(Guid Id)
         {
@@ -159,7 +152,6 @@ namespace Okurdostu.Web.Controllers.Api
             }
 
             var DeletedComment = await Context.NeedComment.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && x.UserId == Guid.Parse(User.Identity.GetUserId()));
-
             if (DeletedComment != null)
             {
                 DeletedComment.IsRemoved = true;
@@ -176,8 +168,6 @@ namespace Okurdostu.Web.Controllers.Api
                 return Error(rm);
             }
         }
-
-        //api/comments/{Id} -- edit
         public class EditCommentModel
         {
             [Required]
@@ -192,8 +182,6 @@ namespace Okurdostu.Web.Controllers.Api
         public async Task<IActionResult> PatchEdit(EditCommentModel model)
         {
             ReturnModel rm = new ReturnModel();
-            var EditedComment = await Context.NeedComment.FirstOrDefaultAsync(x => x.Id == model.Id && !x.IsRemoved && x.UserId == Guid.Parse(User.Identity.GetUserId()));
-
             if (!ModelState.IsValid)
             {
                 if (model.Comment == null)
@@ -209,7 +197,7 @@ namespace Okurdostu.Web.Controllers.Api
 
                 return Error(rm);
             }
-
+            var EditedComment = await Context.NeedComment.FirstOrDefaultAsync(x => x.Id == model.Id && !x.IsRemoved && x.UserId == Guid.Parse(User.Identity.GetUserId()));
             if (EditedComment != null)
             {
                 if (EditedComment.Comment != model.Comment)
