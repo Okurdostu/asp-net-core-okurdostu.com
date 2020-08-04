@@ -34,8 +34,9 @@
         <div id="maincomment-div">
             <div class="form-horizontal">
                 <input hidden="hidden" id="NeedId" name="NeedId" value="@Model.Id" />
-                <div class="form-group"><textarea class="form-control" id="Comment" name="Comment" maxlength="100" style="height: 100px;" autocomplete="off" required="required"></textarea></div>
-                <div class="form-group"><input class="btn btn-outline-purple rounded-custom float-right btn-block font-weight-bold fontrem1" type="submit" value="Başlat" onclick="MainComment()" /><br /></div>
+                <label class="float-right text-warning small font-weight-bold mb-1" id="max-length-warn"></label>
+                <div class="form-group"><textarea class="form-control" id="Comment" name="Comment" maxlength="100" style="height: 100px;" autocomplete="off" required="required" ></textarea></div>
+                <div class="form-group"><input class="btn btn-outline-purple rounded-custom float-right btn-block font-weight-bold fontrem1" type="submit" value="Başlat" id="comment-button" onclick="MainComment()" /><br /></div>
             </div>
         </div>
         <div class="pt-3" id="comments"> <h4 class="text-center">Biraz bekleyin..</h4> </div>

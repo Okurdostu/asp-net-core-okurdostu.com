@@ -1,7 +1,20 @@
-﻿function MainComment() {
-    var _NeedId = $("#maincomment-div input[name='NeedId']").val();
-    var _Comment = $("#maincomment-div textarea[id='Comment']").val();
+﻿var commentTextArea = $("#maincomment-div textarea[id='Comment']");
+var commentButton = $("#maincomment-div input[id='comment-button']");
+var commentMaxLengthWarnLabel = $("#max-length-warn");
 
+commentTextArea.keyup(function () {
+    var thisValueLength = $(this).val().length;
+    if (thisValueLength > 89) {
+        commentMaxLengthWarnLabel.html(100 - thisValueLength + " kalan");
+    }
+    else {
+        commentMaxLengthWarnLabel.html("");
+    }
+});
+
+function MainComment() {
+    var _NeedId = $("#maincomment-div input[name='NeedId']").val();
+    var _Comment = commentTextArea.val();
     if (_NeedId.length <= 0) {
         Toast.fire({
             icon: "info",
@@ -23,6 +36,7 @@
     else {
         $.post("/api/comments", { NeedId: _NeedId, Comment: _Comment }).done(function (result) {
             $("#maincomment-div textarea[name='Comment']").val('');
+            commentMaxLengthWarnLabel.html("");
             GetComments(result.data)
         }).fail(function (result) {
             Toast.fire({
@@ -32,7 +46,6 @@
         });
     }
 }
-
 
 function getReplyDialog(id) {
     $.get("/api/comments/" + id).done(function (result) {
