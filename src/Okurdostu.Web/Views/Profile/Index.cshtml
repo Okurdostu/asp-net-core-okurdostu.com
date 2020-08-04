@@ -81,22 +81,65 @@
         @{
             if (IsAuthenticatedUserEqualModelUser)
             {
-                <script>function FileSelect() { document.getElementById('file').click(); } function Selected() { document.getElementById('AddPhotoButton').click(); }</script>
-                using (Html.BeginForm("AddPhoto", "Account", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                {
-                    <input hidden="hidden" id="file" name="file" type="file" onchange="Selected()" accept="image/*" /> <button hidden="hidden" type="submit" id="AddPhotoButton"></button>
-                }
-                <div class="modal fade" id="profile-photo" tabindex="-1" role="dialog" aria-hidden="true">
+                <script>
+                    function FileSelect() {
+                        document.getElementById("photo-input").click();
+                    }
+                    function PhotoSelected() {
+                        var formData = new FormData();
+                        formData.append("File", $("#photo-input").prop("files")[0]);
+                        $("#photo-input").val("");
+                        $.ajax({
+                            type: "PATCH",
+                            url: "/api/me/photo/",
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function (result) {
+                                $("#profile-photo-modal").modal("hide");
+                                $("#profile-photo-img").attr({ "src": result.data.photo });
+                            },
+                            error: function (result) {
+                                Toast.fire({
+                                    icon: "warning",
+                                    html: "<span class=\"font-weight-bold text-black-50 ml-1 \">" + result.responseJSON.message + "</span>"
+                                });
+                            }
+                        }
+                        );
+                    }
+                    function RemovePhoto() {
+                        if ($("#profile-photo-img").attr("src") !== "/svg/user.svg") {
+                            $.ajax({
+                                type: "PATCH",
+                                url: "/api/me/photo/remove",
+                                success: function () {
+                                    $("#profile-photo-modal").modal("hide");
+                                    $("#profile-photo-img").attr({ "src": "/svg/user.svg" });
+                                },
+                                error: function (result) {
+                                    Toast.fire({
+                                        icon: "warning",
+                                        html: "<span class=\"font-weight-bold text-black-50 ml-1 \">" + result.responseJSON.message + "</span>"
+                                    });
+                                }
+                            }
+                            );
+                        }
+                        else {
+                            $("#profile-photo-modal").modal("hide");
+                        }
+                    }
+                </script>
+                <input hidden="hidden" id="photo-input" name="photo-input" type="file" onchange="PhotoSelected()" accept="image/*" /> <button hidden="hidden" type="submit" id="AddPhotoButton"></button>
+                <div class="modal fade" id="profile-photo-modal" tabindex="-1" role="dialog" aria-hidden="true">
                     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
                         <div class="modal-content" style="background: transparent;">
                             <div class="modal-body bg-light text-center" style="border-radius: 25px;">
                                 <h3 class="font-weight-bold text-center text-black-50">Profil fotoğrafı</h3>
                                 <hr />
                                 <button class="btn btn-block btn-outline-info rounded-custom font-weight-bold" onclick="FileSelect();">Yeni fotoğraf yükle</button>
-                                @using (Html.BeginForm("RemovePhoto", "Account", FormMethod.Post))
-                                {
-                                    <button class="btn btn-block btn-danger rounded-custom font-weight-bold mb-1 mt-1" type="submit">Şuan ki fotoğrafı kaldır</button>
-                                }
+                                <button class="btn btn-block btn-danger rounded-custom font-weight-bold mb-1 mt-1" onclick="RemovePhoto()" type="submit">Şuan ki fotoğrafı kaldır</button>
                                 <button class="btn btn-block btn-outline-secondary rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>
                             </div>
                         </div>
@@ -104,21 +147,31 @@
                 </div>
             }
         }
-        @if (Model.PictureUrl != null)
+        @if (IsAuthenticatedUserEqualModelUser)
         {
-            if (IsAuthenticatedUserEqualModelUser)
-            {<a data-toggle="modal" data-target="#profile-photo" style="cursor:pointer;"><img src="@Model.PictureUrl" class="profil-image img-thumbnail rounded-pill mb-2" style="width:150px; height:150px;" /></a> }
-            else
-            { <img src="@Model.PictureUrl" class="img-thumbnail rounded-pill mb-2" style="width:150px; height:150px;" /> }
+            <a data-toggle="modal" data-target="#profile-photo-modal" style="cursor:pointer;">
+                @if (Model.PictureUrl != null)
+                {
+                    <img src="@Model.PictureUrl" id="profile-photo-img" class="profil-image img-thumbnail rounded-pill mb-2" style="width:150px; height:150px;" />
+                }
+                else
+                {
+                    <img src="/svg/user.svg" id="profile-photo-img" class="profil-image img-thumbnail rounded-pill mb-2" style="width:150px; height:150px;" />
+                }
+            </a>
         }
         else
         {
-            if (IsAuthenticatedUserEqualModelUser)
-            { <a data-toggle="modal" data-target="#profile-photo" style="cursor:pointer;"> <img src="~/svg/user.svg" class="profil-image img-thumbnail rounded-pill mb-2" style="width:150px; max-height:150px;" /> </a> }
+            if (Model.PictureUrl != null)
+            {
+                <img src="@Model.PictureUrl" class="img-thumbnail rounded-pill mb-2" style="width:150px; height:150px;" />
+            }
             else
-            { <img src="~/svg/user.svg" class="img-thumbnail rounded-pill mb-2" style="width:150px; max-height:150px;" />}
+            {
+                <img src="/svg/user.svg" class="img-thumbnail rounded-pill mb-2" style="width:150px; height:150px;" />
+            }
         }
-        @if (Model.ContactEmail != null || Model.Twitter != null || Model.Github != null)
+            @if (Model.ContactEmail != null || Model.Twitter != null || Model.Github != null)
         {
             <div style="font-size:22px" class="text-center">
                 @if (Model.Twitter != null)

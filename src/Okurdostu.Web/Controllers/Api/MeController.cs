@@ -293,7 +293,7 @@ namespace Okurdostu.Web.Controllers.Api
                 rm.Message = "Fotoğraf seçmediniz";
                 return Error(rm);
             }
-
+            AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
             string fileName = Guid.NewGuid().ToString() + Path.GetExtension(File.FileName);
             string pathToSave = Environment.WebRootPath + "/image/profile/" + fileName;
 
