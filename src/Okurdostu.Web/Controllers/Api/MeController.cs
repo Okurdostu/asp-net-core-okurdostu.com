@@ -19,6 +19,12 @@ namespace Okurdostu.Web.Controllers.Api
     [ServiceFilter(typeof(ConfirmedEmailFilter))]
     public class MeController : SecureApiController
     {
+        [HttpGet("")]
+        public ActionResult Index()
+        {
+            return NotFound();
+        }
+
 #pragma warning disable CS0618 // Type or member is obsolete
         private readonly IHostingEnvironment Environment;
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -64,7 +70,7 @@ namespace Okurdostu.Web.Controllers.Api
                         {
                             AuthenticatedUser.LastChangedOn = DateTime.Now;
                             await Context.SaveChangesAsync();
-                            await SignInWithCookie(AuthenticatedUser);
+                            await SignInWithCookie(AuthenticatedUser).ConfigureAwait(false);
                             rm.Data = AuthenticatedUser.Username;
                             rm.Message = "Yeni kullanıcı adınız: " + AuthenticatedUser.Username;
                             return Succes(rm);

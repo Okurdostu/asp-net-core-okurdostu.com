@@ -23,6 +23,12 @@ namespace Okurdostu.Web.Controllers.Api.Me
         public EducationDocumentsController(IHostingEnvironment env) => Environment = env;
 #pragma warning restore CS0618 // Type or member is obsolete
 
+        [HttpGet("")]
+        public ActionResult Index()
+        {
+            return NotFound();
+        }
+
         [HttpPost("")] //api/me/educationdocuments
         public async Task<IActionResult> Post(Guid Id, IFormFile File)
         {

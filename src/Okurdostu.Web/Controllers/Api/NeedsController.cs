@@ -14,6 +14,12 @@ namespace Okurdostu.Web.Controllers.Api
 {
     public class NeedsController : SecureApiController
     {
+        [HttpGet("")]
+        public ActionResult Index()
+        {
+            return NotFound();
+        }
+
         [NonAction]
         public async Task AddNeedItem(Guid needId, string link, string name, double price, string picture, string platformName)
         {

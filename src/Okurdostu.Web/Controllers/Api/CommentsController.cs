@@ -12,6 +12,12 @@ namespace Okurdostu.Web.Controllers.Api
 {
     public class CommentsController : SecureApiController
     {
+        [HttpGet("")]
+        public ActionResult Index()
+        {
+            return NotFound();
+        }
+
         [HttpGet("{Id}")]
         public async Task<IActionResult> GetSingle(Guid Id)
         {

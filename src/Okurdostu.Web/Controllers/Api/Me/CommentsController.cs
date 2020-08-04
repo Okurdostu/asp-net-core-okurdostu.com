@@ -11,14 +11,19 @@ namespace Okurdostu.Web.Controllers.Api.Me
     [Route("/api/me/comments")]
     public class CommentsController : SecureApiController
     {
-        const int RecordPerPage = 10;
-        // /api/me/comments/{SelectedPage}
+        [HttpGet("")]
+        public ActionResult Index()
+        {
+            return NotFound();
+        }
+
+        const int MaxRecordPerPage = 10;
         [HttpGet("{SelectedPage}")]
         public async Task<IActionResult> GetComments(int SelectedPage)
         {
             ReturnModel rm = new ReturnModel();
 
-            if (!(SelectedPage >= 1))
+            if (SelectedPage <= 0)
             {
                 rm.InternalMessage = "Page number is required";
                 return Error(rm);
@@ -26,10 +31,10 @@ namespace Okurdostu.Web.Controllers.Api.Me
             else
             {
                 var TotalRecord = await Context.NeedComment.Where(x => x.UserId == Guid.Parse(User.Identity.GetUserId())).CountAsync();
-                var TotalPage = TotalRecord / RecordPerPage;
-                if (!(TotalRecord % RecordPerPage == 0))
+                var TotalPage = TotalRecord / MaxRecordPerPage;
+
+                if (TotalRecord % MaxRecordPerPage != 0)
                 {
-                    // mod 0 değilse, arta kalan kayıt veya kayıtlar vardır ve bunlar içinde toplam sayfa sayısına bir ekliyoruz
                     TotalPage++;
                 }
 
@@ -53,8 +58,8 @@ namespace Okurdostu.Web.Controllers.Api.Me
                         s.Comment,
                         s.CreatedOn
                     })
-                    .SkipLast(RecordPerPage * (SelectedPage - 1))
-                    .TakeLast(RecordPerPage).ToList();
+                    .SkipLast(MaxRecordPerPage * (SelectedPage - 1))
+                    .TakeLast(MaxRecordPerPage).ToList();
 
                 byte ViewingRecordCount = (byte)Comments.Count();
 

@@ -4,7 +4,6 @@ namespace Okurdostu.Web.Controllers
 {
     public class HomeController : Controller
     {
-        //viewbag.authuser i onactionexecuting e al.
         [Route("")]
         public IActionResult Index()
         {
