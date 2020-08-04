@@ -39,22 +39,6 @@ namespace Okurdostu.Web.Controllers
             ConfirmPassword = ConfirmPassword.SHA512();
             return ConfirmPassword == AuthUser.Password;
         }
-
-        [NonAction]
-        public bool DeleteFileFromServer(string filePathAfterRootPath)
-        {
-            if (System.IO.File.Exists(Environment.WebRootPath + filePathAfterRootPath))
-            {
-                System.IO.File.Delete(Environment.WebRootPath + filePathAfterRootPath);
-                Logger.LogInformation("User({Id}) | A file deleted on server: {file}", AuthUser?.Id, filePathAfterRootPath);
-                return true;
-            }
-            else
-            {
-                Logger.LogWarning("File deleting failed, there isn't a file: " + filePathAfterRootPath);
-                return false;
-            }
-        }
         #endregion
 
         #region account
@@ -256,90 +240,6 @@ namespace Okurdostu.Web.Controllers
             else
             {
                 TempData["ProfileMessage"] = "Sanırım bir hata yapıyorsunuz, size gönderdiğimiz bağlantıyı kullanın";
-            }
-
-            Response.Redirect("/" + AuthUser.Username);
-        }
-
-        [ServiceFilter(typeof(ConfirmedEmailFilter))]
-        [HttpPost, ValidateAntiForgeryToken]
-        [Route("account/photo")]
-        public async Task AddPhoto()
-        {
-            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-            var File = Request.Form.Files.First();
-
-            if (File != null && File.Length <= 1048576 && File.Length > 0)
-            {
-                if (File.ContentType == "image/png" || File.ContentType == "image/jpg" || File.ContentType == "image/jpeg")
-                {
-                    string Name = Guid.NewGuid().ToString() + Path.GetExtension(File.FileName);
-                    string FilePathWithName = Environment.WebRootPath + "/image/profil-fotograf/" + Name;
-
-                    using var ImageSharp = Image.Load(File.OpenReadStream());
-                    if (ImageSharp.Width > 200)
-                    {
-                        ImageSharp.Mutate(x => x.Resize(200, 200));
-                    }
-                    ImageSharp.Save(FilePathWithName);
-                    Logger.LogInformation("User({Id}) added a photo({file}) on server", AuthUser.Id, "/image/profil-fotograf/" + Name);
-                    string OldPhoto = AuthUser.PictureUrl;
-                    AuthUser.PictureUrl = "/image/profil-fotograf/" + Name;
-                    AuthUser.LastChangedOn = DateTime.Now;
-                    var result = await Context.SaveChangesAsync();
-                    if (result > 0)
-                    {
-                        await SignInWithCookie(AuthUser);
-                        Logger.LogInformation("User({Id}) changed profile photo", AuthUser.Id);
-                        if (OldPhoto != null)
-                        {
-                            DeleteFileFromServer(OldPhoto);
-                        }
-                    }
-                    else
-                    {
-                        Logger.LogError("Changes aren't save, User({Id}) take error when trying change profile photo", AuthUser.Id);
-                        DeleteFileFromServer("/image/profil-fotograf/" + Name);
-                        TempData["ProfileMessage"] = "Başaramadık, neler olduğunu bilmiyoruz";
-                    }
-                }
-                else
-                {
-                    TempData["ProfileMessage"] = "PNG, JPG ve JPEG türünde fotoğraf yükleyiniz";
-                }
-            }
-            else if (File.Length > 1048576)
-            {
-                TempData["ProfileMessage"] = "Seçtiğiniz dosya 1 megabyte'dan fazla";
-            }
-
-            Response.Redirect("/" + AuthUser.Username);
-        }
-
-        [ServiceFilter(typeof(ConfirmedEmailFilter))]
-        [HttpPost, ValidateAntiForgeryToken]
-        [Route("account/remove-photo")]
-        public async Task RemovePhoto()
-        {
-
-            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-            if (AuthUser.PictureUrl != null)
-            {
-                string OldPhoto = AuthUser.PictureUrl;
-                AuthUser.PictureUrl = null;
-                AuthUser.LastChangedOn = DateTime.Now;
-                var result = await Context.SaveChangesAsync();
-                if (result > 0)
-                {
-                    await SignInWithCookie(AuthUser);
-                    Logger.LogInformation("User({Id}) removed their photo", AuthUser.Id);
-                    DeleteFileFromServer(OldPhoto);
-                }
-                else
-                {
-                    Logger.LogError("Changes aren't save, User({Id}) take error when trying remove their photo", AuthUser.Id);
-                    TempData["ProfileMessage"] = "Başaramadık, ne olduğunu bilmiyoruz";
-                }
             }
 
             Response.Redirect("/" + AuthUser.Username);
