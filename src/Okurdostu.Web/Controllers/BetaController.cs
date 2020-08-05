@@ -22,6 +22,7 @@ namespace Okurdostu.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Feedback(FeedbackModel Model)
         {
+            ReturnModel rm = new ReturnModel();
             if (ModelState.IsValid)
             {
                 var Feedback = new Feedback
@@ -29,19 +30,21 @@ namespace Okurdostu.Web.Controllers
                     Email = Model.Email,
                     Message = Model.Message
                 };
-                await Context.AddAsync(Feedback);
-                var result = await Context.SaveChangesAsync();
-                if (result > 0)
-                {
-                    TempData["BetaMessage"] = "Geri bildiriminiz iletildi, teşekkür ederiz";
-                }
+                await Context.AddAsync(Feedback).ConfigureAwait(false);
+                await Context.SaveChangesAsync().ConfigureAwait(false);
+
+                rm.Code = 200;
+                rm.Succes = true;
+                rm.Message = "Geri bildiriminiz iletildi, teşekkür ederiz";
+                return Ok(rm);
             }
             else
             {
-                TempData["BetaMessage"] = "Gerekli bilgileri doldurmadınız.";
+                rm.Code = 400;
+                rm.Succes = false;
+                rm.InternalMessage = "Model is invalid";
+                return BadRequest(rm);
             }
-
-            return Redirect("/beta");
         }
     }
 }

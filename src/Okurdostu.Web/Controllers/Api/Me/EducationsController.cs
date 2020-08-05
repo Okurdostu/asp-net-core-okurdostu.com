@@ -96,7 +96,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
         }
 
         [HttpGet("")]
-        public async Task<IActionResult> GetEducations()
+        public async Task<IActionResult> GetEducations() //need: pagination
         {
             ReturnModel rm = new ReturnModel();
 

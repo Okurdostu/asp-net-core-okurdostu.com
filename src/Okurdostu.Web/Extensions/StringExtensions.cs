@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Extensions
 {
@@ -81,7 +78,7 @@ namespace Okurdostu.Web.Extensions
                     charArray[i] = '_'; // converts spaces to _
                 }
             }
-                
+
 
             //" asd asd asd "
             str = new string(charArray).Replace("_", ""); // delete '_' [space] characters
