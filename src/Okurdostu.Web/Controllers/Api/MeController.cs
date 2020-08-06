@@ -7,8 +7,6 @@ using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Filters;
 using Okurdostu.Web.Models;
 using Okurdostu.Web.Services;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
@@ -280,7 +278,9 @@ namespace Okurdostu.Web.Controllers.Api
         public async Task<IActionResult> Photo(IFormFile File)
         {
             ReturnModel rm = new ReturnModel();
-            if (File != null && File.Length <= 10485767 && File.Length > 0)
+            long acceptableFileSize = 10485767 / 2;
+
+            if (File != null && File.Length <= acceptableFileSize && File.Length > 0)
             {
                 if (File.ContentType != "image/png" && File.ContentType != "image/jpg" && File.ContentType != "image/jpeg")
                 {
@@ -288,7 +288,7 @@ namespace Okurdostu.Web.Controllers.Api
                     return Error(rm);
                 }
             }
-            else if (File != null && File.Length > 10485767)
+            else if (File != null && File.Length > acceptableFileSize)
             {
                 rm.Message = "Kabul edilen boyutları aştı";
                 return Error(rm);
@@ -303,19 +303,16 @@ namespace Okurdostu.Web.Controllers.Api
                 rm.Message = "Fotoğraf seçmediniz";
                 return Error(rm);
             }
-            AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
-            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(File.FileName);
-            string newPhotoFullPath = Environment.WebRootPath + "/image/profile/" + fileName;
 
-            using var imageSharp = Image.Load(File.OpenReadStream());
-            if (imageSharp.Width > 200)
+            var uploadedPhotoPathAfterRoot = LocalStorage.UploadProfilePhoto(File.OpenReadStream(), Environment.WebRootPath, Path.GetExtension(File.FileName));
+            if (uploadedPhotoPathAfterRoot == null)
             {
-                imageSharp.Mutate(x => x.Resize(200, 200));
+                return Error(rm);
             }
-            imageSharp.Save(newPhotoFullPath);
 
+            AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync().ConfigureAwait(false);
             string oldPhotoPath = AuthenticatedUser.PictureUrl;
-            AuthenticatedUser.PictureUrl = "/image/profile/" + fileName;
+            AuthenticatedUser.PictureUrl = uploadedPhotoPathAfterRoot;
             AuthenticatedUser.LastChangedOn = DateTime.Now;
 
             var result = await Context.SaveChangesAsync();
@@ -328,12 +325,12 @@ namespace Okurdostu.Web.Controllers.Api
                     LocalStorage.DeleteIfExists(Environment.WebRootPath + oldPhotoPath);
                 }
 
-                rm.Data = new { photo = "/image/profile/" + fileName };
+                rm.Data = new { photo = uploadedPhotoPathAfterRoot };
                 return Succes(rm);
             }
             else
             {
-                LocalStorage.DeleteIfExists(newPhotoFullPath);
+                LocalStorage.DeleteIfExists(Environment.WebRootPath + uploadedPhotoPathAfterRoot);
                 rm.Message = "Yaptığınız değişiklikler kaydedilemedi";
                 return Error(rm);
             }

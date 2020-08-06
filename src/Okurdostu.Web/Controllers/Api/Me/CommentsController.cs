@@ -67,7 +67,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
                 {
                     TotalRecord,
                     TotalPage,
-                    SelectedPage,
+                    CurrentPage = SelectedPage,
                     ViewingRecordCount
                 };
 
