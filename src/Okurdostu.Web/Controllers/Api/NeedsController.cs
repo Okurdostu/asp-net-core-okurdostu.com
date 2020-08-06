@@ -51,12 +51,17 @@ namespace Okurdostu.Web.Controllers.Api
             var Need = await Context.Need.Where(x => x.Id == needId
             && x.UserId == AuthenticatedUserId
             && !x.IsRemoved
-            && !x.IsSentForConfirmation
-            && x.NeedItem.Where(a => a.IsRemoved != true).Count() < maxItemCount)
+            && !x.IsSentForConfirmation)
                 .FirstOrDefaultAsync();
 
             if (Need != null)
             {
+                if (Need.NeedItem.Count() >= maxItemCount)
+                {
+                    rm.Code = 403;
+                    return Error(rm);
+                }
+
                 if (itemLink.Contains("udemy.com"))
                 {
                     Udemy Udemy = new Udemy();
@@ -127,6 +132,7 @@ namespace Okurdostu.Web.Controllers.Api
             }
             else
             {
+                rm.Code = 404;
                 rm.Message = "Kampanyanıza ulaşamadık, tekrar deneyin";
                 rm.InternalMessage = "There is no campaign to add a new item";
                 return Error(rm);

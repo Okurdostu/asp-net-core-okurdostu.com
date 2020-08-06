@@ -53,6 +53,7 @@ namespace Okurdostu.Web
                 new ClaimsPrincipal(ClaimsIdentity),
                 AuthProperties);
         }
+
         public async Task<User> GetAuthenticatedUserFromDatabaseAsync()
         {
             var authUserId = User?.Identity?.GetUserId();
@@ -60,7 +61,7 @@ namespace Okurdostu.Web
             {
                 var AuthenticatedUser = await Context.User.FirstOrDefaultAsync(x => x.Id == Guid.Parse(authUserId) && x.IsActive);
                 //if user did any changing on their profile
-                if (AuthenticatedUser.LastChangedOn.ToString() != User.Identity.GetLastChangedOn()) 
+                if (AuthenticatedUser.LastChangedOn.ToString() != User.Identity.GetLastChangedOn())
                 {
                     await SignInWithCookie(AuthenticatedUser);
                     //actually it should be call in other session of authenticated user.

@@ -247,8 +247,20 @@ namespace Okurdostu.Web.Controllers.Api.Me
         {
             var AuthenticatedUserId = User.Identity.GetUserId();
             ReturnModel rm = new ReturnModel();
-
             var editedEducation = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && Guid.Parse(AuthenticatedUserId) == x.UserId);
+            
+            if (Model.Startyear > Model.Finishyear)
+            {
+                rm.Message = "Başlangıç yılı, bitiş yılından büyük olamaz";
+                rm.Code = 200;
+                return Error(rm);
+            }
+            else if (Model.Startyear < 1980 || Model.Startyear > DateTime.Now.Year || Model.Finishyear < 1980 || Model.Startyear > DateTime.Now.Year + 7)
+            {
+                rm.Message = "Başlangıç yılı, bitiş yılı ile alakalı bilgileri kontrol edip, tekrar deneyin";
+                rm.Code = 200;
+                return Error(rm);
+            }
 
             if (editedEducation != null)
             {
@@ -266,7 +278,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
             {
                 rm.Message = "Böyle bir eğitiminiz yok";
                 rm.InternalMessage = "Education is null";
-
+                rm.Code = 404;
                 return Error(rm);
             }
 
@@ -308,7 +320,5 @@ namespace Okurdostu.Web.Controllers.Api.Me
                 return Error(rm);
             }
         }
-
-        
     }
 }

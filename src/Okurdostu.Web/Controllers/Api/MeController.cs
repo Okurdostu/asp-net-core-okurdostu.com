@@ -57,8 +57,9 @@ namespace Okurdostu.Web.Controllers.Api
                 rm.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
                 return Error(rm);
             }
+            AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
 
-            if (await ConfirmIdentityWithPassword(model.UsernameConfirmPassword))
+            if (AuthenticatedUser.PasswordCheck(model.UsernameConfirmPassword))
             {
                 if (!blockedUsernames.Any(x => model.Username == x))
                 {
@@ -131,7 +132,8 @@ namespace Okurdostu.Web.Controllers.Api
                 return Error(rm);
             }
 
-            if (await ConfirmIdentityWithPassword(model.PasswordConfirmPassword))
+            AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
+            if (AuthenticatedUser.PasswordCheck(model.PasswordConfirmPassword))
             {
                 model.Password = model.Password.SHA512();
 

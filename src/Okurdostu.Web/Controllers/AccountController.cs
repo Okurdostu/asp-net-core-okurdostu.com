@@ -1,19 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Okurdostu.Data;
 using Okurdostu.Web.Extensions;
-using Okurdostu.Web.Filters;
 using Okurdostu.Web.Models;
 using Okurdostu.Web.Services;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
 using System;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
@@ -21,7 +14,7 @@ namespace Okurdostu.Web.Controllers
     [Authorize]
     public class AccountController : BaseController<AccountController>
     {
-        private User AuthUser;
+        private User AuthenticatedUser;
 
 #pragma warning disable CS0618 // Type or member is obsolete
         private readonly IHostingEnvironment Environment;
@@ -31,27 +24,17 @@ namespace Okurdostu.Web.Controllers
         public AccountController(IHostingEnvironment env) => Environment = env;
 #pragma warning restore CS0618 // Type or member is obsolete
 
-        #region nonaction
-        [NonAction]
-        public async Task<bool> ConfirmIdentityWithPassword(string ConfirmPassword)
-        {
-            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-            ConfirmPassword = ConfirmPassword.SHA512();
-            return ConfirmPassword == AuthUser.Password;
-        }
-        #endregion
-
         #region account
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> SendConfirmationEmail() //it's used on /beta/index page
         {
             //if user doesn't confirm their email, user will see a warning on beta/index page.
             //and this httppost coming there.
-            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+            AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
 
-            if (!AuthUser.IsEmailConfirmed)
+            if (!AuthenticatedUser.IsEmailConfirmed)
             {
-                var _UserEmailConfirmation = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.UserId == AuthUser.Id && !x.IsUsed);
+                var _UserEmailConfirmation = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.UserId == AuthenticatedUser.Id && !x.IsUsed);
 
                 var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
                 {
@@ -68,18 +51,18 @@ namespace Okurdostu.Web.Controllers
                 {
                     var newUserEmailConfirmation = new UserEmailConfirmation()
                     {
-                        UserId = AuthUser.Id,
+                        UserId = AuthenticatedUser.Id,
                     };
                     await Context.AddAsync(newUserEmailConfirmation);
                     await Context.SaveChangesAsync();
                     confirmationGuid = newUserEmailConfirmation.GUID;
                 }
 
-                Email.Send(Email.NewUserMail(AuthUser.FullName, AuthUser.Email, confirmationGuid));
-                TempData["ProfileMessage"] = AuthUser.Email + " adresine yeni bir onay maili gönderildi";
+                Email.Send(Email.NewUserMail(AuthenticatedUser.FullName, AuthenticatedUser.Email, confirmationGuid));
+                TempData["ProfileMessage"] = AuthenticatedUser.Email + " adresine yeni bir onay maili gönderildi";
             }
 
-            return Redirect("/" + AuthUser.Username);
+            return Redirect("/" + AuthenticatedUser.Username);
         }
 
         [HttpPost, ValidateAntiForgeryToken]
@@ -87,7 +70,8 @@ namespace Okurdostu.Web.Controllers
         {
             //authuser must confirm their identity with password if user doesn't this, 
             //user can't show 'CreateEmailChangeRequest' and can't do httppost to 'CreateEmailChangeRequest'.
-            if (await ConfirmIdentityWithPassword(Model.ConfirmPassword).ConfigureAwait(false))
+            AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync().ConfigureAwait(false);
+            if (AuthenticatedUser.PasswordCheck(Model.ConfirmPassword))
             {
                 TempData.Set("IsEmailChangingConfirmedwithPassword", true);
                 return Redirect("/account/changeemail");
@@ -95,7 +79,7 @@ namespace Okurdostu.Web.Controllers
             else
             {
                 TempData["ProfileMessage"] = "Kimliğinizi doğrulayamadık";
-                return Redirect("/" + AuthUser.Username);
+                return Redirect("/" + AuthenticatedUser.Username);
             }
 
         }
@@ -124,7 +108,7 @@ namespace Okurdostu.Web.Controllers
         [Route("account/changeemail")]
         public async Task<IActionResult> CreateEmailChangeRequest(ProfileModel Model)
         {
-            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+            AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
 
             if (TempData.Get<bool>("IsEmailChangingConfirmedwithPasswordForPost"))
             {
@@ -136,7 +120,7 @@ namespace Okurdostu.Web.Controllers
 
                 if (!IsThereAnyUserWithThatEmailAdress)
                 {
-                    if (AuthUser.Email != Model.Email)
+                    if (AuthenticatedUser.Email != Model.Email)
                     {
 
                         var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
@@ -145,14 +129,14 @@ namespace Okurdostu.Web.Controllers
                             SenderName = "Okurdostu"
                         };
 
-                        var RequestWithSameEmailandUser = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.NewEmail == Model.Email && x.UserId == AuthUser.Id && !x.IsUsed);
+                        var RequestWithSameEmailandUser = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.NewEmail == Model.Email && x.UserId == AuthenticatedUser.Id && !x.IsUsed);
 
                         if (RequestWithSameEmailandUser == null)
                         {
 
                             var UserEmailConfirmation = new UserEmailConfirmation() //UserEmailConfirmation'u oluştur
                             {
-                                UserId = AuthUser.Id,
+                                UserId = AuthenticatedUser.Id,
                                 NewEmail = Model.Email,
                             };
 
@@ -160,7 +144,7 @@ namespace Okurdostu.Web.Controllers
                             var result = await Context.SaveChangesAsync();
                             if (result > 0)
                             {
-                                Email.Send(Email.EmailAddressChangeMail(AuthUser.FullName, UserEmailConfirmation.NewEmail, UserEmailConfirmation.GUID));
+                                Email.Send(Email.EmailAddressChangeMail(AuthenticatedUser.FullName, UserEmailConfirmation.NewEmail, UserEmailConfirmation.GUID));
                                 TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + UserEmailConfirmation.NewEmail + ") onaylamanız için bir e-mail gönderildi";
                             }
                             else
@@ -171,7 +155,7 @@ namespace Okurdostu.Web.Controllers
                         }
                         else
                         {
-                            Email.Send(Email.EmailAddressChangeMail(AuthUser.FullName, RequestWithSameEmailandUser.NewEmail, RequestWithSameEmailandUser.GUID));
+                            Email.Send(Email.EmailAddressChangeMail(AuthenticatedUser.FullName, RequestWithSameEmailandUser.NewEmail, RequestWithSameEmailandUser.GUID));
                             TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + RequestWithSameEmailandUser.NewEmail + ") onaylamanız için bir e-mail gönderildi";
                         }
                     }
@@ -187,29 +171,29 @@ namespace Okurdostu.Web.Controllers
                 }
             }
 
-            return Redirect("/" + AuthUser.Username);
+            return Redirect("/" + AuthenticatedUser.Username);
         }
 
         [Route("confirmemail/{guid}")]
         public async Task ConfirmEmail(Guid guid)
         {
-            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-            var ConfirmationRequest = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => !x.IsUsed && x.UserId == AuthUser.Id && x.GUID == guid);
+            AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
+            var ConfirmationRequest = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => !x.IsUsed && x.UserId == AuthenticatedUser.Id && x.GUID == guid);
 
             if (ConfirmationRequest != null)
             {
-                string OldEmail = AuthUser.Email;
-                bool OldEmailConfirmStatus = AuthUser.IsEmailConfirmed;
+                string OldEmail = AuthenticatedUser.Email;
+                bool OldEmailConfirmStatus = AuthenticatedUser.IsEmailConfirmed;
 
                 if (ConfirmationRequest.NewEmail != null)
                 {
                     //yeni bir user onaylaması değilde e-mail değiştirme isteği ile geldiyse.
-                    AuthUser.Email = ConfirmationRequest.NewEmail;
+                    AuthenticatedUser.Email = ConfirmationRequest.NewEmail;
                     TempData["ProfileMessage"] = "Yeni e-mail adresiniz hesabınıza eşleştirildi";
                 }
                 try
                 {
-                    AuthUser.IsEmailConfirmed = true;
+                    AuthenticatedUser.IsEmailConfirmed = true;
                     ConfirmationRequest.IsUsed = true;
                     ConfirmationRequest.UsedOn = DateTime.Now;
                     if (TempData["ProfileMessage"] != null)
@@ -220,17 +204,17 @@ namespace Okurdostu.Web.Controllers
                     {
                         TempData["ProfileMessage"] = "E-mail adresiniz onaylandı, teşekkürler";
                     }
-                    AuthUser.LastChangedOn = DateTime.Now;
+                    AuthenticatedUser.LastChangedOn = DateTime.Now;
                     await Context.SaveChangesAsync();
-                    await SignInWithCookie(AuthUser);
+                    await SignInWithCookie(AuthenticatedUser);
                 }
                 catch (Exception e)
                 {
                     if (e.InnerException != null && e.InnerException.Message.Contains("Unique_Key_Email"))
                     {
                         TempData["ProfileMessage"] = "Değiştirme talebinde bulunduğunuz e-mail adresini kullanamazsınız.<br>E-mail değiştirme isteğiniz geçersiz kılındı<br>Yeni bir e-mail değiştirme isteğinde bulunun";
-                        AuthUser.Email = OldEmail;
-                        AuthUser.IsEmailConfirmed = OldEmailConfirmStatus;
+                        AuthenticatedUser.Email = OldEmail;
+                        AuthenticatedUser.IsEmailConfirmed = OldEmailConfirmStatus;
                         ConfirmationRequest.IsUsed = true;
                         ConfirmationRequest.UsedOn = DateTime.Now;
                         await Context.SaveChangesAsync();
@@ -242,7 +226,7 @@ namespace Okurdostu.Web.Controllers
                 TempData["ProfileMessage"] = "Sanırım bir hata yapıyorsunuz, size gönderdiğimiz bağlantıyı kullanın";
             }
 
-            Response.Redirect("/" + AuthUser.Username);
+            Response.Redirect("/" + AuthenticatedUser.Username);
         }
         #endregion
     }

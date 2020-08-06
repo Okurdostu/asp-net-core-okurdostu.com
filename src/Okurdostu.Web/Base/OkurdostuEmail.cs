@@ -1,10 +1,8 @@
 ﻿using MailKit.Net.Smtp;
-using Microsoft.AspNetCore.Hosting;
 using MimeKit;
 using Okurdostu.Web.Services;
 using System;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace Okurdostu.Web
 {

@@ -113,6 +113,8 @@ namespace Okurdostu.Web.Controllers.Api.Me
                     {
                         Logger.LogCritical("A user is trying to send education document but file wasn't create on server");
                     }
+
+                    rm.Code = 500;
                     return Error(rm);
                 }
             }

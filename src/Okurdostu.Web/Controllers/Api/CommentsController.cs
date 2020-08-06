@@ -48,6 +48,7 @@ namespace Okurdostu.Web.Controllers.Api
             [DataType(DataType.MultilineText)]
             public string Comment { get; set; }
         }
+
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost("")]
         public async Task<IActionResult> PostAdd(CommentModel model) //doing comment or reply
@@ -70,7 +71,6 @@ namespace Okurdostu.Web.Controllers.Api
                 {
                     rm.Message = "En fazla 100 karakter";
                 }
-                rm.InternalMessage = "Comment is required";
 
                 return Error(rm);
             }
@@ -104,6 +104,7 @@ namespace Okurdostu.Web.Controllers.Api
                 }
                 else
                 {
+                    rm.Code = 404;
                     rm.Message = "Tartışmanın başlatılacağı kampanya yok veya burada tartışma başlatılamaz";
                     return Error(rm);
                 }
@@ -140,7 +141,7 @@ namespace Okurdostu.Web.Controllers.Api
                 }
                 else
                 {
-                    rm.Code = 200;
+                    rm.Code = 404;
                     rm.Message = "Cevaplanacak yorum yok, silinmiş veya burada cevap verilemez";
                     return Error(rm);
                 }
