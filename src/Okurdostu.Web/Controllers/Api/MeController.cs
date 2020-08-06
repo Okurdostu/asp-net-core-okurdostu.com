@@ -9,7 +9,6 @@ using Okurdostu.Web.Models;
 using Okurdostu.Web.Services;
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -278,33 +277,15 @@ namespace Okurdostu.Web.Controllers.Api
         public async Task<IActionResult> Photo(IFormFile File)
         {
             ReturnModel rm = new ReturnModel();
-            long acceptableFileSize = 10485767 / 2;
+            var warning = LocalStorage.WarnAcceptability(File, FileType.Photo);
 
-            if (File != null && File.Length <= acceptableFileSize && File.Length > 0)
+            if (warning != null)
             {
-                if (File.ContentType != "image/png" && File.ContentType != "image/jpg" && File.ContentType != "image/jpeg")
-                {
-                    rm.Message = "Sadece fotoğraf seçiniz";
-                    return Error(rm);
-                }
-            }
-            else if (File != null && File.Length > acceptableFileSize)
-            {
-                rm.Message = "Kabul edilen boyutları aştı";
-                return Error(rm);
-            }
-            else if (File != null && File.Length! > 0)
-            {
-                rm.Message = "Seçtiğiniz fotoğraf görüntülenemez";
-                return Error(rm);
-            }
-            else // file is null
-            {
-                rm.Message = "Fotoğraf seçmediniz";
+                rm.Message = warning;
                 return Error(rm);
             }
 
-            var uploadedPhotoPathAfterRoot = LocalStorage.UploadProfilePhoto(File.OpenReadStream(), Environment.WebRootPath, Path.GetExtension(File.FileName));
+            var uploadedPhotoPathAfterRoot = LocalStorage.UploadProfilePhoto(File, Environment.WebRootPath);
             if (uploadedPhotoPathAfterRoot == null)
             {
                 return Error(rm);
