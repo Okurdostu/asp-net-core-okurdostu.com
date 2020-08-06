@@ -6,6 +6,7 @@ using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Filters;
 using Okurdostu.Web.Models;
+using Okurdostu.Web.Services;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using System;
@@ -19,19 +20,20 @@ namespace Okurdostu.Web.Controllers.Api
     [ServiceFilter(typeof(ConfirmedEmailFilter))]
     public class MeController : SecureApiController
     {
+        private readonly ILocalStorageService LocalStorage;
+        private readonly IHostingEnvironment Environment;
+
+        public MeController(IHostingEnvironment hostingEnvironment, ILocalStorageService localStorageService)
+        {
+            LocalStorage = localStorageService;
+            Environment = hostingEnvironment;
+        }
+
         [HttpGet("")]
         public ActionResult Index()
         {
             return NotFound();
         }
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        private readonly IHostingEnvironment Environment;
-#pragma warning restore CS0618 // Type or member is obsolete
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        public MeController(IHostingEnvironment env) => Environment = env;
-#pragma warning restore CS0618 // Type or member is obsolete
         public class UsernameModel
         {
             [Required(ErrorMessage = "Kimliğinizi doğrulamak için şuan ki parolanızı girmelisiniz")]
@@ -303,14 +305,14 @@ namespace Okurdostu.Web.Controllers.Api
             }
             AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
             string fileName = Guid.NewGuid().ToString() + Path.GetExtension(File.FileName);
-            string pathToSave = Environment.WebRootPath + "/image/profile/" + fileName;
+            string newPhotoFullPath = Environment.WebRootPath + "/image/profile/" + fileName;
 
             using var imageSharp = Image.Load(File.OpenReadStream());
             if (imageSharp.Width > 200)
             {
                 imageSharp.Mutate(x => x.Resize(200, 200));
             }
-            imageSharp.Save(pathToSave);
+            imageSharp.Save(newPhotoFullPath);
 
             string oldPhotoPath = AuthenticatedUser.PictureUrl;
             AuthenticatedUser.PictureUrl = "/image/profile/" + fileName;
@@ -323,7 +325,7 @@ namespace Okurdostu.Web.Controllers.Api
 
                 if (oldPhotoPath != null)
                 {
-                    DeleteFileFromServer(Environment.WebRootPath + oldPhotoPath);
+                    LocalStorage.DeleteIfExists(Environment.WebRootPath + oldPhotoPath);
                 }
 
                 rm.Data = new { photo = "/image/profile/" + fileName };
@@ -331,7 +333,7 @@ namespace Okurdostu.Web.Controllers.Api
             }
             else
             {
-                DeleteFileFromServer(pathToSave);
+                LocalStorage.DeleteIfExists(newPhotoFullPath);
                 rm.Message = "Yaptığınız değişiklikler kaydedilemedi";
                 return Error(rm);
             }
@@ -354,7 +356,7 @@ namespace Okurdostu.Web.Controllers.Api
                 await Context.SaveChangesAsync();
                 await SignInWithCookie(AuthenticatedUser);
 
-                DeleteFileFromServer(Environment.WebRootPath + OldPhoto);
+                LocalStorage.DeleteIfExists(Environment.WebRootPath + OldPhoto);
                 return Succes(rm);
             }
 

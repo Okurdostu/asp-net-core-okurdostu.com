@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Okurdostu.Data;
 using Okurdostu.Web.Base;
 using Okurdostu.Web.Models;
+using Okurdostu.Web.Services;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -15,13 +16,14 @@ namespace Okurdostu.Web.Controllers.Api.Me
     [Route("api/me/educationdocuments")]
     public class EducationDocumentsController : SecureApiController
     {
-#pragma warning disable CS0618 // Type or member is obsolete
+        private readonly ILocalStorageService LocalStorage;
         private readonly IHostingEnvironment Environment;
-#pragma warning restore CS0618 // Type or member is obsolete
 
-#pragma warning disable CS0618 // Type or member is obsolete
-        public EducationDocumentsController(IHostingEnvironment env) => Environment = env;
-#pragma warning restore CS0618 // Type or member is obsolete
+        public EducationDocumentsController(IHostingEnvironment hostingEnvironment, ILocalStorageService localStorageService)
+        {
+            LocalStorage = localStorageService;
+            Environment = hostingEnvironment;
+        }
 
         [HttpGet("")]
         public ActionResult Index()
@@ -103,7 +105,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
                     }
                     else
                     {
-                        DeleteFileFromServer(Environment.WebRootPath + EducationDocument.PathAfterRoot);
+                        LocalStorage.DeleteIfExists(EducationDocument.FullPath);
                         return Error(rm);
                     }
                 }

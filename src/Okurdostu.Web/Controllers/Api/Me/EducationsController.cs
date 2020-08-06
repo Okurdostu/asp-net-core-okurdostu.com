@@ -6,6 +6,7 @@ using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Filters;
 using Okurdostu.Web.Models;
+using Okurdostu.Web.Services;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,13 +16,12 @@ namespace Okurdostu.Web.Controllers.Api.Me
     [Route("api/me/educations")]
     public class EducationsController : SecureApiController
     {
-#pragma warning disable CS0618 // Type or member is obsolete
-        private readonly IHostingEnvironment Environment;
-#pragma warning restore CS0618 // Type or member is obsolete
+        private readonly ILocalStorageService LocalStorage;
 
-#pragma warning disable CS0618 // Type or member is obsolete
-        public EducationsController(IHostingEnvironment env) => Environment = env;
-#pragma warning restore CS0618 // Type or member is obsolete
+        public EducationsController(ILocalStorageService localStorageService)
+        {
+            LocalStorage = localStorageService;
+        }
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost("")]
@@ -203,7 +203,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
                             var educationDocuments = await Context.UserEducationDoc.Where(x => x.UserEducationId == deletedEducation.Id).ToListAsync();
                             foreach (var item in educationDocuments)
                             {
-                                if (DeleteFileFromServer(Environment.WebRootPath + item.PathAfterRoot))
+                                if (LocalStorage.DeleteIfExists(item.FullPath))
                                 {
                                     Context.Remove(item);
                                 }
@@ -248,7 +248,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
             var AuthenticatedUserId = User.Identity.GetUserId();
             ReturnModel rm = new ReturnModel();
             var editedEducation = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && Guid.Parse(AuthenticatedUserId) == x.UserId);
-            
+
             if (Model.Startyear > Model.Finishyear)
             {
                 rm.Message = "Başlangıç yılı, bitiş yılından büyük olamaz";

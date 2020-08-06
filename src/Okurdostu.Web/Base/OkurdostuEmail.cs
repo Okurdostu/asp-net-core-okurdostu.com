@@ -12,9 +12,9 @@ namespace Okurdostu.Web
 
         public string SenderName { get; set; }
 
-        private readonly IEmailConfiguration EmailConfigurations;
+        private readonly IEmailConfigurationService EmailConfigurations;
 
-        public OkurdostuEmail(IEmailConfiguration emailConfigurations)
+        public OkurdostuEmail(IEmailConfigurationService emailConfigurations)
         {
             EmailConfigurations = emailConfigurations;
         }

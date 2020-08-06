@@ -60,7 +60,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                 return Redirect("/account/passwordreset");
             }
 
-            var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
+            var Email = new OkurdostuEmail((IEmailConfigurationService)HttpContext?.RequestServices.GetService(typeof(IEmailConfigurationService)))
             {
                 SenderMail = "noreply@okurdostu.com",
                 SenderName = "Okurdostu"

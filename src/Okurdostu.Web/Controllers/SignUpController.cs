@@ -78,7 +78,7 @@ namespace Okurdostu.Web.Controllers
                 await Context.AddAsync(_UserEmailConfirmation);
                 await Context.SaveChangesAsync();
 
-                var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
+                var Email = new OkurdostuEmail((IEmailConfigurationService)HttpContext?.RequestServices.GetService(typeof(IEmailConfigurationService)))
                 {
                     SenderMail = "halil@okurdostu.com",
                     SenderName = "Halil İbrahim Kocaöz"

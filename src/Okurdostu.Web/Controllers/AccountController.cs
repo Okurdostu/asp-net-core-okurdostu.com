@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data;
@@ -15,15 +14,6 @@ namespace Okurdostu.Web.Controllers
     public class AccountController : BaseController<AccountController>
     {
         private User AuthenticatedUser;
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        private readonly IHostingEnvironment Environment;
-#pragma warning restore CS0618 // Type or member is obsolete
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        public AccountController(IHostingEnvironment env) => Environment = env;
-#pragma warning restore CS0618 // Type or member is obsolete
-
         #region account
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> SendConfirmationEmail() //it's used on /beta/index page
@@ -36,7 +26,7 @@ namespace Okurdostu.Web.Controllers
             {
                 var _UserEmailConfirmation = await Context.UserEmailConfirmation.FirstOrDefaultAsync(x => x.UserId == AuthenticatedUser.Id && !x.IsUsed);
 
-                var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
+                var Email = new OkurdostuEmail((IEmailConfigurationService)HttpContext?.RequestServices.GetService(typeof(IEmailConfigurationService)))
                 {
                     SenderMail = "halil@okurdostu.com",
                     SenderName = "Halil İbrahim Kocaöz"
@@ -123,7 +113,7 @@ namespace Okurdostu.Web.Controllers
                     if (AuthenticatedUser.Email != Model.Email)
                     {
 
-                        var Email = new OkurdostuEmail((IEmailConfiguration)HttpContext?.RequestServices.GetService(typeof(IEmailConfiguration)))
+                        var Email = new OkurdostuEmail((IEmailConfigurationService)HttpContext?.RequestServices.GetService(typeof(IEmailConfigurationService)))
                         {
                             SenderMail = "noreply@okurdostu.com",
                             SenderName = "Okurdostu"
