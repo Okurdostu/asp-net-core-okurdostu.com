@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace Okurdostu.Web.Models
+﻿namespace Okurdostu.Web.Models
 {
     public class ReturnModel
     {
