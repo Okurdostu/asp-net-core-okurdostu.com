@@ -22,7 +22,7 @@
 {
     <script src="~/js/popper.min.js"></script>
     <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
-    <script src="~/lib/sweetalert/sweetalert2.all.min.js"></script>
+    <partial name="~/Views/Shared/_SweetAlertPartial.cshtml" />
     @if (TempData["ProfileMessage"] != null)
     {
         <div class="alert alert-secondary text-center font-weight-bold" role="alert"><span class="">@Html.Raw(TempData["ProfileMessage"])</span></div>
@@ -171,7 +171,7 @@
                 <img src="/svg/user.svg" class="img-thumbnail rounded-pill mb-2" style="width:150px; height:150px;" />
             }
         }
-            @if (Model.ContactEmail != null || Model.Twitter != null || Model.Github != null)
+        @if (Model.ContactEmail != null || Model.Twitter != null || Model.Github != null)
         {
             <div style="font-size:22px" class="text-center">
                 @if (Model.Twitter != null)
@@ -299,11 +299,8 @@ else
             </div>
         </div>
     </div>
-    @Html.AntiForgeryToken()
-    <script>
-        var validatetoken = $("input[name=__RequestVerificationToken]").val();
-        const Toast = Swal.mixin({ toast: true, position: 'top-end', timer: 2000, showConfirmButton: false, timerProgressBar: true, });
-    </script>
+    <partial name="~/Views/Shared/_ValidateTokenPartial.cshtml" />
+
     <script src="~/js/profile/education.js"></script>
     <script src="~/js/profile/password.js"></script>
     <script src="~/js/profile/username.js"></script>

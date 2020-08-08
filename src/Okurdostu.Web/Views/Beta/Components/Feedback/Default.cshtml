@@ -1,14 +1,14 @@
 ﻿@model FeedbackModel
 <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
-@using (Html.BeginForm("Feedback", "Beta", FormMethod.Post, new { @id = "FeedbackForm" }))
+@using (Html.BeginForm("", "", FormMethod.Post, new { @id = "FeedbackForm" }))
 {
-<div class="form-horizontal">
-    <div class="form-group"> @Html.LabelFor(model => model.Message, htmlAttributes: new { @class = "control-label font-weight-bold" }) @Html.EditorFor(model => model.Message, new { htmlAttributes = new { @class = "form-control" } }) @Html.ValidationMessageFor(model => model.Message, "", new { @class = "text-danger font-weight-bold" }) </div>
-    <div class="form-group"> @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label font-weight-bold" }) @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } }) @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger font-weight-bold" }) </div>
-    <div class="modal-footer pb-0 pt-1"> <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button> <input type="submit" value="Gönder" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" /> </div>
-</div>
+    <div class="form-horizontal">
+        <div class="form-group"> @Html.LabelFor(model => model.Message, htmlAttributes: new { @class = "control-label font-weight-bold" }) @Html.EditorFor(model => model.Message, new { htmlAttributes = new { @class = "form-control" } }) @Html.ValidationMessageFor(model => model.Message, "", new { @class = "text-danger font-weight-bold" }) </div>
+        <div class="form-group"> @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label font-weight-bold" }) @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } }) @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger font-weight-bold" }) </div>
+        <div class="modal-footer pb-0 pt-1"> <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button> <input type="submit" value="Gönder" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" /> </div>
+    </div>
     <partial name="~/Views/Shared/_GoogleRecaptchaWarningPartial.cshtml" />
 }
-<script>
-    $('#FeedbackForm').on('submit', function () { setTimeout(function () { if (!($('#Message-error').length || $('#Email-error').length)) { $('#spinner-div').show(); } }, 5) });
-</script>
+<partial name="~/Views/Shared/_ValidateTokenPartial.cshtml" />
+<partial name="~/Views/Shared/_SweetAlertPartial.cshtml" />
+<script src="~/js/beta/feedback.js"></script>

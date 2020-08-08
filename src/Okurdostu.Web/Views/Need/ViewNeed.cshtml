@@ -15,10 +15,7 @@
 }
 
 @{ ViewData["Title"] = Model.Title + " @" + Model.User.Username + " | Okurdostu"; ViewData["OGDescription"] = "Bir öğrencinin ihtiyaç kampanyası: " + Model.Title; ViewData["Description"] = "Bir öğrencinin ihtiyaç kampanyası: " + Model.Title; Layout = "~/Views/Shared/_LayoutOkurdostu.cshtml";}
-@Html.AntiForgeryToken()
-<script>
-    var validatetoken = $("input[name=__RequestVerificationToken]").val();
-</script>
+<partial name="~/Views/Shared/_ValidateTokenPartial.cshtml" />
 @if (Model.ShouldBeCheck)
 {
     <script>
@@ -125,7 +122,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
             $("#unsignlikebutton").click(function () {
                 $("#loginsignup-modal-info").html("<h2><i class='fas fa-heart od'></i></h2><h5>Kampanyayı sevgin ile destekle</h5>")
             });
-            function MainComment(){
+            function MainComment() {
                 $("#loginsignup-modal-info").html("<h2><i class='fas fa-comment od'></i></h2><h4>Tartışma başlatmak için</h4>")
                 $("#loginsignup").modal('show');
             };
@@ -221,10 +218,7 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
             });
         </script>
         <script src="~/js/need/comment.js"></script>
-        <script src="~/lib/sweetalert/sweetalert2.all.min.js"></script>
-        <script>
-            const Toast = Swal.mixin({ toast: true, position: 'top-end', timer: 2000, showConfirmButton: false, timerProgressBar: true, });
-        </script>
+        <partial name="~/Views/Shared/_SweetAlertPartial.cshtml" />
     }
 }
 else
