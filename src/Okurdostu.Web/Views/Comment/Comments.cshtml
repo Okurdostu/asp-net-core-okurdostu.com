@@ -18,7 +18,7 @@
             height: 100% !important
         }
     </style>
-    <div class="container pr-1">
+    <div class="container pr-2">
         @foreach (var mainComment in Model.Where(x => x.RelatedCommentId == null).OrderByDescending(x => x.InverseRelatedComment.Count()).ToList())
         {
             <div class="row" id="@mainComment.Id">

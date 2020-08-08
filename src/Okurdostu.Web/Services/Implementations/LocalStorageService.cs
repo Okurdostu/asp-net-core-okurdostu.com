@@ -32,7 +32,7 @@ namespace Okurdostu.Web.Services
 
             using (var Stream = File.Create(webRootPath + filePathAfterRoot))
             {
-                Stream.CopyTo(Stream);
+                formFile.CopyTo(Stream);
             };
             if (File.Exists(webRootPath + filePathAfterRoot))
             {

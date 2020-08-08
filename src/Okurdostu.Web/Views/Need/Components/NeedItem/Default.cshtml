@@ -32,24 +32,9 @@
         foreach (Okurdostu.Data.NeedItem Item in UnRemovedItemList)
         {
             <div class="row pt-1">
-                @if (Item.Picture.ToLower() == "udemy")
-                {
-                    <div class="col-auto pr-1">
-                        <img class="img-thumbnail" src="~/image/udemy.png" style="width:75px; height:75px;" />
-                    </div>
-                }
-                else if (Item.Picture.ToLower() == "amazon")
-                {
-                    <div class="col-auto pr-1">
-                        <img class="img-thumbnail" src="~/image/amazon.png" style="width:75px; height:75px;" />
-                    </div>
-                }
-                else
-                {
-                    <div class="col-auto pr-1">
-                        <img class="img-thumbnail" src="@Html.Raw(Item.Picture)" style="width:75px; height:75px;" />
-                    </div>
-                }
+                <div class="col-auto pr-1">
+                    <img class="img-thumbnail" src="@Html.Raw(Item.Picture)" style="width:75px; height:75px;" />
+                </div>
                 <div class="col pl-0">
                     <p class="mb-1">@Html.Raw(Item.Name)</p>
                     <p class="mb-1">
@@ -99,15 +84,18 @@
             for (int i = 0; i < 3 - UnRemovedItemList.Count; i++)
             {
                 @:
-                <a class="text-center od small font-weight-bold" href="" data-toggle="modal" data-target="#additem">
-                    <p>
-                        <i class="fas fa-plus od" style="font-size:40px;"></i>
-                        <br />
-                        İhtiyaç kampanyanıza hedef ekleyebilirsiniz
-                        <br />
-                        Hedef eklemek için tıklayınız
-                    </p>
-                </a>
+                <div class="pt-4">
+                    <a class="text-center od small font-weight-bold" href="" data-toggle="modal" data-target="#additem">
+                        <p class="m-0">
+                            <i class="fas fa-plus od" style="font-size:40px;"></i>
+                            <br />
+                            İhtiyaç kampanyanıza hedef ekleyebilirsiniz
+                            <br />
+                            Hedef eklemek için tıklayınız
+                        </p>
+                    </a>
+                </div>
+
             }
             <div class="modal fade" id="additem" tabindex="-1" role="dialog" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered" role="document">

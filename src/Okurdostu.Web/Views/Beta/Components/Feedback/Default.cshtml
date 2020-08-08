@@ -10,5 +10,5 @@
     <partial name="~/Views/Shared/_GoogleRecaptchaWarningPartial.cshtml" />
 }
 <script>
-    $('#FeedbackForm').on('submit', function () { setTimeout(function () { if (!($('#Message-error').length || $('#Email-error').length)) { $('#spinner-form').show(); } }, 5) });
+    $('#FeedbackForm').on('submit', function () { setTimeout(function () { if (!($('#Message-error').length || $('#Email-error').length)) { $('#spinner-div').show(); } }, 5) });
 </script>

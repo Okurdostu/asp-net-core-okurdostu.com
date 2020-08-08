@@ -41,6 +41,7 @@ namespace Okurdostu.Web.Controllers.Api
             await Context.SaveChangesAsync();
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost("item")]
         public async Task<IActionResult> AddItem(string itemLink, Guid needId)
         {
@@ -51,17 +52,11 @@ namespace Okurdostu.Web.Controllers.Api
             var Need = await Context.Need.Where(x => x.Id == needId
             && x.UserId == AuthenticatedUserId
             && !x.IsRemoved
-            && !x.IsSentForConfirmation)
-                .FirstOrDefaultAsync();
+            && !x.IsSentForConfirmation
+            && x.NeedItem.Count() < maxItemCount).FirstOrDefaultAsync();
 
             if (Need != null)
             {
-                if (Need.NeedItem.Count() >= maxItemCount)
-                {
-                    rm.Code = 403;
-                    return Error(rm);
-                }
-
                 if (itemLink.Contains("udemy.com"))
                 {
                     Udemy Udemy = new Udemy();

@@ -347,8 +347,8 @@ namespace Okurdostu.Web.Controllers
                 AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
                 if (AuthUser.Id == item.Need.UserId) //item(ihtiyaç)'ı silmeye çalıştığı kampanya Authenticated olmuş üzere aitse..
                 {
-                    item.IsRemoved = true;
                     item.Need.TotalCharge -= item.Price;
+                    Context.Remove(item);
                     await Context.SaveChangesAsync();
                     Response.Redirect("/" + item.Need.Link);
                 }
