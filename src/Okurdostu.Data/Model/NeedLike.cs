@@ -8,6 +8,7 @@ namespace Okurdostu.Data
         public NeedLike()
         {
             Id = Guid.NewGuid();
+            IsCurrentLiked = true;
         }
 
         public Guid Id { get; private set; }

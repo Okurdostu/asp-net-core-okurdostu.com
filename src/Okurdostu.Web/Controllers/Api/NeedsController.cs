@@ -32,8 +32,6 @@ namespace Okurdostu.Web.Controllers.Api
                 Price = (decimal)price,
                 Picture = picture,
                 PlatformName = platformName,
-                IsRemoved = false,
-                IsWrong = false
             };
 
             await Context.AddAsync(NeedItem);

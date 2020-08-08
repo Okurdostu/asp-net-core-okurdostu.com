@@ -10,6 +10,8 @@ namespace Okurdostu.Data
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
             Id = Guid.NewGuid();
+            IsRemoved = false;
+            IsWrong = false;
         }
         public Guid Id { get; private set; }
         public Guid NeedId { get; set; }

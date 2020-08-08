@@ -59,7 +59,6 @@ namespace Okurdostu.Web.Controllers.Api.Me
 
                 var EducationDocument = new UserEducationDoc
                 {
-                    CreatedOn = DateTime.Now,
                     UserEducationId = Id,
                     FullPath = Environment.WebRootPath + uploadedDocumentPathAfterRoot,
                     PathAfterRoot = uploadedDocumentPathAfterRoot,
@@ -78,9 +77,12 @@ namespace Okurdostu.Web.Controllers.Api.Me
                 else
                 {
                     LocalStorage.DeleteIfExists(EducationDocument.FullPath);
+                    rm.Message = "Bu işleminizi sonra tekrar deneyin.";
                     return Error(rm);
                 }
             }
+
+            rm.Message = "Eğitim bilgisine ulaşılamadı";
             rm.Code = 404;
             return Error(rm);
         }

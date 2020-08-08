@@ -18,12 +18,20 @@ namespace Okurdostu.Web.Controllers.Api.Me
         }
 
         const int MaxRecordPerPage = 10;
-        [HttpGet("{SelectedPage}")]
-        public async Task<IActionResult> GetComments(int SelectedPage)
+
+        private static int CalculateTotalPage(int TotalRecord)
+        {
+            var TotalPage = TotalRecord / MaxRecordPerPage;
+            if (TotalRecord % MaxRecordPerPage != 0) TotalPage++;
+
+            return TotalPage;
+        }
+
+        [HttpGet("{selectedPage}")]
+        public async Task<IActionResult> GetComments([FromRoute] int selectedPage)
         {
             ReturnModel rm = new ReturnModel();
-
-            if (SelectedPage <= 0)
+            if (selectedPage <= 0)
             {
                 rm.InternalMessage = "Page number is required";
                 return Error(rm);
@@ -31,47 +39,45 @@ namespace Okurdostu.Web.Controllers.Api.Me
             else
             {
                 var TotalRecord = await Context.NeedComment.Where(x => x.UserId == Guid.Parse(User.Identity.GetUserId())).CountAsync();
-                var TotalPage = TotalRecord / MaxRecordPerPage;
-
-                if (TotalRecord % MaxRecordPerPage != 0)
+                if (TotalRecord == 0)
                 {
-                    TotalPage++;
-                }
-
-                if (SelectedPage > TotalPage)
-                {
-                    rm.InternalMessage = "There's no page more than: " + TotalPage;
-                    if (TotalPage == 0)
-                    {
-                        rm.Data = new { count = 0 };
-                    }
+                    rm.Message = "You have no comment";
+                    rm.Code = 404;
                     return Error(rm);
                 }
 
+                var TotalPage = CalculateTotalPage(TotalRecord);
 
-                var Comments = Context.NeedComment.AsEnumerable()
+                if (selectedPage > TotalPage)
+                {
+                    rm.InternalMessage = "There's no page more than: " + TotalPage;
+                    rm.Code = 404;
+                    return Error(rm);
+                }
+
+                var Comments = Context.NeedComment
+                    .Include(x => x.Need).ThenInclude(xNeed => xNeed.User).AsEnumerable()
                     .Where(x => x.UserId == Guid.Parse(User.Identity.GetUserId()))
                     .OrderByDescending(x => x.CreatedOn)
                     .Select(s => new
                     {
                         s.Id,
                         s.Comment,
-                        s.CreatedOn
+                        s.HowLongPassed,
+                        s.Need.Link
                     })
-                    .SkipLast(MaxRecordPerPage * (SelectedPage - 1))
+                    .SkipLast(MaxRecordPerPage * (selectedPage - 1))
                     .TakeLast(MaxRecordPerPage).ToList();
-
-                byte ViewingRecordCount = (byte)Comments.Count();
 
                 object Information = new
                 {
                     TotalRecord,
                     TotalPage,
-                    CurrentPage = SelectedPage,
-                    ViewingRecordCount
+                    CurrentPage = selectedPage,
+                    Count = (byte)Comments.Count()
                 };
 
-                rm.Data = new { Comments, Information };
+                rm.Data = new { Information, Comments };
                 return Succes(rm);
             }
         }

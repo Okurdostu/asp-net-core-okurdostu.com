@@ -30,12 +30,10 @@ namespace Okurdostu.Web.Controllers
                 }
                 else
                 {
-
                     var NewLike = new NeedLike
                     {
                         NeedId = Need.Id,
-                        UserId = AuthUserId,
-                        IsCurrentLiked = true,
+                        UserId = AuthUserId
                     };
                     await Context.AddAsync(NewLike);
 

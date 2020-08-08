@@ -7,6 +7,7 @@ namespace Okurdostu.Data
     {
         public UserEducationDoc()
         {
+            CreatedOn = DateTime.Now;
             Id = Guid.NewGuid();
         }
 
@@ -14,7 +15,7 @@ namespace Okurdostu.Data
         public Guid UserEducationId { get; set; }
         public string PathAfterRoot { get; set; }
         public string FullPath { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreatedOn { get; private set; }
 
         public virtual UserEducation UserEducation { get; set; }
     }

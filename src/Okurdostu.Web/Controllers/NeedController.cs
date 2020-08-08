@@ -232,7 +232,6 @@ namespace Okurdostu.Web.Controllers
                             TotalCharge += item.Price;
                         }
 
-                        Need.TotalCollectedMoney = 0;
                         Need.TotalCharge = TotalCharge;
                         Need.IsSentForConfirmation = true;
 
