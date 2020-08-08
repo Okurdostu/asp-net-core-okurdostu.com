@@ -1,27 +1,29 @@
-﻿var oldUniversityId, oldEducationId, oldDepartment, oldActivitiesSocieties, oldStartYear, oldFinishYear;
+﻿var oldUniversityId, oldDepartment, oldActivitiesSocieties, oldStartYear, oldEndYear;
 
 function getModalToEditEducation(id) {
     $.get("/api/me/educations/" + id).done(function (result) {
         if (result.succes === true) {
-            oldUniversityId = result.data.universityId; oldActivitiesSocieties = result.data.activitiesSocieties;
-            oldDepartment = result.data.department; oldEducationId = result.data.educationId;
-            oldStartYear = result.data.startyear; oldFinishYear = result.data.finishyear;
+            oldUniversityId = result.data.universityId;
+            oldActivitiesSocieties = result.data.activitiesSocieties;
+            oldDepartment = result.data.department;
+            oldStartYear = result.data.startYear;
+            oldEndYear = result.data.endYear;
 
+            $('#education-edit-modal-body').load("/education/editview/?ActivitiesSocieties=" + result.data.activitiesSocieties.replace(" ", "%20") + "&Department=" + result.data.department.replace(" ", "%20") + "&UniversityId=" + result.data.universityId + "&EducationId=" + result.data.educationId + "&StartYear=" + result.data.startYear + "&EndYear=" + result.data.endYear + "&AreUniversityorDepartmentCanEditable=" + result.data.areUniversityorDepartmentCanEditable);
             $('#education-edit-modal').modal('show');
-            $('#education-edit-modal-body').load("/education/editview/?ActivitiesSocieties=" + result.data.activitiesSocieties.replace(" ", "%20") + "&Department=" + result.data.department.replace(" ", "%20") + "&UniversityId=" + result.data.universityId + "&EducationId=" + result.data.educationId + "&Startyear=" + result.data.startyear + "&Finishyear=" + result.data.finishyear + "&AreUniversityorDepartmentCanEditable=" + result.data.areUniversityorDepartmentCanEditable);
         }
     });
 };
 
-var universityId, educationId, department, activitiesSocieties, startYear, finishYear;
+var universityId, educationId, department, activitiesSocieties, startYear, endYear;
 //edit
 $(document).on('submit', '#edit-education-form', function (evt) {
     evt.preventDefault();
     universityId = $("#edit-education-form select[name=UniversityId]").val();
     department = $("#edit-education-form input[name=Department]").val();
     activitiesSocieties = $("#edit-education-form input[name=ActivitiesSocieties]").val();
-    startYear = $("#edit-education-form select[name=Startyear]").val();
-    finishYear = $("#edit-education-form select[name=Finishyear]").val();
+    startYear = $("#edit-education-form select[name=StartYear]").val();
+    endYear = $("#edit-education-form select[name=EndYear]").val();
     educationId = $("#edit-education-form input[name=EducationId]").val();
 
     if (department != null && department.length <= 0) {
@@ -31,7 +33,7 @@ $(document).on('submit', '#edit-education-form', function (evt) {
         });
     }
     else {
-        if (universityId != oldUniversityId || department != oldDepartment || educationId != oldEducationId || activitiesSocieties != oldActivitiesSocieties || startYear != oldStartYear || finishYear != oldFinishYear) {
+        if (universityId != oldUniversityId || department != oldDepartment || activitiesSocieties != oldActivitiesSocieties || startYear != oldStartYear || endYear != oldEndYear) {
             apiEducationPut();
         }
         else {
@@ -48,8 +50,8 @@ $('#add-education-form').submit(function (evt) {
     universityId = $("#add-education-form select[name=UniversityId]").val();
     department = $("#add-education-form input[name=Department]").val();
     activitiesSocieties = $("#add-education-form input[name=ActivitiesSocieties]").val();
-    startYear = $("#add-education-form select[name=Startyear]").val();
-    finishYear = $("#add-education-form select[name=Finishyear]").val();
+    startYear = $("#add-education-form select[name=StartYear]").val();
+    endYear = $("#add-education-form select[name=EndYear]").val();
     educationId = $("#add-education-form input[name=EducationId]").val();
 
     if (department != null && department.length <= 0) {
@@ -64,7 +66,7 @@ $('#add-education-form').submit(function (evt) {
 });
 
 function apiEducationPost() {
-    $.post("/api/me/educations", { UniversityId: universityId, Department: department, ActivitiesSocieties: activitiesSocieties, Startyear: startYear, Finishyear: finishYear, EducationId: educationId, })
+    $.post("/api/me/educations", { UniversityId: universityId, Department: department, ActivitiesSocieties: activitiesSocieties, StartYear: startYear, EndYear: endYear})
         .done(function (result) {
             $('#edit-education-button').prop('disabled', true);
             $('#add-education-button').prop('disabled', true);
@@ -86,7 +88,7 @@ function apiEducationPut() {
     $.ajax({
         url: '/api/me/educations/' + educationId,
         type: 'PUT',
-        data: { UniversityId: universityId, Department: department, ActivitiesSocieties: activitiesSocieties, Startyear: startYear, Finishyear: finishYear },
+        data: { UniversityId: universityId, Department: department, ActivitiesSocieties: activitiesSocieties, StartYear: startYear, EndYear: endYear},
         success: function (result) {
             $('#education-remove-modal').modal('hide');
             $('#education-' + _educationIdForRemove).attr('style', 'display:none;');

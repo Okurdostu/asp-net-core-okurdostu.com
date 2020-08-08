@@ -67,8 +67,12 @@ namespace Okurdostu.Web.Extensions
             return new string(charArray);
         }
 
-        public static string ClearSpaces(this String str)
+        public static string ClearBlanks(this String str)
         {
+            if (string.IsNullOrEmpty(str))
+            {
+                return null;
+            }
             //example input: "            asd       asd              asd           "
             char[] charArray = str.ToCharArray();
             for (int i = 0; i < charArray.Length - 1; i++)
@@ -78,7 +82,6 @@ namespace Okurdostu.Web.Extensions
                     charArray[i] = '_'; // converts spaces to _
                 }
             }
-
 
             //" asd asd asd "
             str = new string(charArray).Replace("_", ""); // delete '_' [space] characters

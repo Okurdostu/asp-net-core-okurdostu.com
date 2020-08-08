@@ -10,27 +10,27 @@ public class EducationModel
     [Required]
     public Guid EducationId { get; set; } //it's for edit UserEducation[Table] : Id
     [Required(ErrorMessage = "Başlangıç yılı seçmelisiniz")]
-    public int Startyear { get; set; }
+    public int StartYear { get; set; }
 
     [Required(ErrorMessage = "Bitiş yılı seçmelisiniz")]
-    public int Finishyear { get; set; }
+    public int EndYear { get; set; }
 
     [Required(ErrorMessage = "Bölümünüzü yazmalısınız")]
     [MaxLength(50, ErrorMessage = "En fazla 50 karakter")]
     [Display(Name = "Bölüm")]
     public string Department { get; set; }
 
-    [MaxLength(200, ErrorMessage = "En fazla 200 karakter")]
+    [MaxLength(100, ErrorMessage = "En fazla 100 karakter")]
     [Display(Name = "Aktiviteler veya topluluklar")]
     public string ActivitiesSocieties { get; set; }
-
     public bool AreUniversityorDepartmentCanEditable { get; set; }
+
     [Required]
     public List<SelectListItem> Universities { get; set; } //sabit bir veri bloguna bağlanabilir.
 
     public List<SelectListItem> StartYears { get; set; }
 
-    public List<SelectListItem> FinishYears { get; set; }
+    public List<SelectListItem> EndYears { get; set; }
 
     public void ListYears()
     {
@@ -47,6 +47,6 @@ public class EducationModel
         }
 
         this.StartYears = _StartYears;
-        this.FinishYears = _FinishYears;
+        this.EndYears = _FinishYears;
     }
 }

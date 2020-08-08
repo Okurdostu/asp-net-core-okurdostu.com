@@ -30,13 +30,14 @@ namespace Okurdostu.Web.Controllers.Api.Me
             var AuthenticatedUserId = User.Identity.GetUserId();
             ReturnModel rm = new ReturnModel();
 
-            if (Model.Startyear > Model.Finishyear)
+            if (Model.StartYear > Model.EndYear)
             {
                 rm.Message = "Başlangıç yılı, bitiş yılından büyük olamaz";
                 rm.Code = 200;
                 return Error(rm);
             }
-            else if (Model.Startyear < 1980 || Model.Startyear > DateTime.Now.Year || Model.Finishyear < 1980 || Model.Startyear > DateTime.Now.Year + 7)
+
+            if (Model.StartYear < 1980 || Model.StartYear > DateTime.Now.Year || Model.EndYear < 1980 || Model.StartYear > DateTime.Now.Year + 7)
             {
                 rm.Message = "Başlangıç yılı, bitiş yılı ile alakalı bilgileri kontrol edip, tekrar deneyin";
                 rm.Code = 200;
@@ -47,10 +48,10 @@ namespace Okurdostu.Web.Controllers.Api.Me
             {
                 UserId = Guid.Parse(AuthenticatedUserId),
                 UniversityId = Model.UniversityId,
-                Department = Model.Department,
-                ActivitiesSocieties = Model.ActivitiesSocieties,
-                StartYear = Model.Startyear.ToString(),
-                EndYear = Model.Finishyear.ToString(),
+                Department = Model.Department.ClearBlanks(),
+                ActivitiesSocieties = Model.ActivitiesSocieties.ClearBlanks(),
+                StartYear = Model.StartYear.ToString(),
+                EndYear = Model.EndYear.ToString(),
             };
             await Context.AddAsync(NewEducation);
             try
@@ -63,8 +64,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
                 }
                 else
                 {
-                    rm.Message = "Bir işlem yapılmadı";
-                    rm.Code = 1001;
+                    rm.Message = "Lütfen sonra tekrar deneyin";
                     return Error(rm);
                 }
             }
@@ -141,10 +141,10 @@ namespace Okurdostu.Web.Controllers.Api.Me
                     Department = Education.Department,
                     EducationId = Id,
                     ActivitiesSocieties = Education.ActivitiesSocieties,
-                    Startyear = int.Parse(Education.StartYear),
-                    Finishyear = int.Parse(Education.EndYear),
-
+                    StartYear = int.Parse(Education.StartYear),
+                    EndYear = int.Parse(Education.EndYear),
                 };
+
                 educationModel.AreUniversityorDepartmentCanEditable = Education.AreUniversityorDepartmentCanEditable();
                 if (educationModel.ActivitiesSocieties == null || educationModel.ActivitiesSocieties == "undefined")
                 {
@@ -157,7 +157,6 @@ namespace Okurdostu.Web.Controllers.Api.Me
             {
                 return Error(rm);
             }
-
             return Succes(rm);
         }
 
@@ -166,10 +165,8 @@ namespace Okurdostu.Web.Controllers.Api.Me
             if (edu.IsConfirmed || edu.IsActiveEducation)
             {
                 var EducationUserAnyActiveNeed = await Context.Need.AnyAsync(x => !x.IsRemoved && x.UserId == edu.UserId);
-
                 return !EducationUserAnyActiveNeed;
             }
-
             return true;
         }
 
@@ -249,13 +246,13 @@ namespace Okurdostu.Web.Controllers.Api.Me
             ReturnModel rm = new ReturnModel();
             var editedEducation = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && Guid.Parse(AuthenticatedUserId) == x.UserId);
 
-            if (Model.Startyear > Model.Finishyear)
+            if (Model.StartYear > Model.EndYear)
             {
                 rm.Message = "Başlangıç yılı, bitiş yılından büyük olamaz";
                 rm.Code = 200;
                 return Error(rm);
             }
-            else if (Model.Startyear < 1980 || Model.Startyear > DateTime.Now.Year || Model.Finishyear < 1980 || Model.Startyear > DateTime.Now.Year + 7)
+            else if (Model.StartYear < 1980 || Model.StartYear > DateTime.Now.Year || Model.EndYear < 1980 || Model.StartYear > DateTime.Now.Year + 7)
             {
                 rm.Message = "Başlangıç yılı, bitiş yılı ile alakalı bilgileri kontrol edip, tekrar deneyin";
                 rm.Code = 200;
@@ -264,14 +261,14 @@ namespace Okurdostu.Web.Controllers.Api.Me
 
             if (editedEducation != null)
             {
-                editedEducation.StartYear = Model.Startyear.ToString();
-                editedEducation.EndYear = Model.Finishyear.ToString();
-                editedEducation.ActivitiesSocieties = Model.ActivitiesSocieties;
+                editedEducation.StartYear = Model.StartYear.ToString();
+                editedEducation.EndYear = Model.EndYear.ToString();
+                editedEducation.ActivitiesSocieties = Model.ActivitiesSocieties.ClearBlanks();
 
                 if (editedEducation.AreUniversityorDepartmentCanEditable())
                 {
                     editedEducation.UniversityId = Model.UniversityId;
-                    editedEducation.Department = Model.Department;
+                    editedEducation.Department = Model.Department.ClearBlanks();
                 }
             }
             else

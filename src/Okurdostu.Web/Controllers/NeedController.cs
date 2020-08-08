@@ -274,7 +274,7 @@ namespace Okurdostu.Web.Controllers
 
                 if (!await IsThereAnyProblemtoCreateNeed().ConfigureAwait(false))
                 {
-                    Model.Title = Model.Title.ClearSpaces();
+                    Model.Title = Model.Title.ClearBlanks();
                     Model.Title = Model.Title.ToLower().UppercaseFirstCharacters();
 
                     var Need = new Need
@@ -376,7 +376,7 @@ namespace Okurdostu.Web.Controllers
                         {
                             string oldTitle = Need.Title;
                             string oldFriendlyTitle = Need.FriendlyTitle;
-                            Model.Title = Model.Title.ClearSpaces();
+                            Model.Title = Model.Title.ClearBlanks();
                             Model.Title = Model.Title.ToLower().UppercaseFirstCharacters();
 
                             Need.Title = Model.Title;
