@@ -37,6 +37,10 @@ namespace Okurdostu.Data
         public string ContactEmail { get; set; }
         public DateTime LastChangedOn { get; set; }
 
+        public DateTime BirthDate { get; set; }
+        public bool AreBDMonthDayPublic { get; set; }
+        public bool IsBDYearPublic { get; set; }
+
         public virtual ICollection<Need> Need { get; set; }
         public virtual ICollection<NeedComment> NeedComment { get; set; }
         public virtual ICollection<NeedLike> NeedLike { get; set; }

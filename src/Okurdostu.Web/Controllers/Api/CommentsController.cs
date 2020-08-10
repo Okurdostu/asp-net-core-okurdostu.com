@@ -32,7 +32,7 @@ namespace Okurdostu.Web.Controllers.Api
             }
             else
             {
-                rm.Code = 200;
+                rm.Code = 404;
                 rm.Message = "Böyle bir yorum yok";
                 return Error(rm);
             }
@@ -93,12 +93,13 @@ namespace Okurdostu.Web.Controllers.Api
 
                     if (result > 0)
                     {
+                        rm.Code = 201;
                         rm.Data = NewComment.Id;
                         return Succes(rm);
                     }
                     else
                     {
-                        rm.Message = "Yorumunuz kaydolmadı";
+                        rm.Code = 1001;
                         return Error(rm);
                     }
                 }
@@ -128,14 +129,13 @@ namespace Okurdostu.Web.Controllers.Api
 
                     if (result > 0)
                     {
+                        rm.Code = 201;
                         rm.Data = NewReply.Id;
-                        rm.Message = "Cevapladınız";
                         return Succes(rm);
                     }
                     else
                     {
-                        rm.Code = 200;
-                        rm.Message = "Başaramadık, ne olduğunu bilmiyoruz";
+                        rm.Code = 1001;
                         return Error(rm);
                     }
                 }
@@ -147,6 +147,7 @@ namespace Okurdostu.Web.Controllers.Api
                 }
             }
         }
+
         [HttpPatch("remove/{Id}")]
         public async Task<IActionResult> PatchRemove(Guid Id)
         {
@@ -171,10 +172,12 @@ namespace Okurdostu.Web.Controllers.Api
             }
             else
             {
+                rm.Code = 404;
                 rm.Message = "Silmeye çalıştığınız yorum yok";
                 return Error(rm);
             }
         }
+
         public class EditCommentModel
         {
             [Required]
@@ -185,6 +188,7 @@ namespace Okurdostu.Web.Controllers.Api
             [DataType(DataType.MultilineText)]
             public string Comment { get; set; }
         }
+
         [HttpPatch("{Id}")]
         public async Task<IActionResult> PatchEdit(EditCommentModel model)
         {

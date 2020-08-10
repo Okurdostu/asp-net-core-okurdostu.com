@@ -33,14 +33,12 @@ namespace Okurdostu.Web.Controllers.Api.Me
             if (Model.StartYear > Model.EndYear)
             {
                 rm.Message = "Başlangıç yılı, bitiş yılından büyük olamaz";
-                rm.Code = 200;
                 return Error(rm);
             }
 
             if (Model.StartYear < 1980 || Model.StartYear > DateTime.Now.Year || Model.EndYear < 1980 || Model.StartYear > DateTime.Now.Year + 7)
             {
                 rm.Message = "Başlangıç yılı, bitiş yılı ile alakalı bilgileri kontrol edip, tekrar deneyin";
-                rm.Code = 200;
                 return Error(rm);
             }
 
@@ -59,19 +57,18 @@ namespace Okurdostu.Web.Controllers.Api.Me
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
                 {
+                    rm.Code = 201;
                     rm.Message = "Eğitim bilgisi kaydedildi";
                     return Succes(rm);
                 }
                 else
                 {
-                    rm.Message = "Lütfen sonra tekrar deneyin";
+                    rm.Code = 1001;
                     return Error(rm);
                 }
             }
             catch (Exception e)
             {
-                rm.Code = 200;
-
                 string innerMessage = (e.InnerException != null) ? e.InnerException.Message.ToLower() : "";
 
                 if (innerMessage.Contains("department"))
@@ -211,8 +208,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
                     }
                     else
                     {
-                        rm.Message = "Başaramadık, ne olduğunu bilmiyoruz";
-                        rm.InternalMessage = "Changes aren't save";
+                        rm.Code = 1001;
                         return Error(rm);
                     }
                 }
@@ -233,6 +229,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
             }
             else
             {
+                rm.Code = 404;
                 rm.Message = "Böyle bir eğitiminiz yok";
                 rm.InternalMessage = "Education is null";
                 return Error(rm);
@@ -249,13 +246,11 @@ namespace Okurdostu.Web.Controllers.Api.Me
             if (Model.StartYear > Model.EndYear)
             {
                 rm.Message = "Başlangıç yılı, bitiş yılından büyük olamaz";
-                rm.Code = 200;
                 return Error(rm);
             }
             else if (Model.StartYear < 1980 || Model.StartYear > DateTime.Now.Year || Model.EndYear < 1980 || Model.StartYear > DateTime.Now.Year + 7)
             {
                 rm.Message = "Başlangıç yılı, bitiş yılı ile alakalı bilgileri kontrol edip, tekrar deneyin";
-                rm.Code = 200;
                 return Error(rm);
             }
 
@@ -289,7 +284,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
                 }
                 else
                 {
-                    rm.Message = "Bir işlem yapılmadı";
+                    rm.Code = 1001;
                     return Error(rm);
                 }
             }

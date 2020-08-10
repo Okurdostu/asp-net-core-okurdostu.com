@@ -70,6 +70,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
 
                 if (result > 0)
                 {
+                    rm.Code = 201;
                     rm.Message = "Eğitim dökümanınız yollandı";
                     TempData["ProfileMessage"] = "Eğitim dökümanınız yollandı, en geç 48 saat içinde geri dönüş yapılacak";
                     return Succes(rm);
@@ -77,7 +78,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
                 else
                 {
                     LocalStorage.DeleteIfExists(EducationDocument.FullPath);
-                    rm.Message = "Bu işleminizi sonra tekrar deneyin.";
+                    rm.Code = 1001;
                     return Error(rm);
                 }
             }

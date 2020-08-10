@@ -62,8 +62,8 @@ namespace Okurdostu.Web.Controllers.Api
                     if (Udemy.Error == null)
                     {
                         await AddNeedItem(Need.Id, Udemy.Link, Udemy.Name, Udemy.Price, "/image/udemy.png", "Udemy").ConfigureAwait(false);
-
-                        //rm.Data = Udemy;
+                        rm.Code = 201;
+                        rm.Data = Udemy;
                         return Succes(rm);
                     }
                     else
@@ -80,8 +80,8 @@ namespace Okurdostu.Web.Controllers.Api
                     if (Amazon.Error == null)
                     {
                         await AddNeedItem(Need.Id, Amazon.Link, Amazon.Name, Amazon.Price, "/image/amazon.png", "Amazon").ConfigureAwait(false);
-
-                        //rm.Data = Amazon;
+                        rm.Code = 201;
+                        rm.Data = Amazon;
                         return Succes(rm);
                     }
                     else
@@ -100,8 +100,8 @@ namespace Okurdostu.Web.Controllers.Api
                         if (Pandora.Error == null)
                         {
                             await AddNeedItem(Need.Id, Pandora.Link, Pandora.Name, Pandora.Price, Pandora.Picture, "Pandora").ConfigureAwait(false);
-
-                            //rm.Data = Pandora;
+                            rm.Code = 201;
+                            rm.Data = Pandora;
                             return Succes(rm);
                         }
                         else

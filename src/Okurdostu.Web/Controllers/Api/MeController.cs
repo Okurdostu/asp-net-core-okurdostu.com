@@ -31,6 +31,7 @@ namespace Okurdostu.Web.Controllers.Api
         {
             return NotFound();
         }
+
         public class UsernameModel
         {
             [Required(ErrorMessage = "Kimliğinizi doğrulamak için şuan ki parolanızı girmelisiniz")]
@@ -262,7 +263,7 @@ namespace Okurdostu.Web.Controllers.Api
                 }
                 else
                 {
-                    rm.Message = "Başaramadık, ne olduğunu bilmiyoruz";
+                    rm.Code = 1001;
                     return Error(rm);
                 }
             }
@@ -312,7 +313,7 @@ namespace Okurdostu.Web.Controllers.Api
             else
             {
                 LocalStorage.DeleteIfExists(Environment.WebRootPath + uploadedPhotoPathAfterRoot);
-                rm.Message = "Yaptığınız değişiklikler kaydedilemedi";
+                rm.Code = 1001;
                 return Error(rm);
             }
         }
