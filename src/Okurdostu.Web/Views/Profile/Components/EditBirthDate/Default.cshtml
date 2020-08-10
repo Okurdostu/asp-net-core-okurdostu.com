@@ -1,0 +1,58 @@
+﻿@model Okurdostu.Web.Controllers.Api.MeController.BirthdateModel
+<br />
+@using (Html.BeginForm("", "", FormMethod.Post))
+{
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-4 pr-1 pl-2">
+                    <span class="font-weight-bold text-black-50">Ay</span>
+                    <select id="Month" name="Month" required class="form-control font-weight-bold"> </select>
+                    @Html.ValidationMessageFor(model => model.Month, "", new { @class = "text-danger font-weight-bold" })
+                </div>
+                <div class="col-4 pr-0 pl-0">
+                    <span class="font-weight-bold text-black-50">Yıl</span>
+                    <select id="Year" name="Year" required class="form-control font-weight-bold"> </select>
+                    @Html.ValidationMessageFor(model => model.Year, "", new { @class = "text-danger font-weight-bold" })
+                </div>
+                <div class="col-4 pr-1 pl-1">
+                    <span class="font-weight-bold text-black-50">Gün</span>
+                    <select id="Day" name="Day" required class="form-control font-weight-bold"> </select>
+                    @Html.ValidationMessageFor(model => model.Day, "", new { @class = "text-danger font-weight-bold" })
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-6">
+                    <span class="font-weight-bold text-black-50">Görünürlük</span>
+                    <select id="Privacy" name="Privacy" required class="form-control font-weight-bold">
+                        <option value="Public">
+                            Yıl, ay ve gün görünsün
+                        </option>
+                        <option value="MonthDay">
+                            Ay ve gün görünsün
+                        </option>
+                        <option value="Secret">
+                            Hiç biri görünmesin
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer pb-0 pt-1"> <button class="btn btn-outline-secondary rounded-custom font-weight-bold btn-block" data-dismiss="modal">Vazgeçtim</button> <input type="submit" value="Kaydet" class="btn btn-outline-purple rounded-custom w-100 font-weight-bold" /> </div>
+    </div>
+}
+
+<script>
+    var oldYear;
+    var oldDay;
+    var oldMonth;
+</script>
+@if (Model.Year != 0)
+{
+    <script>
+        oldYear = @Model.Year;
+        oldDay = @Model.Day;
+        oldMonth = @Model.Month;
+    </script>
+}
+<script src="~/js/profile/birthdate.js"></script>

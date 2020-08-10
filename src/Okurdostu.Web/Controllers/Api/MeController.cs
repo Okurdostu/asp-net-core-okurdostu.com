@@ -10,6 +10,7 @@ using Okurdostu.Web.Services;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers.Api
@@ -261,17 +262,10 @@ namespace Okurdostu.Web.Controllers.Api
                     rm.Message = "Profil bilgileriniz kaydedildi";
                     return Succes(rm);
                 }
-                else
-                {
-                    rm.Code = 1001;
-                    return Error(rm);
-                }
             }
-            else
-            {
-                rm.Message = "Hiç bir değişiklik yapılmadı";
-                return Error(rm);
-            }
+
+            rm.Code = 1001;
+            return Error(rm);
         }
 
         [HttpPatch("photo")]
@@ -340,6 +334,51 @@ namespace Okurdostu.Web.Controllers.Api
             }
 
             return Error(rm);
+        }
+
+        public class BirthdateModel
+        {
+            [Required]
+            public int Year { get; set; }
+            [Required]
+            public int Day { get; set; }
+            [Required]
+            public int Month { get; set; }
+            [Required]
+            public bool AreBDMonthDayPublic { get; set; }
+            [Required]
+            public bool IsBDYearPublic { get; set; }
+        }
+
+        [HttpPatch("birthdate")]
+        public async Task<IActionResult> Birthdate(BirthdateModel model)
+        {
+            ReturnModel rm = new ReturnModel();
+            if (!ModelState.IsValid)
+            {
+                rm.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
+                return Error(rm);
+            }
+            else
+            {
+                Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
+                AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
+                AuthenticatedUser.BirthDate = DateTime.Parse(model.Day + "/" + model.Month + "/" + model.Year);
+                AuthenticatedUser.AreBDMonthDayPublic = model.AreBDMonthDayPublic;
+                AuthenticatedUser.IsBDYearPublic = model.IsBDYearPublic;
+
+                var result = await Context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    return Succes(rm);
+                }
+                else
+                {
+                    rm.Code = 1001;
+                    return Error(rm);
+                }
+            }
         }
     }
 }

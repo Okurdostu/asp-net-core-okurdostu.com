@@ -64,11 +64,20 @@
                 <div class="modal-body bg-light text-left" style="border-radius: 25px;">
                     <h3 class="font-weight-bold text-center text-black-50">Profil düzenleme</h3>
                     <ul class="nav nav-tabs font-weight-bold justify-content-center" id="tab" role="tablist">
-                        <li class="nav-item"><a class="nav-link active" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="true">Profil</a></li>
-                        <li class="nav-item"><a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">İletişim</a></li>
+                        <li class="nav-item"><a class="nav-link pr-1 pl-1 pr-md-3 pl-md-3 active" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="true">Profil</a></li>
+                        <li class="nav-item"><a class="nav-link pr-1 pl-1 pr-md-3 pl-md-3" id="birthdate-tab" data-toggle="tab" href="#birthdate" role="tab" aria-controls="birthdate" aria-selected="false">Doğum tarihi</a></li>
+                        <li class="nav-item"><a class="nav-link pr-1 pl-1 pr-md-3 pl-md-3" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">İletişim</a></li>
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profil-tab">@await Component.InvokeAsync("ProfileBasic")</div>
+                        @if (Model.BirthDate.HasValue)
+                        {
+                            <div class="tab-pane fade" id="birthdate" role="tabpanel" aria-labelledby="birthdate-tab">@await Component.InvokeAsync("EditBirthDate", new { Year = Model.BirthDate.Value.Year, Month = Model.BirthDate.Value.Month, Day = Model.BirthDate.Value.Day, AreBDMonthDayPublic = Model.AreBDMonthDayPublic, IsBYearPublic = Model.IsBDYearPublic })</div>
+                        }
+                        else
+                        {
+                            <div class="tab-pane fade" id="birthdate" role="tabpanel" aria-labelledby="birthdate-tab">@await Component.InvokeAsync("EditBirthDate")</div>
+                        }
                         <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">@await Component.InvokeAsync("Contact")</div>
                     </div>
                 </div>
