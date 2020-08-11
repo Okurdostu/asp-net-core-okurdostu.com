@@ -1,6 +1,6 @@
 ﻿@model Okurdostu.Web.Controllers.Api.MeController.BirthdateModel
 <br />
-@using (Html.BeginForm("", "", FormMethod.Post))
+@using (Html.BeginForm("", "", FormMethod.Post,new { @id = "BirthDateForm" }))
 {
     <div class="form-horizontal">
         <div class="form-group">
@@ -25,13 +25,13 @@
                 <div class="col-12 col-md-6">
                     <span class="font-weight-bold text-black-50">Görünürlük</span>
                     <select id="Privacy" name="Privacy" required class="form-control font-weight-bold">
-                        <option value="Public">
+                        <option value="0">
                             Yıl, ay ve gün görünsün
                         </option>
-                        <option value="MonthDay">
+                        <option value="1">
                             Ay ve gün görünsün
                         </option>
-                        <option value="Secret">
+                        <option value="2">
                             Hiç biri görünmesin
                         </option>
                     </select>
@@ -46,6 +46,7 @@
     var oldYear;
     var oldDay;
     var oldMonth;
+    var oldSecretLevel;
 </script>
 @if (Model.Year != 0)
 {
@@ -53,6 +54,7 @@
         oldYear = @Model.Year;
         oldDay = @Model.Day;
         oldMonth = @Model.Month;
+        oldSecretLevel = @Model.BDSecretLevel;
     </script>
 }
 <script src="~/js/profile/birthdate.js"></script>

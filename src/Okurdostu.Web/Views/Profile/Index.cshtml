@@ -72,7 +72,7 @@
                         <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profil-tab">@await Component.InvokeAsync("ProfileBasic")</div>
                         @if (Model.BirthDate.HasValue)
                         {
-                            <div class="tab-pane fade" id="birthdate" role="tabpanel" aria-labelledby="birthdate-tab">@await Component.InvokeAsync("EditBirthDate", new { Year = Model.BirthDate.Value.Year, Month = Model.BirthDate.Value.Month, Day = Model.BirthDate.Value.Day, AreBDMonthDayPublic = Model.AreBDMonthDayPublic, IsBYearPublic = Model.IsBDYearPublic })</div>
+                            <div class="tab-pane fade" id="birthdate" role="tabpanel" aria-labelledby="birthdate-tab">@await Component.InvokeAsync("EditBirthDate", new { Year = Model.BirthDate.Value.Year, Month = Model.BirthDate.Value.Month, Day = Model.BirthDate.Value.Day, BDSecretLevel = Model.BDSecretLevel })</div>
                         }
                         else
                         {
@@ -90,56 +90,7 @@
         @{
             if (IsAuthenticatedUserEqualModelUser)
             {
-                <script>
-                    function FileSelect() {
-                        document.getElementById("photo-input").click();
-                    }
-                    function PhotoSelected() {
-                        var formData = new FormData();
-                        formData.append("File", $("#photo-input").prop("files")[0]);
-                        $("#photo-input").val("");
-                        $.ajax({
-                            type: "PATCH",
-                            url: "/api/me/photo/",
-                            data: formData,
-                            processData: false,
-                            contentType: false,
-                            success: function (result) {
-                                $("#profile-photo-modal").modal("hide");
-                                $("#profile-photo-img").attr({ "src": result.data.photo });
-                            },
-                            error: function (result) {
-                                Toast.fire({
-                                    icon: "warning",
-                                    html: "<span class=\"font-weight-bold text-black-50 ml-1 \">" + result.responseJSON.message + "</span>"
-                                });
-                            }
-                        }
-                        );
-                    }
-                    function RemovePhoto() {
-                        if ($("#profile-photo-img").attr("src") !== "/svg/user.svg") {
-                            $.ajax({
-                                type: "PATCH",
-                                url: "/api/me/photo/remove",
-                                success: function () {
-                                    $("#profile-photo-modal").modal("hide");
-                                    $("#profile-photo-img").attr({ "src": "/svg/user.svg" });
-                                },
-                                error: function (result) {
-                                    Toast.fire({
-                                        icon: "warning",
-                                        html: "<span class=\"font-weight-bold text-black-50 ml-1 \">" + result.responseJSON.message + "</span>"
-                                    });
-                                }
-                            }
-                            );
-                        }
-                        else {
-                            $("#profile-photo-modal").modal("hide");
-                        }
-                    }
-                </script>
+                <script src="~/js/profile/photo.js"></script>
                 <input hidden="hidden" id="photo-input" name="photo-input" type="file" onchange="PhotoSelected()" accept="image/*" /> <button hidden="hidden" type="submit" id="AddPhotoButton"></button>
                 <div class="modal fade" id="profile-photo-modal" tabindex="-1" role="dialog" aria-hidden="true">
                     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
@@ -197,16 +148,52 @@
     <h5 style="color:black;" class="m-0">
         @Html.Raw(Model.FullName)
         @if (IsAuthenticatedUserEqualModelUser)
-        {<a style="font-size:20px" class="od" href="" data-toggle="modal" data-target="#ProfileSettings"><i class="far fa-edit"></i></a>}
+        {
+            <a style="font-size:20px" class="od" href="" data-toggle="modal" data-target="#ProfileSettings"><i class="far fa-edit"></i></a>
+        }
     </h5>
-    <span style="font-size:17px;" class="pl-1"> @Html.Raw("(@" + Model.Username + ")") </span>
-    <div style="font-size:15.5px;" class="pl-1">
-        @if (Model.Biography != null)
-        {<span class="text-break">@Html.Raw(Model.Biography.Replace("\r\n", "<br />"))</span>}
+    <div>
+        <span style="font-size:17px;" class="pl-1"> @Html.Raw("(@" + Model.Username + ")") </span>
     </div>
+    @if (Model.Biography != null)
+    {
+        <div style="font-size:15.5px;" class="pl-1">
+            <span class="text-break">@Html.Raw(Model.Biography.Replace("\r\n", "<br />"))</span>
+        </div>
+    }
+    @if (Model.BDSecretLevel.HasValue && Model.BDSecretLevel < 2 && Model.BDSecretLevel >= 0)
+    {
+        <div style="font-size:15px">
+            @if (Model.BDSecretLevel.Value == 0)
+            {
+                <i class="fas fa-birthday-cake od"></i>
+                <span>
+                    @Model.BirthDate.Value.Day
+                </span>
+                <span>
+                    @Model.BirthDateMonthName(),
+                </span>
+                <span>
+                    @Model.BirthDate.Value.Year
+                </span>
+            }
+            else if (Model.BDSecretLevel.Value == 1)
+            {
+                <i class="fas fa-birthday-cake od"></i>
+                <span>
+                    @Model.BirthDate.Value.Day
+                </span>
+                <span>
+                    @Model.BirthDateMonthName()
+                </span>
+            }
+        </div>
+    }
     <div>
         @if (IsAuthenticatedUserEqualModelUser)
-        {<hr class="mb-1" /> <div>  <a class="btn btn-outline-purple font-weight-bold rounded-custom btn-block" href="/ihtiyac-olustur" style="font-size:16px">İhtiyaç oluştur</a> </div>}
+        {
+            <hr class="mb-1" /> <div>  <a class="btn btn-outline-purple font-weight-bold rounded-custom btn-block" href="/ihtiyac-olustur" style="font-size:16px">İhtiyaç oluştur</a> </div>
+        }
     </div>
 </div>
 @if (IsAuthenticatedUserEqualModelUser)

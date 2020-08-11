@@ -36,10 +36,8 @@ namespace Okurdostu.Data
         public string Github { get; set; }
         public string ContactEmail { get; set; }
         public DateTime LastChangedOn { get; set; }
-
         public DateTime? BirthDate { get; set; }
-        public bool? AreBDMonthDayPublic { get; set; }
-        public bool? IsBDYearPublic { get; set; }
+        public sbyte? BDSecretLevel { get; set; } //0: year-month-day, 1: month-day, 2: just user can see
 
         public string BirthDateMonthName()
         {

@@ -345,9 +345,7 @@ namespace Okurdostu.Web.Controllers.Api
             [Required]
             public int Month { get; set; }
             [Required]
-            public bool AreBDMonthDayPublic { get; set; }
-            [Required]
-            public bool IsBDYearPublic { get; set; }
+            public sbyte BDSecretLevel { get; set; }
         }
 
         [HttpPatch("birthdate")]
@@ -362,15 +360,13 @@ namespace Okurdostu.Web.Controllers.Api
             else
             {
                 Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-
                 AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
-                AuthenticatedUser.BirthDate = DateTime.Parse(model.Day + "/" + model.Month + "/" + model.Year);
-                AuthenticatedUser.AreBDMonthDayPublic = model.AreBDMonthDayPublic;
-                AuthenticatedUser.IsBDYearPublic = model.IsBDYearPublic;
-
+                AuthenticatedUser.BirthDate = DateTime.Parse(model.Month + "/" + model.Day + "/" + model.Year);
+                AuthenticatedUser.BDSecretLevel = model.BDSecretLevel;
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
                 {
+                    rm.Message = "Başarılı";
                     return Succes(rm);
                 }
                 else
