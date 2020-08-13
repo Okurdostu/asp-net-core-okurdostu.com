@@ -34,7 +34,7 @@ function MainComment() {
         });
     }
     else {
-        $.post("/api/comments", { NeedId: _NeedId, Comment: _Comment }).done(function (result) {
+        $.post("/api/comments", { NeedId: _NeedId, Comment: _Comment, __RequestVerificationToken: validatetoken }).done(function (result) {
             $("#maincomment-div textarea[name='Comment']").val('');
             commentMaxLengthWarnLabel.html("");
             GetComments(result.data)
@@ -79,7 +79,7 @@ function ReplyComment() {
         });
     }
     else {
-        $.post("/api/comments", { RelatedCommentId: _RelatedCommentId, Comment: _Comment }).done(function (result) {
+        $.post("/api/comments", { RelatedCommentId: _RelatedCommentId, Comment: _Comment, __RequestVerificationToken: validatetoken }).done(function (result) {
             $("#replycomment-div textarea[name='ReplyComment']").val('');
             $('#reply-comment-modal').modal('hide');
             GetComments(result.data);

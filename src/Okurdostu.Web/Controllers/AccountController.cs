@@ -108,7 +108,7 @@ namespace Okurdostu.Web.Controllers
 
                 bool IsThereAnyUserWithThatEmailAdress = await Context.User.AnyAsync(x => x.Email == Model.Email);
 
-                if (!IsThereAnyUserWithThatEmailAdress)
+                if (IsThereAnyUserWithThatEmailAdress is false)
                 {
                     if (AuthenticatedUser.Email != Model.Email)
                     {
@@ -135,7 +135,9 @@ namespace Okurdostu.Web.Controllers
                             if (result > 0)
                             {
                                 Email.Send(Email.EmailAddressChangeMail(AuthenticatedUser.FullName, UserEmailConfirmation.NewEmail, UserEmailConfirmation.GUID));
-                                TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + UserEmailConfirmation.NewEmail + ") onaylamanız için bir e-mail gönderildi";
+                                TempData["ProfileMessage"] = "Yeni e-mail adresinize (" + UserEmailConfirmation.NewEmail + ") onaylamanız için bir e-mail gönderildi" +
+                                    "<br>" +
+                                    "Onaylayana kadar şuan ki e-mail adresiniz geçerli kalacaktır.";
                             }
                             else
                             {

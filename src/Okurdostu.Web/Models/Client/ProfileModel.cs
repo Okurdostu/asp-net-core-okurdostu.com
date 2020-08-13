@@ -13,7 +13,7 @@ namespace Okurdostu.Web.Models
 
         [Required(ErrorMessage = "E-mail adresinizi yazmalısınız")]
         [Display(Name = "Email adresi")]
-        [MaxLength(25, ErrorMessage = "Çok uzun, en fazla 25 karakter")]
+        [MaxLength(40, ErrorMessage = "Çok uzun, en fazla 40 karakter")]
         [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$", ErrorMessage = "Lütfen geçerli bir e-mail adresi olsun")]
         public string Email { get; set; }
 

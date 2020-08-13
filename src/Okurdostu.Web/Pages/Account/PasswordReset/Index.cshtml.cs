@@ -17,7 +17,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
         {
             [Required(ErrorMessage = "Bu bilgiyi doldurmalısınız")]
             [Display(Name = "Kullanıcı adı, e-mail veya telefon numarası")]
-            [MaxLength(25, ErrorMessage = "Çok uzun, en fazla 25 karakter")]
+            [MaxLength(100, ErrorMessage = "Çok uzun, en fazla 100 karakter")]
             public string IdentificationValue { get; set; }
         }
         public OkurdostuContext Context => (OkurdostuContext)HttpContext?.RequestServices.GetService(typeof(OkurdostuContext));

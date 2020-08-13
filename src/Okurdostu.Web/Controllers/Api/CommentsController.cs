@@ -50,6 +50,7 @@ namespace Okurdostu.Web.Controllers.Api
         }
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
+        [ValidateAntiForgeryToken]
         [HttpPost("")]
         public async Task<IActionResult> PostAdd(CommentModel model) //doing comment or reply
         {
