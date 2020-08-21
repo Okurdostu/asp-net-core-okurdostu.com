@@ -23,6 +23,33 @@ namespace Okurdostu.Web.Controllers.Api.Me
             LocalStorage = localStorageService;
         }
 
+
+        [NonAction]
+        public IActionResult ReturnByInnerMessage(Exception e) //return according to innermessage when operation drops into the catch while adding or editing a education
+        {
+            ReturnModel rm = new ReturnModel();
+            string innerMessage = (e.InnerException != null) ? e.InnerException.Message.ToLower() : "";
+
+            if (innerMessage.Contains("university"))
+            {
+                rm.Message = "Üniversite bilgilerine ulaşamadık veya eksik";
+            }
+            else if (innerMessage.Contains("department"))
+            {
+                rm.Message = "Bölüm bilgilerine ulaşamadık veya eksik";
+            }
+            else if (innerMessage.Contains("startyear") || innerMessage.Contains("endyear"))
+            {
+                rm.Message = "Başlangıç veya bitiş yılını kontrol edin";
+            }
+            else
+            {
+                rm.Message = "Başaramadık ve ne olduğunu bilmiyoruz, tekrar deneyin";
+            }
+
+            return Error(rm);
+        }
+
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
         [HttpPost("")]
         public async Task<IActionResult> PostAdd(EducationModel Model)
@@ -69,26 +96,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
             }
             catch (Exception e)
             {
-                string innerMessage = (e.InnerException != null) ? e.InnerException.Message.ToLower() : "";
-
-                if (innerMessage.Contains("department"))
-                {
-                    rm.Message = "Bölüm bilgilerine ulaşamadık veya eksik";
-                }
-                else if (innerMessage.Contains("university"))
-                {
-                    rm.Message = "Üniversite bilgilerine ulaşamadık veya eksik";
-                }
-                else if (innerMessage.Contains("startyear") || innerMessage.Contains("endyear"))
-                {
-                    rm.Message = "Başlangıç veya bitiş yılını kontrol edin";
-                }
-                else
-                {
-                    rm.Message = "Başaramadık ve ne olduğunu bilmiyoruz, tekrar deneyin";
-                }
-
-                return Error(rm);
+                return ReturnByInnerMessage(e);
             }
         }
 
@@ -290,26 +298,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
             }
             catch (Exception e)
             {
-                string innerMessage = (e.InnerException != null) ? e.InnerException.Message.ToLower() : "";
-
-                if (innerMessage.Contains("department"))
-                {
-                    rm.Message = "Bölüm bilgilerine ulaşamadık veya eksik";
-                }
-                else if (innerMessage.Contains("university"))
-                {
-                    rm.Message = "Üniversite bilgilerine ulaşamadık veya eksik";
-                }
-                else if (innerMessage.Contains("startyear") || innerMessage.Contains("endyear"))
-                {
-                    rm.Message = "Başlangıç veya bitiş yılını kontrol edin";
-                }
-                else
-                {
-                    rm.Message = "Başaramadık ve ne olduğunu bilmiyoruz, tekrar deneyin";
-                }
-
-                return Error(rm);
+                return ReturnByInnerMessage(e);
             }
         }
     }

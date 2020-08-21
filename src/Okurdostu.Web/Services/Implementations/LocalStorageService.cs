@@ -64,18 +64,18 @@ namespace Okurdostu.Web.Services
             {
                 if (fileType == FileType.Document)
                 {
-                    var IsFileTypeAcceptable = !acceptableFileTypesForDocument.Any(x => x == formFile.ContentType);
+                    var IsFileTypeAcceptable = acceptableFileTypesForDocument.Any(x => x == formFile.ContentType);
 
-                    if (IsFileTypeAcceptable)
+                    if (IsFileTypeAcceptable == false)
                     {
                         return "Sadece fotoğraf veya PDF dökümanı seçebilirsiniz";
                     }
                 }
                 else if (fileType == FileType.Photo)
                 {
-                    var IsFileTypeAcceptable = !acceptableFileTypesForPhoto.Any(x => x == formFile.ContentType);
+                    var IsFileTypeAcceptable = acceptableFileTypesForPhoto.Any(x => x == formFile.ContentType);
 
-                    if (IsFileTypeAcceptable)
+                    if (IsFileTypeAcceptable == false)
                     {
                         return "Sadece fotoğraf seçebilirsiniz";
                     }

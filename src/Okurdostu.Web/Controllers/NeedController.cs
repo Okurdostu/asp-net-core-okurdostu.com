@@ -445,24 +445,6 @@ namespace Okurdostu.Web.Controllers
 
 
         #region view
-        [Route("{friendlytitle}")]
-        public async Task<IActionResult> ShortUrl(string friendlytitle)
-        {
-            var Need = await Context.Need.Include(needuser => needuser.User).FirstOrDefaultAsync(x => x.FriendlyTitle == friendlytitle && !x.IsRemoved);
-
-            if (Need != null)
-            {
-                TempData["MetaRouteLink"] = Need.Link;
-                return View(Need);
-            }
-            else
-            {
-                //böyle bir ihtiyaç kampanyasının olmadığını söyleyen bir sayfa yapılacak
-                return Redirect("/ihtiyaclar");
-            }
-        }
-
-
         [Route("{username}/ihtiyac/{friendlytitle}")]
         public async Task<IActionResult> ViewNeed(string username, string friendlytitle)
         {
