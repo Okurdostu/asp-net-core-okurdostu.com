@@ -33,11 +33,10 @@ namespace Okurdostu.Web.Controllers.Api.Me
         public async Task<IActionResult> Post(Guid Id, IFormFile File)
         {
             ReturnModel rm = new ReturnModel();
-            var warning = LocalStorage.WarnAcceptability(File, FileType.Document);
-
-            if (warning != null)
+            var UploadingStatus = LocalStorage.UploadEducationDocument(File, Environment.WebRootPath);
+            if (!UploadingStatus.Succes)
             {
-                rm.Message = warning;
+                rm.Message = UploadingStatus.Message;
                 return Error(rm);
             }
 
@@ -51,17 +50,11 @@ namespace Okurdostu.Web.Controllers.Api.Me
 
             if (Education != null)
             {
-                var uploadedDocumentPathAfterRoot = LocalStorage.UploadEducationDocument(File, Environment.WebRootPath);
-                if (uploadedDocumentPathAfterRoot == null)
-                {
-                    return Error(rm);
-                }
-
                 var EducationDocument = new UserEducationDoc
                 {
                     UserEducationId = Id,
-                    FullPath = Environment.WebRootPath + uploadedDocumentPathAfterRoot,
-                    PathAfterRoot = uploadedDocumentPathAfterRoot,
+                    FullPath = Environment.WebRootPath + UploadingStatus.UploadedPathAfterRoot,
+                    PathAfterRoot = UploadingStatus.UploadedPathAfterRoot,
                 };
 
                 Education.IsSentToConfirmation = true;

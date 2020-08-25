@@ -7,11 +7,18 @@ using System.Linq;
 
 namespace Okurdostu.Web.Services
 {
+    public struct StorageStatus
+    {
+        public bool Succes { get; set; }
+        public string Message { get; set; }
+        public string UploadedPathAfterRoot { get; set; }
+    }
+
     public class LocalStorageService : ILocalStorageService
     {
         private static readonly string profilePhotoPath = "/image/profile/";
         private static readonly string educationDocumentPath = "/documents/";
-        private static readonly long acceptableFileSize = 1048576 / 2;
+        private static readonly long acceptableFileSize = 1048576;
         private static readonly string[] acceptableFileTypesForDocument = { "application/pdf", "image/png", "image/jpg", "image/jpeg" };
         private static readonly string[] acceptableFileTypesForPhoto = { "image/png", "image/jpg", "image/jpeg" };
 
@@ -24,8 +31,15 @@ namespace Okurdostu.Web.Services
             }
             return false;
         }
-        public string UploadEducationDocument(IFormFile formFile, string webRootPath)
+
+        public StorageStatus UploadEducationDocument(IFormFile formFile, string webRootPath)
         {
+            var returnStorageStatus = CheckAcceptability(formFile, FileType.Document);
+            if (!returnStorageStatus.Succes)
+            {
+                return returnStorageStatus;
+            }
+
             string documentFileName = Guid.NewGuid().ToString() + Path.GetExtension(formFile.FileName);
             string filePathAfterRoot = educationDocumentPath + documentFileName;
 
@@ -33,15 +47,25 @@ namespace Okurdostu.Web.Services
             {
                 formFile.CopyTo(Stream);
             };
+
             if (File.Exists(webRootPath + filePathAfterRoot))
             {
-                return filePathAfterRoot;
+                returnStorageStatus.UploadedPathAfterRoot = filePathAfterRoot;
+                return returnStorageStatus;
             }
 
-            return null;
+            returnStorageStatus.Succes = false;
+            return returnStorageStatus;
         }
-        public string UploadProfilePhoto(IFormFile formFile, string webRootPath)
+
+        public StorageStatus UploadProfilePhoto(IFormFile formFile, string webRootPath)
         {
+            var returnStorageStatus = CheckAcceptability(formFile, FileType.Photo);
+            if (!returnStorageStatus.Succes)
+            {
+                return returnStorageStatus;
+            }
+
             string photoFileName = Guid.NewGuid().ToString() + Path.GetExtension(formFile.FileName);
             string photoPathAfterRoot = profilePhotoPath + photoFileName;
             var profilePhoto = Image.Load(formFile.OpenReadStream());
@@ -51,46 +75,62 @@ namespace Okurdostu.Web.Services
                 profilePhoto.Mutate(x => x.Resize(200, 200));
             }
             profilePhoto.Save(webRootPath + photoPathAfterRoot);
+
             if (File.Exists(webRootPath + photoPathAfterRoot))
             {
-                return photoPathAfterRoot;
+                returnStorageStatus.UploadedPathAfterRoot = photoPathAfterRoot;
+                return returnStorageStatus;
             }
 
-            return null;
+            returnStorageStatus.Succes = false;
+            return returnStorageStatus;
         }
-        public string WarnAcceptability(IFormFile formFile, FileType fileType)
+
+        public StorageStatus CheckAcceptability(IFormFile formFile, FileType fileType)
         {
+            var returnStorageStatus = new StorageStatus();
+
             if (formFile != null && formFile.Length <= acceptableFileSize)
             {
-                if (fileType == FileType.Document)
+                switch (fileType)
                 {
-                    var IsFileTypeAcceptable = acceptableFileTypesForDocument.Any(x => x == formFile.ContentType);
+                    case FileType.Document:
+                        {
+                            var IsFileTypeAcceptable = acceptableFileTypesForDocument.Any(x => x == formFile.ContentType);
 
-                    if (IsFileTypeAcceptable == false)
-                    {
-                        return "Sadece fotoğraf veya PDF dökümanı seçebilirsiniz";
-                    }
-                }
-                else if (fileType == FileType.Photo)
-                {
-                    var IsFileTypeAcceptable = acceptableFileTypesForPhoto.Any(x => x == formFile.ContentType);
+                            if (IsFileTypeAcceptable == false)
+                            {
+                                returnStorageStatus.Message = "Sadece fotoğraf veya PDF dökümanı seçebilirsiniz";
+                            }
 
-                    if (IsFileTypeAcceptable == false)
-                    {
-                        return "Sadece fotoğraf seçebilirsiniz";
-                    }
+                            break;
+                        }
+                    case FileType.Photo:
+                        {
+                            var IsFileTypeAcceptable = acceptableFileTypesForPhoto.Any(x => x == formFile.ContentType);
+
+                            if (IsFileTypeAcceptable == false)
+                            {
+                                returnStorageStatus.Message = "Sadece fotoğraf seçebilirsiniz";
+                            }
+
+                            break;
+                        }
                 }
-            }
-            else if (formFile != null && formFile.Length > acceptableFileSize)
-            {
-                return "Yüklemeye çalıştığınız dosya kabul edilebilir boyutları aşıyor";
             }
             else
             {
-                return "Dosya seçmediniz";
+                returnStorageStatus.Message = formFile != null && formFile.Length > acceptableFileSize
+                    ? "Yüklemeye çalıştığınız dosya kabul edilebilir boyutları aşıyor"
+                    : "Dosyaya ulaşılamadı";
             }
 
-            return null;
+            if (string.IsNullOrEmpty(returnStorageStatus.Message))
+            {
+                returnStorageStatus.Succes = true;
+            }
+
+            return returnStorageStatus;
         }
     }
 }

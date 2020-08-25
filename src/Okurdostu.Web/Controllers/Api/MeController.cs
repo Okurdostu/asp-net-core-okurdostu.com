@@ -272,23 +272,18 @@ namespace Okurdostu.Web.Controllers.Api
         public async Task<IActionResult> Photo(IFormFile File)
         {
             ReturnModel rm = new ReturnModel();
-            var warning = LocalStorage.WarnAcceptability(File, FileType.Photo);
 
-            if (warning != null)
-            {
-                rm.Message = warning;
-                return Error(rm);
-            }
+            var UploadingStatus = LocalStorage.UploadProfilePhoto(File, Environment.WebRootPath);
 
-            var uploadedPhotoPathAfterRoot = LocalStorage.UploadProfilePhoto(File, Environment.WebRootPath);
-            if (uploadedPhotoPathAfterRoot == null)
+            if (!UploadingStatus.Succes)
             {
+                rm.Message = UploadingStatus.Message;
                 return Error(rm);
             }
 
             AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync().ConfigureAwait(false);
             string oldPhotoPath = AuthenticatedUser.PictureUrl;
-            AuthenticatedUser.PictureUrl = uploadedPhotoPathAfterRoot;
+            AuthenticatedUser.PictureUrl = UploadingStatus.UploadedPathAfterRoot;
             AuthenticatedUser.LastChangedOn = DateTime.Now;
 
             var result = await Context.SaveChangesAsync();
@@ -301,12 +296,12 @@ namespace Okurdostu.Web.Controllers.Api
                     LocalStorage.DeleteIfExists(Environment.WebRootPath + oldPhotoPath);
                 }
 
-                rm.Data = new { photo = uploadedPhotoPathAfterRoot };
+                rm.Data = new { photo = UploadingStatus.UploadedPathAfterRoot };
                 return Succes(rm);
             }
             else
             {
-                LocalStorage.DeleteIfExists(Environment.WebRootPath + uploadedPhotoPathAfterRoot);
+                LocalStorage.DeleteIfExists(Environment.WebRootPath + UploadingStatus.UploadedPathAfterRoot);
                 rm.Code = 1001;
                 return Error(rm);
             }
