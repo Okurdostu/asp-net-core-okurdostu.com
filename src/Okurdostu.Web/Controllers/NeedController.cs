@@ -7,12 +7,11 @@ using Okurdostu.Data;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 using Okurdostu.Web.Models.NeedItem;
-using Okurdostu.Web.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers
 {
@@ -381,7 +380,7 @@ namespace Okurdostu.Web.Controllers
 
                             Need.Title = Model.Title;
                             Need.FriendlyTitle = Need.Title.FriendlyUrl();
-                            
+
                             try
                             {
                                 await Context.SaveChangesAsync();

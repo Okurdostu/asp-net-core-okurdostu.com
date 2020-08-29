@@ -6,6 +6,7 @@ using Okurdostu.Web.Filters;
 using Okurdostu.Web.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Okurdostu.Web.Controllers.Api
@@ -64,15 +65,7 @@ namespace Okurdostu.Web.Controllers.Api
 
             if (!ModelState.IsValid)
             {
-                if (model.Comment == null)
-                {
-                    rm.Message = "Bir şeyler yazmalısın";
-                }
-                else if (model.Comment.Length > 100)
-                {
-                    rm.Message = "En fazla 100 karakter";
-                }
-
+                rm.Message = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage;
                 return Error(rm);
             }
 
@@ -196,17 +189,7 @@ namespace Okurdostu.Web.Controllers.Api
             ReturnModel rm = new ReturnModel();
             if (!ModelState.IsValid)
             {
-                if (model.Comment == null)
-                {
-                    rm.Message = "Bir şeyler yazmalısın";
-                }
-                else if (model.Comment.Length > 100)
-                {
-                    rm.Message = "En fazla 100 karakter";
-                }
-
-                rm.InternalMessage = "Id and comment are required";
-
+                rm.Message = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage;
                 return Error(rm);
             }
             var EditedComment = await Context.NeedComment.FirstOrDefaultAsync(x => x.Id == model.Id && !x.IsRemoved && x.UserId == Guid.Parse(User.Identity.GetUserId()));

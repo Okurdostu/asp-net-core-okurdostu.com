@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data;
 using Okurdostu.Web.Base;
@@ -180,11 +179,9 @@ namespace Okurdostu.Web.Controllers.Api.Me
         {
             var AuthenticatedUserId = User.Identity.GetUserId();
             ReturnModel rm = new ReturnModel();
-
-            if (!ModelState.IsValid)
+            if (Id == Guid.Empty)
             {
                 rm.Message = "Silinmesi gereken eğitim bilgisine ulaşılamadı";
-                rm.InternalMessage = "Id is required";
                 return Error(rm);
             }
 

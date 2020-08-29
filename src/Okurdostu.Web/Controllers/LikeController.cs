@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Okurdostu.Data;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -48,10 +46,10 @@ namespace Okurdostu.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         [Route("Like/Likers")]
         public async Task<ActionResult> LikersAsync(Guid id, string username) => View(await Context.NeedLike.Where(x => x.IsCurrentLiked && x.NeedId == id && x.Need.User.Username == username).Select(a => a.User).ToListAsync());
-        
+
         [Route("Like/Count/{id}")]
         public async Task<int> CountAsync(Guid id) => await Context.NeedLike.CountAsync(x => x.IsCurrentLiked && x.NeedId == id);
-        
+
         [Authorize]
         [Route("Like/LikeState/{id}")]
         public async Task<bool> LikeStateAsync(Guid id) => await Context.NeedLike.AnyAsync(x => x.IsCurrentLiked && x.NeedId == id && x.UserId == Guid.Parse(User.Identity.GetUserId()));

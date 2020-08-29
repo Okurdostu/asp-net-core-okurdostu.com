@@ -16,17 +16,11 @@ namespace Okurdostu.Web.Controllers.Api.Me
         {
             return NotFound();
         }
-
         const int MaxRecordPerPage = 10;
-
         private static int CalculateTotalPage(int TotalRecord)
         {
-            var TotalPage = TotalRecord / MaxRecordPerPage;
-            if (TotalRecord % MaxRecordPerPage != 0) TotalPage++;
-
-            return TotalPage;
+            return TotalRecord % MaxRecordPerPage != 0 ? (TotalRecord / MaxRecordPerPage) + 1 : TotalRecord / MaxRecordPerPage;
         }
-
         [HttpGet("{selectedPage}")]
         public async Task<IActionResult> GetComments([FromRoute] int selectedPage)
         {
@@ -69,15 +63,15 @@ namespace Okurdostu.Web.Controllers.Api.Me
                     .SkipLast(MaxRecordPerPage * (selectedPage - 1))
                     .TakeLast(MaxRecordPerPage).ToList();
 
-                object Information = new
+                rm.Data = new
                 {
                     TotalRecord,
                     TotalPage,
                     CurrentPage = selectedPage,
-                    Count = (byte)Comments.Count()
+                    Count = (byte)Comments.Count(),
+                    Comments
                 };
 
-                rm.Data = new { Information, Comments };
                 return Succes(rm);
             }
         }

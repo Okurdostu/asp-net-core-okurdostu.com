@@ -55,7 +55,7 @@ namespace Okurdostu.Web.Controllers.Api
 
             if (!ModelState.IsValid)
             {
-                rm.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
+                rm.Message = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage;
                 return Error(rm);
             }
             AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
@@ -129,7 +129,7 @@ namespace Okurdostu.Web.Controllers.Api
 
             if (!ModelState.IsValid)
             {
-                rm.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
+                rm.Message = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage;
                 return Error(rm);
             }
 
@@ -180,7 +180,7 @@ namespace Okurdostu.Web.Controllers.Api
 
             if (!ModelState.IsValid)
             {
-                rm.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
+                rm.Message = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage;
                 return Error(rm);
             }
 
@@ -238,7 +238,7 @@ namespace Okurdostu.Web.Controllers.Api
 
             if (!ModelState.IsValid)
             {
-                rm.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
+                rm.Message = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage;
                 return Error(rm);
             }
 
@@ -349,26 +349,24 @@ namespace Okurdostu.Web.Controllers.Api
             ReturnModel rm = new ReturnModel();
             if (!ModelState.IsValid)
             {
-                rm.Message = "İstenen bilgileri, geçerli bir şekilde giriniz";
+                rm.Message = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage;
                 return Error(rm);
+            }
+
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+            AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
+            AuthenticatedUser.BirthDate = DateTime.Parse(model.Month + "/" + model.Day + "/" + model.Year);
+            AuthenticatedUser.BDSecretLevel = model.BDSecretLevel;
+            var result = await Context.SaveChangesAsync();
+            if (result > 0)
+            {
+                rm.Message = "Başarılı";
+                return Succes(rm);
             }
             else
             {
-                Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-                AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
-                AuthenticatedUser.BirthDate = DateTime.Parse(model.Month + "/" + model.Day + "/" + model.Year);
-                AuthenticatedUser.BDSecretLevel = model.BDSecretLevel;
-                var result = await Context.SaveChangesAsync();
-                if (result > 0)
-                {
-                    rm.Message = "Başarılı";
-                    return Succes(rm);
-                }
-                else
-                {
-                    rm.Code = 1001;
-                    return Error(rm);
-                }
+                rm.Code = 1001;
+                return Error(rm);
             }
         }
     }

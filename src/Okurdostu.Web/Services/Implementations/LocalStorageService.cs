@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Okurdostu.Web.Services
 {
-    public struct StorageStatus
+    public class StorageStatus
     {
         public bool Succes { get; set; }
         public string Message { get; set; }

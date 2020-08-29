@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
-
 namespace Okurdostu.Web.Controllers
 {
     public class ProfileController : BaseController<ProfileController>
