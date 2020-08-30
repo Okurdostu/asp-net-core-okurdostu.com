@@ -1,6 +1,6 @@
 # ignores about project
 universite-logo/
-profile/
+image/profile/
 documents/
 notes.txt
 Mailtemplates/
@@ -8,6 +8,7 @@ src/Okurdostu.Web/Properties/PublishProfiles/FolderProfile.pubxml
 
 
 #vscode
+.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
