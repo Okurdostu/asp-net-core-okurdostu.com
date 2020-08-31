@@ -22,21 +22,21 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpGet("{Id}")]
         public async Task<IActionResult> GetSingle(Guid Id)
         {
-            ReturnModel rm = new ReturnModel();
             //when user does reply a comment or wants to edit their comment, it works to view comment that will be edited or replied.
             var RequestedComment = await Context.NeedComment.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved);
 
             if (RequestedComment != null)
             {
-                rm.Data = new { comment = RequestedComment.Comment, username = RequestedComment.User.Username, fullname = RequestedComment.User.FullName };
-                return Succes(rm);
+                var data = new 
+                { 
+                    comment = RequestedComment.Comment, 
+                    username = RequestedComment.User.Username, 
+                    fullname = RequestedComment.User.FullName 
+                };
+                return Succes(null, data);
             }
-            else
-            {
-                rm.Code = 404;
-                rm.Message = "Böyle bir yorum yok";
-                return Error(rm);
-            }
+            
+            return Error("Böyle bir yorum yok", null, null, 404);
         }
 
         public class CommentModel
@@ -55,24 +55,18 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPost("")]
         public async Task<IActionResult> PostAdd(CommentModel model) //doing comment or reply
         {
-            ReturnModel rm = new ReturnModel();
-
             if (model.NeedId == null && model.RelatedCommentId == null || model.NeedId == Guid.Empty && model.RelatedCommentId == null)
             {
-                rm.Message = "Yorum yapmak istediğiniz kampanyayı veya cevaplamak istedğiniz yorumu kontrol edin";
-                return Error(rm);
+                return Error("Yorum yapmak istediğiniz kampanyayı veya cevaplamak istedğiniz yorumu kontrol edin");
             }
-
             if (!ModelState.IsValid)
             {
-                rm.Message = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage;
-                return Error(rm);
+                return Error(ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage);
             }
 
             if (model.NeedId != Guid.Empty && model.NeedId != null) // add new comment
             {
                 var commentedNeed = await Context.Need.AnyAsync(x => x.Id == model.NeedId && !x.IsRemoved && x.IsConfirmed);
-
                 if (commentedNeed)
                 {
                     var NewComment = new NeedComment
@@ -87,21 +81,16 @@ namespace Okurdostu.Web.Controllers.Api
 
                     if (result > 0)
                     {
-                        rm.Code = 201;
-                        rm.Data = NewComment.Id;
-                        return Succes(rm);
+                        return Succes(null, NewComment.Id, 201);
                     }
                     else
                     {
-                        rm.Code = 1001;
-                        return Error(rm);
+                        return Error(null, null, null, 1001);
                     }
                 }
                 else
                 {
-                    rm.Code = 404;
-                    rm.Message = "Tartışmanın başlatılacağı kampanya yok veya burada tartışma başlatılamaz";
-                    return Error(rm);
+                    return Error("Tartışmanın başlatılacağı kampanya yok veya burada tartışma başlatılamaz",null,null,404);
                 }
             }
             else  //[reply] add relational comment
@@ -123,34 +112,24 @@ namespace Okurdostu.Web.Controllers.Api
 
                     if (result > 0)
                     {
-                        rm.Code = 201;
-                        rm.Data = NewReply.Id;
-                        return Succes(rm);
+                        return Succes(null, NewReply.Id, 201);
                     }
                     else
                     {
-                        rm.Code = 1001;
-                        return Error(rm);
+                        return Error(null, null, null, 1001);
                     }
                 }
-                else
-                {
-                    rm.Code = 404;
-                    rm.Message = "Cevaplanacak yorum yok, silinmiş veya burada cevap verilemez";
-                    return Error(rm);
-                }
+
+                return Error("Cevaplanacak yorum yok, silinmiş veya burada cevap verilemez", null, null, 404);
             }
         }
 
         [HttpPatch("remove/{Id}")]
         public async Task<IActionResult> PatchRemove(Guid Id)
         {
-            ReturnModel rm = new ReturnModel();
             if (Id == null || Id == Guid.Empty)
             {
-                rm.Message = "Silmek için yorum seçmediniz";
-                rm.InternalMessage = "Id is required";
-                return Error(rm);
+                return Error("Silmek için yorum seçmediniz","Id is required");
             }
 
             var DeletedComment = await Context.NeedComment.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && x.UserId == Guid.Parse(User.Identity.GetUserId()));
@@ -161,15 +140,10 @@ namespace Okurdostu.Web.Controllers.Api
                 DeletedComment.Comment = ""; // aynı şekilde içerik yok edilmeli
                 await Context.SaveChangesAsync();
 
-                rm.Message = "Yorumunuz silindi";
-                return Succes(rm);
+                return Succes("Yorumunuz silindi");
             }
-            else
-            {
-                rm.Code = 404;
-                rm.Message = "Silmeye çalıştığınız yorum yok";
-                return Error(rm);
-            }
+            
+            return Error("Silmeye çalıştığınız yorum yok",null, null, 404);
         }
 
         public class EditCommentModel
@@ -186,12 +160,11 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPatch("{Id}")]
         public async Task<IActionResult> PatchEdit(EditCommentModel model)
         {
-            ReturnModel rm = new ReturnModel();
             if (!ModelState.IsValid)
             {
-                rm.Message = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage;
-                return Error(rm);
+                return Error(ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage);
             }
+
             var EditedComment = await Context.NeedComment.FirstOrDefaultAsync(x => x.Id == model.Id && !x.IsRemoved && x.UserId == Guid.Parse(User.Identity.GetUserId()));
             if (EditedComment != null)
             {
@@ -199,20 +172,12 @@ namespace Okurdostu.Web.Controllers.Api
                 {
                     EditedComment.Comment = model.Comment;
                     await Context.SaveChangesAsync();
-                    rm.Message = "Yorum içeriğiniz düzenlendi";
-                    return Succes(rm);
+                    return Succes("Yorum içeriğiniz düzenlendi");
                 }
-                else
-                {
-                    rm.Message = "Aynı içerik ile düzenlemeye çalıştınız";
-                    return Error(rm);
-                }
+                
+                return Error("Aynı içerik ile düzenlemeye çalıştınız");
             }
-            else
-            {
-                rm.Message = "Düzenlemeye çalıştığınız yorum yok";
-                return Error(rm);
-            }
+            return Error("Düzenlemeye çalıştığınız yorum yok",null, null, 404);
         }
     }
 }

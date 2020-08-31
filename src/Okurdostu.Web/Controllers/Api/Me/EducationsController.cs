@@ -22,31 +22,18 @@ namespace Okurdostu.Web.Controllers.Api.Me
             LocalStorage = localStorageService;
         }
 
-
         [NonAction]
         public IActionResult ReturnByInnerMessage(Exception e) //return according to innermessage when operation drops into the catch while adding or editing a education
         {
-            ReturnModel rm = new ReturnModel();
             string innerMessage = (e.InnerException != null) ? e.InnerException.Message.ToLower() : "";
-
             if (innerMessage.Contains("university"))
-            {
-                rm.Message = "Üniversite bilgilerine ulaşamadık veya eksik";
-            }
+                return Error("Üniversite bilgilerine ulaşamadık veya eksik");
             else if (innerMessage.Contains("department"))
-            {
-                rm.Message = "Bölüm bilgilerine ulaşamadık veya eksik";
-            }
+                return Error("Bölüm bilgilerine ulaşamadık veya eksik");
             else if (innerMessage.Contains("startyear") || innerMessage.Contains("endyear"))
-            {
-                rm.Message = "Başlangıç veya bitiş yılını kontrol edin";
-            }
+                return Error("Başlangıç veya bitiş yılını kontrol edin");
             else
-            {
-                rm.Message = "Başaramadık ve ne olduğunu bilmiyoruz, tekrar deneyin";
-            }
-
-            return Error(rm);
+                return Error("Başaramadık ve ne olduğunu bilmiyoruz, tekrar deneyin");
         }
 
         [ServiceFilter(typeof(ConfirmedEmailFilter))]
@@ -54,18 +41,15 @@ namespace Okurdostu.Web.Controllers.Api.Me
         public async Task<IActionResult> PostAdd(EducationModel Model)
         {
             var AuthenticatedUserId = User.Identity.GetUserId();
-            ReturnModel rm = new ReturnModel();
 
             if (Model.StartYear > Model.EndYear)
             {
-                rm.Message = "Başlangıç yılı, bitiş yılından büyük olamaz";
-                return Error(rm);
+                return Error("Başlangıç yılı, bitiş yılından büyük olamaz");
             }
 
             if (Model.StartYear < 1980 || Model.StartYear > DateTime.Now.Year || Model.EndYear < 1980 || Model.StartYear > DateTime.Now.Year + 7)
             {
-                rm.Message = "Başlangıç yılı, bitiş yılı ile alakalı bilgileri kontrol edip, tekrar deneyin";
-                return Error(rm);
+                return Error("Başlangıç yılı, bitiş yılı ile alakalı bilgileri kontrol edip, tekrar deneyin");
             }
 
             var NewEducation = new UserEducation
@@ -82,16 +66,9 @@ namespace Okurdostu.Web.Controllers.Api.Me
             {
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
-                {
-                    rm.Code = 201;
-                    rm.Message = "Eğitim bilgisi kaydedildi";
-                    return Succes(rm);
-                }
+                    return Succes("Eğitim bilgisi kaydedildi", null, 201);
                 else
-                {
-                    rm.Code = 1001;
-                    return Error(rm);
-                }
+                    return Error(null, null, null, 1001);
             }
             catch (Exception e)
             {
@@ -99,47 +76,15 @@ namespace Okurdostu.Web.Controllers.Api.Me
             }
         }
 
-        [HttpGet("")]
-        public async Task<IActionResult> GetEducations() //need: pagination
-        {
-            ReturnModel rm = new ReturnModel();
-
-            var Educations = await Context.UserEducation.Where(x => x.UserId == Guid.Parse(User.Identity.GetUserId())).Select(x => new
-            {
-                x.Id,
-                x.IsRemoved,
-                x.StartYear,
-                x.EndYear,
-                x.IsConfirmed,
-                x.IsActiveEducation,
-                x.IsSentToConfirmation,
-
-                universityPageUrl = "/universite/" + x.University.FriendlyName,
-                universityLogoUrl = x.University.LogoUrl,
-                universityName = x.University.Name,
-                universityId = x.UniversityId,
-            }).ToListAsync();
-
-            if (Educations != null)
-            {
-                rm.Data = Educations;
-                return Succes(rm);
-            }
-
-            rm.Code = 404;
-            return Error(rm);
-        }
-
         [HttpGet("{Id}")]
         public async Task<IActionResult> GetSingle(Guid Id)
         {
-            ReturnModel rm = new ReturnModel();
             var AuthenticatedUserId = User.Identity.GetUserId();
             var Education = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && x.UserId == Guid.Parse(AuthenticatedUserId));
 
             if (Education != null)
             {
-                var educationModel = new EducationModel
+                var education = new EducationModel
                 {
                     UniversityId = Education.UniversityId,
                     Department = Education.Department,
@@ -149,21 +94,17 @@ namespace Okurdostu.Web.Controllers.Api.Me
                     EndYear = int.Parse(Education.EndYear),
                 };
 
-                educationModel.AreUniversityorDepartmentCanEditable = Education.AreUniversityorDepartmentCanEditable();
-                if (educationModel.ActivitiesSocieties == null || educationModel.ActivitiesSocieties == "undefined")
+                education.AreUniversityorDepartmentCanEditable = Education.AreUniNameOrDepartmentCanEditable();
+                if (education.ActivitiesSocieties == null || education.ActivitiesSocieties == "undefined")
                 {
-                    educationModel.ActivitiesSocieties = "";
+                    education.ActivitiesSocieties = "";
                 }
 
-                rm.Data = educationModel;
+                return Succes(null, education);
             }
-            else
-            {
-                return Error(rm);
-            }
-            return Succes(rm);
+            
+            return Error(null, null, null, 404);
         }
-
         public async Task<bool> IsCanRemovable(UserEducation edu)
         {
             if (edu.IsConfirmed || edu.IsActiveEducation)
@@ -178,25 +119,21 @@ namespace Okurdostu.Web.Controllers.Api.Me
         public async Task<IActionResult> PatchRemove(Guid Id)
         {
             var AuthenticatedUserId = User.Identity.GetUserId();
-            ReturnModel rm = new ReturnModel();
             if (Id == Guid.Empty)
             {
-                rm.Message = "Silinmesi gereken eğitim bilgisine ulaşılamadı";
-                return Error(rm);
+                return Error("Silinmesi gereken eğitim bilgisine ulaşılamadı");
             }
 
             var deletedEducation = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && Guid.Parse(AuthenticatedUserId) == x.UserId);
-
             if (deletedEducation != null)
             {
-                if (await IsCanRemovable(deletedEducation).ConfigureAwait(false))
+                if (await IsCanRemovable(deletedEducation))
                 {
                     deletedEducation.IsRemoved = true;
                     var result = await Context.SaveChangesAsync();
 
                     if (result > 0)
                     {
-                        rm.Message = "Eğitim bilgisi kaldırıldı";
                         if (deletedEducation.IsSentToConfirmation)
                         {
                             var educationDocuments = await Context.UserEducationDoc.Where(x => x.UserEducationId == deletedEducation.Id).ToListAsync();
@@ -209,18 +146,15 @@ namespace Okurdostu.Web.Controllers.Api.Me
                             }
                             await Context.SaveChangesAsync();
                         }
-                        return Succes(rm);
+                        return Succes("Eğitim bilgisi kaldırıldı");
                     }
                     else
                     {
-                        rm.Code = 1001;
-                        return Error(rm);
+                        return Error(null, null, null, 1001);
                     }
                 }
                 else
                 {
-                    rm.Message = "Bu eğitimi silemezsiniz";
-
                     TempData["ProfileMessage"] = "İhtiyaç kampanyanız olduğu için" +
                         "<br />" +
                         "Aktif olan eğitim bilginizi silemezsiniz." +
@@ -229,35 +163,23 @@ namespace Okurdostu.Web.Controllers.Api.Me
                         "<br/>" +
                         "Daha fazla ayrıntı ve işlem için: info@okurdostu.com";
 
-                    return Error(rm);
+                    return Error("Bu eğitimi silemezsiniz");
                 }
             }
-            else
-            {
-                rm.Code = 404;
-                rm.Message = "Böyle bir eğitiminiz yok";
-                rm.InternalMessage = "Education is null";
-                return Error(rm);
-            }
+            
+            return Error("Böyle bir eğitiminiz yok", null, null, 404);
         }
 
         [HttpPut("{Id}")]
         public async Task<IActionResult> PutEdit(Guid Id, EducationModel Model)
         {
             var AuthenticatedUserId = User.Identity.GetUserId();
-            ReturnModel rm = new ReturnModel();
             var editedEducation = await Context.UserEducation.FirstOrDefaultAsync(x => x.Id == Id && !x.IsRemoved && Guid.Parse(AuthenticatedUserId) == x.UserId);
 
             if (Model.StartYear > Model.EndYear)
-            {
-                rm.Message = "Başlangıç yılı, bitiş yılından büyük olamaz";
-                return Error(rm);
-            }
+                return Error("Başlangıç yılı, bitiş yılından büyük olamaz");
             else if (Model.StartYear < 1980 || Model.StartYear > DateTime.Now.Year || Model.EndYear < 1980 || Model.StartYear > DateTime.Now.Year + 7)
-            {
-                rm.Message = "Başlangıç yılı, bitiş yılı ile alakalı bilgileri kontrol edip, tekrar deneyin";
-                return Error(rm);
-            }
+                return Error("Başlangıç yılı, bitiş yılı ile alakalı bilgileri kontrol edip, tekrar deneyin");
 
             if (editedEducation != null)
             {
@@ -265,7 +187,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
                 editedEducation.EndYear = Model.EndYear.ToString();
                 editedEducation.ActivitiesSocieties = Model.ActivitiesSocieties.ClearBlanks();
 
-                if (editedEducation.AreUniversityorDepartmentCanEditable())
+                if (editedEducation.AreUniNameOrDepartmentCanEditable())
                 {
                     editedEducation.UniversityId = Model.UniversityId;
                     editedEducation.Department = Model.Department.ClearBlanks();
@@ -273,24 +195,18 @@ namespace Okurdostu.Web.Controllers.Api.Me
             }
             else
             {
-                rm.Message = "Böyle bir eğitiminiz yok";
-                rm.InternalMessage = "Education is null";
-                rm.Code = 404;
-                return Error(rm);
+                return Error("Böyle bir eğitiminiz yok", null, null, 404);
             }
-
             try
             {
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
                 {
-                    rm.Message = "Eğitim bilgisi kaydedildi";
-                    return Succes(rm);
+                    return Succes("Eğitim bilgisi kaydedildi", null, 201);
                 }
                 else
                 {
-                    rm.Code = 1001;
-                    return Error(rm);
+                    return Error(null, null, null, 1001);
                 }
             }
             catch (Exception e)

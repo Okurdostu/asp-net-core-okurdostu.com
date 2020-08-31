@@ -43,7 +43,6 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPost("item")]
         public async Task<IActionResult> AddItem(string itemLink, Guid needId)
         {
-            ReturnModel rm = new ReturnModel();
             sbyte maxItemCount = 3;
             var AuthenticatedUserId = Guid.Parse(User.Identity.GetUserId());
 
@@ -62,15 +61,12 @@ namespace Okurdostu.Web.Controllers.Api
                     if (Udemy.Error == null)
                     {
                         await AddNeedItem(Need.Id, Udemy.Link, Udemy.Name, Udemy.Price, "/image/udemy.png", "Udemy").ConfigureAwait(false);
-                        rm.Code = 201;
-                        rm.Data = Udemy;
-                        return Succes(rm);
+                        return Succes(null, Udemy, 201);
                     }
                     else
                     {
                         Logger.LogError("Udemy Error:{error}, Link:{link}", Udemy.Error, itemLink);
-                        rm.Message = Udemy.Error;
-                        return Error(rm);
+                        return Error(Udemy.Error);
                     }
                 }
                 else if (itemLink.Contains("amazon.com.tr"))
@@ -80,15 +76,12 @@ namespace Okurdostu.Web.Controllers.Api
                     if (Amazon.Error == null)
                     {
                         await AddNeedItem(Need.Id, Amazon.Link, Amazon.Name, Amazon.Price, "/image/amazon.png", "Amazon").ConfigureAwait(false);
-                        rm.Code = 201;
-                        rm.Data = Amazon;
-                        return Succes(rm);
+                        return Succes(null, Amazon, 201);
                     }
                     else
                     {
                         Logger.LogError("Amazon Error:{error}, Link:{link}", Amazon.Error, itemLink);
-                        rm.Message = Amazon.Error;
-                        return Error(rm);
+                        return Error(Amazon.Error);
                     }
                 }
                 else if (itemLink.Contains("pandora.com.tr"))
@@ -100,36 +93,22 @@ namespace Okurdostu.Web.Controllers.Api
                         if (Pandora.Error == null)
                         {
                             await AddNeedItem(Need.Id, Pandora.Link, Pandora.Name, Pandora.Price, Pandora.Picture, "Pandora").ConfigureAwait(false);
-                            rm.Code = 201;
-                            rm.Data = Pandora;
-                            return Succes(rm);
+                            return Succes(null, Pandora, 201);
                         }
                         else
                         {
                             Logger.LogError("Pandora Error:{error}, Link:{link}", Pandora.Error, itemLink);
-                            rm.Message = Pandora.Error;
-                            return Error(rm);
+                            return Error(Pandora.Error);
                         }
                     }
-                    else
-                    {
-                        rm.Message = "Pandora.com.tr'den sadece kitap seçebilirsiniz";
-                        return Error(rm);
-                    }
+                    
+                    return Error("Pandora.com.tr'den sadece kitap seçebilirsiniz");
                 }
-                else
-                {
-                    rm.Message = "İhtiyaç duyduğunuz ürünü seçerken desteklenen platformları kullanın";
-                    return Error(rm);
-                }
+                
+                return Error("İhtiyaç duyduğunuz ürünü seçerken desteklenen platformları kullanın");
             }
-            else
-            {
-                rm.Code = 404;
-                rm.Message = "Kampanyanıza ulaşamadık, tekrar deneyin";
-                rm.InternalMessage = "There is no campaign to add a new item";
-                return Error(rm);
-            }
+            
+            return Error("Kampanyanıza ulaşamadık, tekrar deneyin", "There is no campaign to add new item" ,null, 404);
         }
     }
 }

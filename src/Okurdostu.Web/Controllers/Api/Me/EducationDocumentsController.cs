@@ -32,12 +32,10 @@ namespace Okurdostu.Web.Controllers.Api.Me
         [HttpPost("")] //api/me/educationdocuments
         public async Task<IActionResult> Post(Guid Id, IFormFile File)
         {
-            ReturnModel rm = new ReturnModel();
             var UploadingStatus = LocalStorage.UploadEducationDocument(File, Environment.WebRootPath);
             if (!UploadingStatus.Succes)
             {
-                rm.Message = UploadingStatus.Message;
-                return Error(rm);
+                return Error(UploadingStatus.Message);
             }
 
             var AuthenticatedUserId = Guid.Parse(User.Identity.GetUserId());
@@ -60,25 +58,19 @@ namespace Okurdostu.Web.Controllers.Api.Me
                 Education.IsSentToConfirmation = true;
                 await Context.AddAsync(EducationDocument);
                 var result = await Context.SaveChangesAsync();
-
                 if (result > 0)
                 {
-                    rm.Code = 201;
-                    rm.Message = "Eğitim dökümanınız yollandı";
                     TempData["ProfileMessage"] = "Eğitim dökümanınız yollandı, en geç 48 saat içinde geri dönüş yapılacak";
-                    return Succes(rm);
+                    return Succes("Eğitim dökümanınız yollandı", null, 201);
                 }
                 else
                 {
                     LocalStorage.DeleteIfExists(EducationDocument.FullPath);
-                    rm.Code = 1001;
-                    return Error(rm);
+                    return Error(null, null, null, 1001);
                 }
             }
 
-            rm.Message = "Eğitim bilgisine ulaşılamadı";
-            rm.Code = 404;
-            return Error(rm);
+            return Error("Eğitim bilgisine ulaşılamadı", null, null, 404);
         }
     }
 }

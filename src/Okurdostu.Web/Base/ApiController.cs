@@ -9,22 +9,34 @@ namespace Okurdostu.Web.Base
     {
         public User AuthenticatedUser;
 
-        public ActionResult Succes(ReturnModel rm)
+        public ActionResult Succes(string message = null, object data = null, int code = 200)
         {
-            rm.Succes = true;
-
+            var rm = new ReturnModel
+            {
+                Code = code,
+                Data = data,
+                InternalMessage = null,
+                Message = message,
+                Succes = true
+            };
             if (rm.Code == 201)
             {
                 return CreatedAtAction(null, rm);
             }
 
-            rm.Code = 200;
             return Ok(rm);
         }
 
-        public ActionResult Error(ReturnModel rm)
+        public ActionResult Error(string message = null, string internalMessage = null, object data = null, int code = 400)
         {
-            rm.Succes = false;
+            var rm = new ReturnModel
+            {
+                Code = code,
+                Data = data,
+                InternalMessage = internalMessage,
+                Message = message,
+                Succes = false
+            };
 
             if (rm.Code == 500)
             {
@@ -34,7 +46,6 @@ namespace Okurdostu.Web.Base
             {
                 return NotFound(rm);
             }
-
             if (rm.Code == 1001)
             {
                 rm.Message = "Hiç bir değişiklik yapılmadı";
@@ -42,7 +53,6 @@ namespace Okurdostu.Web.Base
                 return BadRequest(rm);
             }
 
-            rm.Code = 400;
             return BadRequest(rm);
         }
     }

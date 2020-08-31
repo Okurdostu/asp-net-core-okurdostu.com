@@ -51,12 +51,10 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPatch("username")]
         public async Task<IActionResult> Username(UsernameModel model)
         {
-            ReturnModel rm = new ReturnModel();
 
             if (!ModelState.IsValid)
             {
-                rm.Message = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage;
-                return Error(rm);
+                return Error(ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage);
             }
             AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
 
@@ -73,37 +71,29 @@ namespace Okurdostu.Web.Controllers.Api
                             AuthenticatedUser.LastChangedOn = DateTime.Now;
                             await Context.SaveChangesAsync();
                             await SignInWithCookie(AuthenticatedUser).ConfigureAwait(false);
-                            rm.Data = AuthenticatedUser.Username;
-                            rm.Message = "Yeni kullanıcı adınız: " + AuthenticatedUser.Username;
-                            return Succes(rm);
+                            return Succes("Yeni kullanıcı adınız: " + AuthenticatedUser.Username, AuthenticatedUser.Username, 201);
                         }
                         catch (Exception e)
                         {
                             if (e.InnerException.Message.Contains("Unique_Key_Username"))
                             {
-                                rm.Message = "Bu kullanıcı adını: " + AuthenticatedUser.Username + " kullanamazsınız";
+                                return Error("Bu kullanıcı adını: " + AuthenticatedUser.Username + " kullanamazsınız");
                             }
-                            else
-                            {
-                                rm.Message = "Başaramadık, ne olduğunu bilmiyoruz";
-                            }
-                            return Error(rm);
+
+                            return Error("Başaramadık, ne olduğunu bilmiyoruz");
                         }
                     }
 
-                    rm.Message = "Aynı değeri girdiniz";
-                    return Error(rm);
+                    return Error("Aynı değeri girdiniz");
                 }
                 else
                 {
-                    rm.Message = "Bu kullanıcı adını: " + model.Username + " kullanamazsınız";
-                    return Error(rm);
+                    return Error("Bu kullanıcı adını: " + model.Username + " kullanamazsınız");
                 }
             }
             else
             {
-                rm.Message = "Kimliğinizi doğrulayamadık: Onay parolası";
-                return Error(rm);
+                return Error("Kimliğinizi doğrulayamadık: Onay parolası");
             }
         }
 
@@ -125,12 +115,10 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPatch("password")]
         public async Task<IActionResult> Password(PasswordModel model)
         {
-            ReturnModel rm = new ReturnModel();
 
             if (!ModelState.IsValid)
             {
-                rm.Message = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage;
-                return Error(rm);
+                return Error(ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage);
             }
 
             AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
@@ -145,13 +133,11 @@ namespace Okurdostu.Web.Controllers.Api
                     await Context.SaveChangesAsync();
                 }
 
-                rm.Message = "Parolanız değiştirildi";
-                return Succes(rm);
+                return Succes("Parolanız değiştirildi",null, 201);
             }
             else
             {
-                rm.Message = "Kimliğinizi doğrulayamadık: Onay parolası";
-                return Error(rm);
+                return Error("Kimliğinizi doğrulayamadık: Onay parolası");
             }
         }
 
@@ -176,12 +162,9 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPatch("contact")]
         public async Task<IActionResult> Contact(ContactModel model)
         {
-            ReturnModel rm = new ReturnModel();
-
             if (!ModelState.IsValid)
             {
-                rm.Message = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage;
-                return Error(rm);
+                return Error(ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage);
             }
 
             AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
@@ -204,16 +187,11 @@ namespace Okurdostu.Web.Controllers.Api
                 }
 
                 await Context.SaveChangesAsync();
-                rm.Message = "İletişim bilgileriniz kaydedildi";
-                return Succes(rm);
+                return Succes("İletişim bilgileriniz kaydedildi", null, 201);
 
             }
-            else
-            {
-                rm.Message = "Aynı içeriklerle değişiklik yapamazsınız";
-                return Error(rm);
-            }
-
+            
+            return Error("Aynı içeriklerle değişiklik yapamazsınız");
         }
 
         public class ProfileModel
@@ -226,7 +204,7 @@ namespace Okurdostu.Web.Controllers.Api
             public string FullName { get; set; }
 
             [Display(Name = "Hakkında")]
-            [MaxLength(124, ErrorMessage = "Lütfen en fazla 124 karakter giriniz.")]
+            [MaxLength(120, ErrorMessage = "Lütfen en fazla 120 karakter giriniz.")]
             [DataType(DataType.MultilineText)]
             public string Biography { get; set; }
         }
@@ -234,12 +212,9 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPatch("profile")]
         public async Task<IActionResult> Profile(ProfileModel model) //editing, adding bio and fullname
         {
-            ReturnModel rm = new ReturnModel();
-
             if (!ModelState.IsValid)
             {
-                rm.Message = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage;
-                return Error(rm);
+                return Error(ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage);
             }
 
             AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
@@ -250,7 +225,7 @@ namespace Okurdostu.Web.Controllers.Api
                     AuthenticatedUser.Biography = model.Biography;
                     AuthenticatedUser.LastChangedOn = DateTime.Now;
                 }
-                if (AuthenticatedUser.Biography != model.FullName)
+                if (AuthenticatedUser.FullName != model.FullName)
                 {
                     AuthenticatedUser.FullName = model.FullName;
                     AuthenticatedUser.LastChangedOn = DateTime.Now;
@@ -259,26 +234,21 @@ namespace Okurdostu.Web.Controllers.Api
                 var result = await Context.SaveChangesAsync();
                 if (result > 0)
                 {
-                    rm.Message = "Profil bilgileriniz kaydedildi";
-                    return Succes(rm);
+                    return Succes("Profil bilgileriniz kaydedildi", null, 201);
                 }
             }
 
-            rm.Code = 1001;
-            return Error(rm);
+            return Error(null, null, null, 1001);
         }
 
         [HttpPatch("photo")]
         public async Task<IActionResult> Photo(IFormFile File)
         {
-            ReturnModel rm = new ReturnModel();
-
             var UploadingStatus = LocalStorage.UploadProfilePhoto(File, Environment.WebRootPath);
 
             if (!UploadingStatus.Succes)
             {
-                rm.Message = UploadingStatus.Message;
-                return Error(rm);
+                return Error(UploadingStatus.Message);
             }
 
             AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync().ConfigureAwait(false);
@@ -296,22 +266,18 @@ namespace Okurdostu.Web.Controllers.Api
                     LocalStorage.DeleteIfExists(Environment.WebRootPath + oldPhotoPath);
                 }
 
-                rm.Data = new { photo = UploadingStatus.UploadedPathAfterRoot };
-                return Succes(rm);
+                return Succes(null, new { photo = UploadingStatus.UploadedPathAfterRoot }, 201);
             }
             else
             {
                 LocalStorage.DeleteIfExists(Environment.WebRootPath + UploadingStatus.UploadedPathAfterRoot);
-                rm.Code = 1001;
-                return Error(rm);
+                return Error(null, null, null, 1001);
             }
         }
 
         [HttpPatch("photo/remove")]
         public async Task<IActionResult> RemovePhoto()
         {
-            ReturnModel rm = new ReturnModel();
-
             if (User.Identity.GetPhoto() != null)
             {
                 AuthenticatedUser = await GetAuthenticatedUserFromDatabaseAsync();
@@ -325,10 +291,10 @@ namespace Okurdostu.Web.Controllers.Api
                 await SignInWithCookie(AuthenticatedUser);
 
                 LocalStorage.DeleteIfExists(Environment.WebRootPath + OldPhoto);
-                return Succes(rm);
+                return Succes(null, null, 201);
             }
 
-            return Error(rm);
+            return Error();
         }
 
         public class BirthdateModel
@@ -346,11 +312,9 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPatch("birthdate")]
         public async Task<IActionResult> Birthdate(BirthdateModel model)
         {
-            ReturnModel rm = new ReturnModel();
             if (!ModelState.IsValid)
             {
-                rm.Message = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage;
-                return Error(rm);
+                return Error(ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage);
             }
 
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
@@ -360,14 +324,10 @@ namespace Okurdostu.Web.Controllers.Api
             var result = await Context.SaveChangesAsync();
             if (result > 0)
             {
-                rm.Message = "Başarılı";
-                return Succes(rm);
+                return Succes("Başarılı", null, 201);
             }
-            else
-            {
-                rm.Code = 1001;
-                return Error(rm);
-            }
+            
+            return Error(null, null, null, 1001);
         }
     }
 }

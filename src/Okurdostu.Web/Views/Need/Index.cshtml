@@ -97,11 +97,11 @@ else
 {
     if (isRequestComingFromUniversityPage)
     {
-        <div class="justify-content-center text-center pt-2"><p class="text-black-50 font-weight-bold mb-0" style="">@ViewBag.tagUniversityName öğrencilerine ait hiç ihtiyaç bulunamadı.</p></div>
+        <div class="justify-content-center text-center pt-2"><p class="text-black-50 font-weight-bold mb-0">@ViewBag.tagUniversityName öğrencilerine ait hiç ihtiyaç bulunamadı.</p></div>
     }
     else
     {
-        <div class="justify-content-center text-center pt-2"><p class="text-black-50 font-weight-bold mb-0" style="">@ViewBag.Tag@ViewBag.tagUniversityName aramasıyla ilgili <br /> hiç ihtiyaç bulunamadı.</p> <a href="/ihtiyaclar" class="font-weight-bold od" style="font-size:15px;">İhtiyaçlara geri dön</a> </div>
+        <div class="justify-content-center text-center pt-2"><p class="text-black-50 font-weight-bold mb-0">@ViewBag.Tag@ViewBag.tagUniversityName aramasıyla ilgili <br /> hiç ihtiyaç bulunamadı.</p> <a href="/ihtiyaclar" class="font-weight-bold od" style="font-size:15px;">İhtiyaçlara geri dön</a> </div>
     }
 }
 @if (!isRequestComingFromUniversityPage)

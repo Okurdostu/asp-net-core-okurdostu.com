@@ -24,29 +24,23 @@ namespace Okurdostu.Web.Controllers.Api.Me
         [HttpGet("{selectedPage}")]
         public async Task<IActionResult> GetComments([FromRoute] int selectedPage)
         {
-            ReturnModel rm = new ReturnModel();
             if (selectedPage <= 0)
             {
-                rm.InternalMessage = "Page number is required";
-                return Error(rm);
+                return Error(null, "Page number is required");
             }
             else
             {
                 var TotalRecord = await Context.NeedComment.Where(x => x.UserId == Guid.Parse(User.Identity.GetUserId())).CountAsync();
                 if (TotalRecord == 0)
                 {
-                    rm.Message = "You have no comment";
-                    rm.Code = 404;
-                    return Error(rm);
+                    return Error(null, "You have no comment", null, 404);
                 }
 
                 var TotalPage = CalculateTotalPage(TotalRecord);
 
                 if (selectedPage > TotalPage)
                 {
-                    rm.InternalMessage = "There's no page more than: " + TotalPage;
-                    rm.Code = 404;
-                    return Error(rm);
+                    return Error(null, "There's no page more than: " + TotalPage, null, 404);
                 }
 
                 var Comments = Context.NeedComment
@@ -63,7 +57,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
                     .SkipLast(MaxRecordPerPage * (selectedPage - 1))
                     .TakeLast(MaxRecordPerPage).ToList();
 
-                rm.Data = new
+                var data = new
                 {
                     TotalRecord,
                     TotalPage,
@@ -72,7 +66,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
                     Comments
                 };
 
-                return Succes(rm);
+                return Succes(null, data);
             }
         }
     }
