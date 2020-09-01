@@ -3,9 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Okurdostu.Data;
 using Okurdostu.Web.Base;
+using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 using Okurdostu.Web.Models.NeedItem;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -109,6 +111,112 @@ namespace Okurdostu.Web.Controllers.Api
             }
             
             return Error("Kampanyanıza ulaşamadık, tekrar deneyin", "There is no campaign to add new item" ,null, 404);
+        }
+        public class TitleModel
+        {
+            [Required]
+            public Guid Id{get;set;}
+
+            [Required(ErrorMessage = "Bir başlık yazmalısın")]
+            [MaxLength(75, ErrorMessage = "Başlık en fazla 75 karakter olmalı")]
+            [RegularExpression(@"[a-zA-ZğüşıöçĞÜŞİÖÇ\s,?!]+", ErrorMessage = "A'dan Z'ye harfler, boşluk, virgül, soru işareti ve ünlem girişi yapabilirsiniz")]
+            public string Title { get; set; }
+        }
+        [HttpPatch("Title")]
+        public async Task<IActionResult> Title(TitleModel model)
+        {
+            if(!ModelState.IsValid)
+            {
+                return Error(ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage);
+            }
+
+            var Need = await Context.Need.Include(need => need.User).FirstOrDefaultAsync(x => 
+            x.Id == model.Id 
+            && !x.IsRemoved 
+            && x.UserId == Guid.Parse(User.Identity.GetUserId()));
+
+            if (Need != null)
+            {
+                if (Need.Stage == 1)
+                {
+                    if (model.Title != Need.Title)
+                    {
+                        var oldTitle = Need.Title;
+                        var oldFriendlyTitle = Need.FriendlyTitle;
+                        model.Title = model.Title.ClearBlanks();
+                        model.Title = model.Title.ToLower().UppercaseFirstCharacters();
+
+                        Need.Title = model.Title;
+                        Need.FriendlyTitle = Need.Title.FriendlyUrl();
+                        try
+                        {
+                            await Context.SaveChangesAsync();
+
+                            return Succes("Düzenlendi", new { Need.Link }, 201);
+                        }
+                        catch (Exception e)
+                        {
+                            string innerMessage = (e.InnerException != null) ? e.InnerException.Message : "";
+
+                            if (innerMessage.Contains("Unique_Key_Title") || innerMessage.Contains("Unique_Key_FriendlyTitle"))
+                            {
+                                return Error("Bu başlığı kullanamazsınız");
+                            }
+
+                            return Error("Başaramadık, ne olduğunu bilmiyoruz");
+                        }
+                    }
+                    
+                    return Error("Hiç bir değişiklik yapılmadı");
+                }
+
+                return Error("Bu kampanyada değişiklik yapamazsın", "Stage must be 1");
+            }
+            
+            return Error("Kampanya yok", null, null, 404);
+        }
+
+        public class DescriptionModel
+        {
+            [Required]
+            public Guid Id{ get; set; }
+
+            [Required(ErrorMessage = "Bir açıklama yazmalısınız")]
+            [MinLength(100, ErrorMessage = "Açıklama en az 100 karakter olmalı")]
+            [MaxLength(10000, ErrorMessage = "Açıklama en fazla 10 bin karakter olmalı")]
+            [DataType(DataType.MultilineText)]
+            public string Description { get; set; }
+        }
+        [HttpPatch("Description")]
+        public async Task<IActionResult> Description(DescriptionModel model)
+        {
+            if(!ModelState.IsValid)
+            {
+                return Error(ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage);
+            }
+
+            var Need = await Context.Need.FirstOrDefaultAsync(x => 
+            x.Id == model.Id 
+            && !x.IsRemoved 
+            && x.UserId == Guid.Parse(User.Identity.GetUserId()));
+
+            if (Need != null)
+            {
+                if (Need.Stage < 4)
+                {
+                    if (Need.Description != model.Description)
+                    {
+                        Need.Description = model.Description;
+                        await Context.SaveChangesAsync();
+                        var description = Need.Description.ReplaceRandNsToBR();
+                        
+                        return Succes("Düzenlendi", new{ description }, 201);
+                    }
+                    return Error("Hiç bir değişiklik yapılmadı");
+                }
+                return Error("Bu kampanyada değişiklik yapamazsın", "Stage must be lower than 4");
+            }
+            return Error("Kampanya yok", null, null, 404);
         }
     }
 }

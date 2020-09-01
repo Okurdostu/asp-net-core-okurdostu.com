@@ -10,24 +10,14 @@ namespace Okurdostu.Web.ViewComponents
     [ViewComponent(Name = "EditNeedTitle")]
     public class EditNeedTitleViewComponent : ViewComponent
     {
-
-        private readonly OkurdostuContext Context;
-        public EditNeedTitleViewComponent(OkurdostuContext _context) => Context = _context;
-        public async Task<IViewComponentResult> InvokeAsync(Guid Id)
+        public IViewComponentResult Invoke(string Title)
         {
-            var Need = await Context.Need.FirstOrDefaultAsync(x => x.Id == Id);
-            
-            if (Need != null)
+            var titleModel = new Controllers.Api.NeedsController.TitleModel
             {
-                var NeedModel = new NeedModel
-                {
-                    Id = Need.Id,
-                    Title = Need.Title
-                };
-                return View(NeedModel);
-            }
+                Title = Title
+            };
 
-            return null;
+            return View(titleModel);
         }
     }
 }

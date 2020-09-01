@@ -298,7 +298,7 @@ namespace Okurdostu.Web.Controllers
                     catch (Exception e)
                     {
 
-                        if (e.InnerException.Message.Contains("Unique_Key_Title") || e.InnerException.Message.Contains("Unique_Key_FriendlyTitle"))
+                        if (e.InnerException.Message != null && e.InnerException.Message.Contains("Unique_Key_Title") || e.InnerException.Message.Contains("Unique_Key_FriendlyTitle"))
                         {
                             TempData["CreateNeedError"] = "Bu başlığı seçemezsiniz";
                         }
@@ -354,94 +354,6 @@ namespace Okurdostu.Web.Controllers
         }
 
         #endregion
-
-
-        #region editneedtitledescription
-        [Authorize]
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task EditTitle(NeedModel Model)
-        {
-
-            var Need = await Context.Need.FirstOrDefaultAsync(x => x.Id == Model.Id);
-            if (Need != null)
-            {
-
-                AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-                if (AuthUser.Id == Need.UserId)
-                {
-                    if (ModelState.ErrorCount < 2)
-                    {
-                        if (Model.Title != Need.Title)
-                        {
-                            string oldTitle = Need.Title;
-                            string oldFriendlyTitle = Need.FriendlyTitle;
-                            Model.Title = Model.Title.ClearBlanks();
-                            Model.Title = Model.Title.ToLower().UppercaseFirstCharacters();
-
-                            Need.Title = Model.Title;
-                            Need.FriendlyTitle = Need.Title.FriendlyUrl();
-
-                            try
-                            {
-                                await Context.SaveChangesAsync();
-                                TempData["NeedMessage"] = "Başlık düzenlendi";
-                            }
-                            catch (Exception e)
-                            {
-                                if (e.InnerException.Message.Contains("Unique_Key_Title") || e.InnerException.Message.Contains("Unique_Key_FriendlyTitle"))
-                                {
-                                    TempData["NeedMessage"] = "Bu başlığı seçemezsiniz";
-                                }
-                                Need.Title = oldTitle;
-                                Need.FriendlyTitle = oldFriendlyTitle;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        TempData["NeedMessage"] = "Başlık boş olamaz.<br />" +
-                            "En fazla 75 karakter ";
-                    }
-                    Response.Redirect("/" + Need.Link);
-                }
-            }
-        }
-
-
-        [Authorize]
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task EditDescription(NeedModel Model)
-        {
-
-            var Need = await Context.Need.FirstOrDefaultAsync(x => x.Id == Model.Id);
-            if (Need != null)
-            {
-
-                AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-                if (AuthUser.Id == Need.UserId)
-                {
-                    if (ModelState.ErrorCount < 2)
-                    {
-                        if (Need.Description != Model.Description)
-                        {
-                            Need.Description = Model.Description;
-                            await Context.SaveChangesAsync();
-                            TempData["NeedMessage"] = "Açıklama düzenlendi";
-                        }
-                    }
-                    else
-                    {
-                        TempData["NeedMessage"] = "Açıklama boş olamaz.<br />" +
-                            "En az: 100, en fazla 10 bin karakter";
-                    }
-
-                    Response.Redirect("/" + Need.Link);
-                }
-
-            }
-        }
-        #endregion
-
 
         #region view
         [Route("{username}/ihtiyac/{friendlytitle}")]

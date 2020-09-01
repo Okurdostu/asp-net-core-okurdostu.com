@@ -158,7 +158,9 @@
     @if (Model.Biography != null)
     {
         <div style="font-size:15.5px;" class="pl-1">
-            <span class="text-break">@Html.Raw(Model.Biography.Replace("\r\n", "<br />"))</span>
+            <span class="text-break">
+                @Html.Raw(Model.Biography)
+            </span>
         </div>
     }
     @if (Model.BDSecretLevel.HasValue && Model.BDSecretLevel < 2 && Model.BDSecretLevel >= 0)

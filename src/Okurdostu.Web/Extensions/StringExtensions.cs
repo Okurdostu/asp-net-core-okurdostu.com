@@ -194,5 +194,10 @@ namespace Okurdostu.Web.Extensions
             }
             return new string(emailArray);
         }
+
+        public static string ReplaceRandNsToBR(this string text)
+        {
+            return text.Replace("\r\n","<br/>").Replace("\r", "<br/>").Replace("\n", "<br/>");
+        }
     }
 }

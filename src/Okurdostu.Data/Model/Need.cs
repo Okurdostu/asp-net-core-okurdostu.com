@@ -40,18 +40,35 @@ namespace Okurdostu.Data
         public DateTime? FinishedOn { get; set; }
         public DateTime? LastCheckOn { get; set; }
         public bool IsWrong { get; set; }
+       public sbyte Stage
+        {
+            get
+            {
+                if (!IsSentForConfirmation)
+                {
+                    return 1; // yeni oluşturulmuş: onay için yollanmamış
+                }
+                else if (IsSentForConfirmation)
+                {
+                    return 2; // onay için yollanmış
+                }
+                else if (IsConfirmed)
+                {
+                    return 3; // onaylanmış - sergilenen - kampanya için para toplama durumunda olan
+                }
+
+                return 4; // tamamlanmış, para toplaması kapatılmış
+            }
+        }
         public bool ShouldBeCheck
         {
             get
             {
                 System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-
                 var PassedTime = DateTime.Now - LastCheckOn;
-
                 return LastCheckOn == null || PassedTime.Value.TotalMinutes > 60; // en son kontrolunun üzerinden 60 dakika'dan fazla geçtiyse veya o ana kadar hiç kontrol edilmediyse tekrar kontrol edilmeli.
             }
         }
-
         public string Link
         {
             get
@@ -59,9 +76,7 @@ namespace Okurdostu.Data
                 return User.Username + "/ihtiyac/" + FriendlyTitle;
             }
         }
-
         public decimal? CompletedPercentage => 100 - (TotalCharge - TotalCollectedMoney) * 100 / TotalCharge;
-
         public virtual User User { get; set; }
         public virtual ICollection<NeedComment> NeedComment { get; set; }
         public virtual ICollection<NeedItem> NeedItem { get; set; }
