@@ -44,20 +44,11 @@ namespace Okurdostu.Data
         {
             get
             {
-                if (!IsSentForConfirmation)
-                {
-                    return 1; // yeni oluşturulmuş: onay için yollanmamış
-                }
-                else if (IsSentForConfirmation)
-                {
-                    return 2; // onay için yollanmış
-                }
-                else if (IsConfirmed)
-                {
-                    return 3; // onaylanmış - sergilenen - kampanya için para toplama durumunda olan
-                }
+                if(IsCompleted)             return 4; // tamamlanmış, para toplaması kapatılmış
+                if (IsConfirmed)            return 3; // onaylanmış - sergilenen - kampanya için para toplama durumunda olan
+                if (IsSentForConfirmation)  return 2; // onay için yollanmış
 
-                return 4; // tamamlanmış, para toplaması kapatılmış
+                return 1; // yeni oluşturulmuş: onay için yollanmamış
             }
         }
         public bool ShouldBeCheck
@@ -66,7 +57,7 @@ namespace Okurdostu.Data
             {
                 System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
                 var PassedTime = DateTime.Now - LastCheckOn;
-                return LastCheckOn == null || PassedTime.Value.TotalMinutes > 60; // en son kontrolunun üzerinden 60 dakika'dan fazla geçtiyse veya o ana kadar hiç kontrol edilmediyse tekrar kontrol edilmeli.
+                return LastCheckOn == null || PassedTime.Value.TotalMinutes > 60 && Stage > 1 && Stage < 4;
             }
         }
         public string Link

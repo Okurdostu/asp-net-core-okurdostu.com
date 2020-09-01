@@ -20,32 +20,31 @@ namespace Okurdostu.Web.Controllers
         [NonAction]
         public async Task<bool> IsThereAnyProblemtoCreateNeed()
         {
-            var AuthUserAnyActiveEducation = await Context.UserEducation.FirstOrDefaultAsync(x => !x.IsRemoved && x.UserId == AuthUser.Id && x.IsActiveEducation && x.IsConfirmed);
+            var AnyActiveEducation = await Context.UserEducation.AnyAsync(x => !x.IsRemoved && x.UserId == Guid.Parse(User.Identity.GetUserId()) && x.IsActiveEducation && x.IsConfirmed);
 
-            if (AuthUserAnyActiveEducation != null)
+            if (AnyActiveEducation)
             {
                 Need ErrorNeed = null;
-                var UserNotRemovedCompletedNeeds = await Context.Need.Where(x => x.UserId == AuthUser.Id && !x.IsRemoved && !x.IsCompleted).ToListAsync();
-                if (UserNotRemovedCompletedNeeds.Count > 0) //User'in önceden oluşturduğu ve silmediği bir kampanya varsa
+                var notRemovednotCompletedNeeds = await Context.Need.Where(x => x.UserId == Guid.Parse(User.Identity.GetUserId()) && !x.IsRemoved && !x.IsCompleted).ToListAsync();
+                if (notRemovednotCompletedNeeds.Count > 0)
                 {
-
-                    if (UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == false).FirstOrDefault() != null)
+                    var Stage1 = notRemovednotCompletedNeeds.Where(x => x.Stage == 1).FirstOrDefault();
+                    if (Stage1 != null)
                     {
-                        //Onaylama için gönderilmemiş bir kampanya varsa
-                        ErrorNeed = UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == false).FirstOrDefault();
-                        TempData["CreateNeedError"] = "Oluşturduğunuz ama onay için gönderilmemiş bir kampanyanız var <br/> Onu tamamlayıp, onaylanması için gönderin";
+                        ErrorNeed = Stage1;
+                        TempData["CreateNeedError"] = "Oluşturduğunuz ama onay için gönderilmemiş bir kampanyanız var<br/>Onu tamamlayıp, onaylanması için gönderin";
                     }
-                    else if (UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == true).FirstOrDefault() != null)
+                    var Stage2 = notRemovednotCompletedNeeds.Where(x => x.Stage == 2).FirstOrDefault();
+                    if (Stage2 != null)
                     {
-                        //Onaylanmamış fakat onaylanması için gönderilmiş bir kampanya varsa
-                        ErrorNeed = UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == false && x.IsSentForConfirmation == true).FirstOrDefault();
+                        ErrorNeed = Stage2;
                         TempData["CreateNeedError"] = "Onaylanmamış bir kampanyanız var onun onaylanmasını bekleyin";
                     }
-                    else if (UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == true && x.IsCompleted == false).FirstOrDefault() != null)
+                    var Stage3 = notRemovednotCompletedNeeds.Where(x => x.Stage == 3).FirstOrDefault();
+                    if (Stage3 != null)
                     {
-                        //Onaylanmış fakat tamamlanmamış bir kampanya varsa
-                        ErrorNeed = UserNotRemovedCompletedNeeds.Where(x => x.IsConfirmed == true && x.IsCompleted == false).FirstOrDefault();
-                        TempData["CreateNeedError"] = "Hedefine ulaşmamış bir kampanyanız var <br/> Aynı anda iki kampanya sergiletemezsiniz";
+                        ErrorNeed = Stage3;
+                        TempData["CreateNeedError"] = "Hedefine ulaşmamış bir kampanyanız var<br/>Aynı anda iki kampanya sergiletemezsiniz";
                     }
 
                     TempData["CausingErrorNeedLink"] = ErrorNeed.Link;
@@ -68,7 +67,7 @@ namespace Okurdostu.Web.Controllers
         {
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
-            var Need = await Context.Need.Include(need => need.NeedItem).FirstOrDefaultAsync(x => x.Id == needId && !x.IsRemoved && !x.IsCompleted && x.IsSentForConfirmation);
+            var Need = await Context.Need.Include(need => need.NeedItem).FirstOrDefaultAsync(x => x.Id == needId && !x.IsRemoved);
             bool IsPageNeedRefresh = false;
             if (Need != null && Need.ShouldBeCheck)
             {
@@ -146,7 +145,6 @@ namespace Okurdostu.Web.Controllers
             return Json(new { IsPageNeedRefresh });
         }
 
-
         private User AuthUser;
 
         [Route("ihtiyaclar")]
@@ -204,9 +202,8 @@ namespace Okurdostu.Web.Controllers
             }
             return View(NeedDefaultList);
         }
-
-
         #region --
+        
         [Authorize]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task SendToConfirmation(Guid NeedId)
@@ -260,7 +257,6 @@ namespace Okurdostu.Web.Controllers
             }
             return View();
         }
-
 
         [Authorize]
         [HttpPost, ValidateAntiForgeryToken]
@@ -325,34 +321,6 @@ namespace Okurdostu.Web.Controllers
 
             return View();
         }
-        #endregion
-
-
-        #region needitemremoveadd
-        [Authorize]
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task RemoveItem(Guid NeedItemId)
-        {
-            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-
-            var item = await Context.NeedItem.Include(needitem => needitem.Need).FirstOrDefaultAsync(x => x.Id == NeedItemId
-            && !x.Need.IsRemoved
-            && !x.Need.IsSentForConfirmation);
-            // Kampanya(need) onaylanma için yollandıysa bir item silemeyecek: onaylanma için gönderdiyse 
-            //(completed ve confirmed kontrol etmeye gerek yok çünkü onaylandıysa veya bittiyse de isSentForConfirmation hep true kalacak.)
-            if (item != null)
-            {
-                AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-                if (AuthUser.Id == item.Need.UserId) //item(ihtiyaç)'ı silmeye çalıştığı kampanya Authenticated olmuş üzere aitse..
-                {
-                    item.Need.TotalCharge -= item.Price;
-                    Context.Remove(item);
-                    await Context.SaveChangesAsync();
-                    Response.Redirect("/" + item.Need.Link);
-                }
-            }
-        }
-
         #endregion
 
         #region view

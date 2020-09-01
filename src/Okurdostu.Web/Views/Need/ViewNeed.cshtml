@@ -22,14 +22,14 @@
         $.post("/needcheck", { needId: '@Model.Id', __RequestVerificationToken: validatetoken }).done(function (result) { if (result.isPageNeedRefresh == true) { location.reload(); } });
     </script>
 }
-@if (IsAuthenticatedUserEqualModelUser && !Model.IsCompleted)
+@if (IsAuthenticatedUserEqualModelUser && Model.Stage != 4)
 {
     <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
     @if (TempData["NeedMessage"] != null)
     {<div class="alert alert-secondary text-center font-weight-bold" role="alert"> <span>@Html.Raw(TempData["NeedMessage"])</span> </div>}
 }
 
-@if (!Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUserEqualModelUser)
+@if (Model.Stage == 1 && IsAuthenticatedUserEqualModelUser)
 {
     <p class="font-weight-bold text-black-50 text-center">İkinci aşama</p><div class="small"> <p class="font-weight-bold text-black-50"> Merhaba dostum.<br /> İhtiyacınız olan hedefler için para toplamaya çok yakınsınız.<br /> İlk başta şunları bilmelisiniz: </p><p class="font-weight-bold text-black-50"> 1.İhtiyaç kampanyanız için 3 adet hedef belirleyebilirsiniz.<br /> 2.İhtiyaç kampanyanızı başlatmak için en az bir hedef belirlemelisiniz <br /> 3.İhtiyaç kampanyanıza hedef eklemek için biraz aşağıda ki kısmı kullanabilirsiniz <br /> 4.Bu sayfadayken, ihtiyaç kampayanızı (başlık, açıklama) düzenleyip, gözden geçirebilirsiniz. </p><hr /> <div class="text-center"> <button class="btn btn-outline-primary rounded-custom font-weight-bold" href="" data-toggle="modal" data-target="#confirm" style="cursor:pointer;"> <i class="fas fa-approval"></i> Onaylama </button> <span class="font-weight-bold text-black-50"> <br /> İhtiyaç kampanyanızı hazır olduğunu düşünüyorsanız artık her hangi bir hedef eklemek veya çıkarmak gibi bir kararsızlığınız yoksa onay için yollayabilirsiniz. </span> </div></div>
     <hr />
@@ -50,11 +50,11 @@
         </div>
     </div>
 }
-else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUserEqualModelUser)
+else if (Model.Stage == 2 && IsAuthenticatedUserEqualModelUser)
 {
     <h4 class="text-center text-black-50"> Tebrikler ! <br /> Bu kampanyanız onaylanması için yollanmış.<br /> En kısa zamanda sizi hiç tanımadığınız dostlarınız ile bir araya getireceğiz. </h4>
 }
-@if (Model.IsConfirmed || IsAuthenticatedUserEqualModelUser)
+@if (Model.Stage >= 3 || IsAuthenticatedUserEqualModelUser)
 {
     <div class="font-weight-bold">
         <div>
@@ -80,13 +80,13 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
         </div>
         <hr class="mb-1" />
         <div class="row">
-            @if (Model.IsConfirmed == true)
+            @if (Model.Stage >= 3)
             {<div class="col-xl-6 col-lg-6 col-md-6"> @await Component.InvokeAsync("NeedItem", new { need = Model }) </div> }
         else
         { <div class="col-12"> @await Component.InvokeAsync("NeedItem", new { need = Model }) </div>}
             <div class="col pl-xl-0 pl-lg-0 pl-md-0"> @await Component.InvokeAsync("NeedBasic", new { need = Model }) </div>
         </div>
-        @if (Model.IsConfirmed == true)
+        @if (Model.Stage >= 3)
         {
             <hr class="mb-1" /> <div class="text-center"> <div> <h4> Onaylanmış kampanya </h4> <p class="text-black-50 mb-1">Bu kampanyayı oluşturan öğrencinin, eğitim bilgileri e-devlet belgesi ile onaylanmıştır.</p></div></div><hr class="mt-0" />
         }
@@ -206,32 +206,32 @@ else if (Model.IsSentForConfirmation && !Model.IsConfirmed && IsAuthenticatedUse
             </div>
         </div>
 
-        <script type="text/javascript">
-            function LikeRefresh() {
-                $.ajax({
-                    url: "/like/LikeState/@Model.Id",
-                    type: "Get",
-                    contentType: "application/json;",
-                    success: function (bool) {
-                        bool ? $("#Like").html("<h3 class='unlike mb-0 rounded-custom'><i class='fas fa-heart'></i></h3>") : $("#Like").html("<h3 class='like mb-0 rounded-custom'><i class='far fa-heart'></i></h3>");
-                    },
-                }),
-                    $("#LikeCount").load("/like/count/@Model.Id");
-            };
-            LikeRefresh();
-            setInterval(function () { LikeRefresh(); }, 30000);
-            $("#Like").on("click", function () {
-                $.ajax({
-                    type: "POST",
-                    url: "/like",
-                    data: { id: "@Model.Id", username: "@Model.User.Username" },
-                    dataType: "json",
-                    success() { LikeRefresh(); },
-                });
-            });
-        </script>
         @if (Model.Stage > 1)
         {
+            <script type="text/javascript">
+                function LikeRefresh() {
+                    $.ajax({
+                        url: "/like/LikeState/@Model.Id",
+                        type: "Get",
+                        contentType: "application/json;",
+                        success: function (bool) {
+                            bool ? $("#Like").html("<h3 class='unlike mb-0 rounded-custom'><i class='fas fa-heart'></i></h3>") : $("#Like").html("<h3 class='like mb-0 rounded-custom'><i class='far fa-heart'></i></h3>");
+                        },
+                    }),
+                        $("#LikeCount").load("/like/count/@Model.Id");
+                };
+                LikeRefresh();
+                setInterval(function () { LikeRefresh(); }, 30000);
+                $("#Like").on("click", function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "/like",
+                        data: { id: "@Model.Id", username: "@Model.User.Username" },
+                        dataType: "json",
+                        success() { LikeRefresh(); },
+                    });
+                });
+            </script>
             <script src="~/js/need/comment.js"></script>
         }
         <script src="~/js/need/needbase.js"></script>

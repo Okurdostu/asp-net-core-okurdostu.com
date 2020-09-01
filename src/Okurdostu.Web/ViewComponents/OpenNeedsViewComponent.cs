@@ -15,10 +15,8 @@ namespace Okurdostu.Web.ViewComponents
         public OpenNeedsViewComponent(OkurdostuContext _context) => Context = _context;
         public async Task<IViewComponentResult> InvokeAsync(Guid UserId)
         {
-
             var OpenNeedList = await Context.Need.Where(x => !x.IsRemoved && x.IsConfirmed && x.UserId == UserId && !x.IsCompleted).ToListAsync();
             return View(OpenNeedList);
-
         }
 
     }

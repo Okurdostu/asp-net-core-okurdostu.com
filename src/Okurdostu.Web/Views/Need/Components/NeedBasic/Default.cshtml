@@ -3,7 +3,7 @@
 @{
     System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 }
-@if (Model.IsConfirmed == true)
+@if (Model.Stage >= 3)
 {
     <div class="card text-center rounded-custom" style="width:100%;">
         <a href="/@Model.User.Username" class="od" target="_self">

@@ -8,7 +8,7 @@
 <div class="text-center text-black-50">
     <span>İhtiyaç kampanyasının hedefleri</span> <a class="od" href="#" data-target="#question" data-toggle="modal"><i class="fas fa-question-circle"></i></a>
     <hr class="mt-0 mb-1" />
-    @if (Model.IsConfirmed == true)
+    @if (Model.Stage >= 3)
     {
         <div class="modal fade" id="question" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal modal-dialog-centered" role="document">
@@ -46,7 +46,7 @@
                         }
                         @Price &#8378
                     </p>
-                    @if (Model.IsSentForConfirmation != true)
+                    @if (Model.Stage == 1)
                     {
                         <button class="btn btn-outline-danger rounded-custom font-weight-bold p-0 pr-2 pl-2" href="" data-toggle="modal" data-target="#removeitem_@Item.Id" style="cursor:pointer;">
                             <i class="fas fa-trash"></i> Kaldır
@@ -61,14 +61,9 @@
                                         <p>
                                             Kampanyanıza ait kaldırılacak hedef: @Item.Name
                                         </p>
-                                        @using (Html.BeginForm("RemoveItem", "Need", FormMethod.Post))
-                                        {
-
-                                            @Html.Hidden("NeedItemId", Item.Id)
-                                            <button type="submit" class="btn btn-danger btn-block font-weight-bold rounded-custom">
-                                                Kaldır
-                                            </button>
-                                        }
+                                        <button type="submit" class="btn btn-danger btn-block font-weight-bold rounded-custom" onclick="RemoveItem('@Item.Id')">
+                                            Kaldır
+                                        </button>
                                         <hr />
                                         <button type="button" class="btn  btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>
                                     </div>
@@ -79,7 +74,7 @@
                 </div>
             </div>
         }
-        if (UnRemovedItemList.Count != 3 && Model.IsConfirmed != true && Model.IsSentForConfirmation != true)
+        if (UnRemovedItemList.Count != 3 && Model.Stage == 1)
         {
             for (int i = 0; i < 3 - UnRemovedItemList.Count; i++)
             {

@@ -4,14 +4,12 @@ using Microsoft.Extensions.Logging;
 using Okurdostu.Data;
 using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
-using Okurdostu.Web.Models;
 using Okurdostu.Web.Models.NeedItem;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
 namespace Okurdostu.Web.Controllers.Api
 {
     public class NeedsController : SecureApiController
@@ -51,71 +49,106 @@ namespace Okurdostu.Web.Controllers.Api
             var Need = await Context.Need.Where(x => x.Id == needId
             && x.UserId == AuthenticatedUserId
             && !x.IsRemoved
-            && !x.IsSentForConfirmation
             && x.NeedItem.Count() < maxItemCount).FirstOrDefaultAsync();
 
             if (Need != null)
             {
-                if (itemLink.Contains("udemy.com"))
+                if (Need.Stage == 1)
                 {
-                    Udemy Udemy = new Udemy();
-                    Udemy = Udemy.Product(itemLink);
-                    if (Udemy.Error == null)
+                    if (itemLink.Contains("udemy.com"))
                     {
-                        await AddNeedItem(Need.Id, Udemy.Link, Udemy.Name, Udemy.Price, "/image/udemy.png", "Udemy").ConfigureAwait(false);
-                        return Succes(null, Udemy, 201);
-                    }
-                    else
-                    {
-                        Logger.LogError("Udemy Error:{error}, Link:{link}", Udemy.Error, itemLink);
-                        return Error(Udemy.Error);
-                    }
-                }
-                else if (itemLink.Contains("amazon.com.tr"))
-                {
-                    Amazon Amazon = new Amazon();
-                    Amazon = Amazon.Product(itemLink);
-                    if (Amazon.Error == null)
-                    {
-                        await AddNeedItem(Need.Id, Amazon.Link, Amazon.Name, Amazon.Price, "/image/amazon.png", "Amazon").ConfigureAwait(false);
-                        return Succes(null, Amazon, 201);
-                    }
-                    else
-                    {
-                        Logger.LogError("Amazon Error:{error}, Link:{link}", Amazon.Error, itemLink);
-                        return Error(Amazon.Error);
-                    }
-                }
-                else if (itemLink.Contains("pandora.com.tr"))
-                {
-                    if (itemLink.ToLower().Contains("/kitap/"))
-                    {
-                        Pandora Pandora = new Pandora();
-                        Pandora = Pandora.Product(itemLink);
-                        if (Pandora.Error == null)
+                        Udemy Udemy = new Udemy();
+                        Udemy = Udemy.Product(itemLink);
+                        if (Udemy.Error == null)
                         {
-                            await AddNeedItem(Need.Id, Pandora.Link, Pandora.Name, Pandora.Price, Pandora.Picture, "Pandora").ConfigureAwait(false);
-                            return Succes(null, Pandora, 201);
+                            await AddNeedItem(Need.Id, Udemy.Link, Udemy.Name, Udemy.Price, "/image/udemy.png", "Udemy").ConfigureAwait(false);
+                            return Succes(null, Udemy, 201);
                         }
                         else
                         {
-                            Logger.LogError("Pandora Error:{error}, Link:{link}", Pandora.Error, itemLink);
-                            return Error(Pandora.Error);
+                            Logger.LogError("Udemy Error:{error}, Link:{link}", Udemy.Error, itemLink);
+                            return Error(Udemy.Error);
                         }
                     }
-                    
-                    return Error("Pandora.com.tr'den sadece kitap seçebilirsiniz");
+                    else if (itemLink.Contains("amazon.com.tr"))
+                    {
+                        Amazon Amazon = new Amazon();
+                        Amazon = Amazon.Product(itemLink);
+                        if (Amazon.Error == null)
+                        {
+                            await AddNeedItem(Need.Id, Amazon.Link, Amazon.Name, Amazon.Price, "/image/amazon.png", "Amazon").ConfigureAwait(false);
+                            return Succes(null, Amazon, 201);
+                        }
+                        else
+                        {
+                            Logger.LogError("Amazon Error:{error}, Link:{link}", Amazon.Error, itemLink);
+                            return Error(Amazon.Error);
+                        }
+                    }
+                    else if (itemLink.Contains("pandora.com.tr"))
+                    {
+                        if (itemLink.ToLower().Contains("/kitap/"))
+                        {
+                            Pandora Pandora = new Pandora();
+                            Pandora = Pandora.Product(itemLink);
+                            if (Pandora.Error == null)
+                            {
+                                await AddNeedItem(Need.Id, Pandora.Link, Pandora.Name, Pandora.Price, Pandora.Picture, "Pandora").ConfigureAwait(false);
+                                return Succes(null, Pandora, 201);
+                            }
+                            else
+                            {
+                                Logger.LogError("Pandora Error:{error}, Link:{link}", Pandora.Error, itemLink);
+                                return Error(Pandora.Error);
+                            }
+                        }
+                        
+                        return Error("Pandora.com.tr'den sadece kitap seçebilirsiniz");
+                    }
+                
+                    return Error("İhtiyaç duyduğunuz ürünü seçerken desteklenen platformları kullanın");
                 }
                 
-                return Error("İhtiyaç duyduğunuz ürünü seçerken desteklenen platformları kullanın");
+                return Error("Bu kampanyada değişiklik yapamazsın", "Stage must be 1");
             }
             
             return Error("Kampanyanıza ulaşamadık, tekrar deneyin", "There is no campaign to add new item" ,null, 404);
         }
+
+        [HttpPatch("removeitem")]
+        public async Task<IActionResult> RemoveItem(Guid Id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Error();
+            }
+            
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+            var item = await Context.NeedItem.Include(needitem => needitem.Need).FirstOrDefaultAsync(x => 
+                x.Id == Id
+            &&  !x.Need.IsRemoved
+            &&  x.Need.UserId == Guid.Parse(User.Identity.GetUserId()));
+
+            if (item != null)
+            {
+                if(item.Need.Stage == 1)
+                {
+                    item.Need.TotalCharge -= item.Price;
+                    Context.Remove(item);
+                    await Context.SaveChangesAsync();
+                    
+                    return Succes(null, null , 201);
+                }
+
+                return Error("Bu kampanyada değişiklik yapamazsın", "Stage must be 1");
+            }
+            
+            return Error("Kampanya ürünü yok", null, null, 404);
+        }
         public class TitleModel
         {
             [Required]
-            public Guid Id{get;set;}
+            public Guid Id { get; set; }
 
             [Required(ErrorMessage = "Bir başlık yazmalısın")]
             [MaxLength(75, ErrorMessage = "Başlık en fazla 75 karakter olmalı")]
@@ -187,6 +220,7 @@ namespace Okurdostu.Web.Controllers.Api
             [DataType(DataType.MultilineText)]
             public string Description { get; set; }
         }
+
         [HttpPatch("Description")]
         public async Task<IActionResult> Description(DescriptionModel model)
         {

@@ -66,9 +66,15 @@ namespace Okurdostu.Web.Controllers.Api
 
             if (model.NeedId != Guid.Empty && model.NeedId != null) // add new comment
             {
-                var commentedNeed = await Context.Need.AnyAsync(x => x.Id == model.NeedId && !x.IsRemoved && x.IsConfirmed);
-                if (commentedNeed)
+                var commentedNeed = await Context.Need.FirstOrDefaultAsync(x => x.Id == model.NeedId && !x.IsRemoved);
+
+                if (commentedNeed != null)
                 {
+                    if (commentedNeed.Stage != 3)
+                    {
+                        return Error("Burada tartışma başlatılamaz");
+                    }
+
                     var NewComment = new NeedComment
                     {
                         Comment = model.Comment,
@@ -77,28 +83,23 @@ namespace Okurdostu.Web.Controllers.Api
                     };
 
                     await Context.AddAsync(NewComment);
-                    var result = await Context.SaveChangesAsync();
+                    await Context.SaveChangesAsync();
+                    return Succes(null, NewComment.Id, 201);
+                }
 
-                    if (result > 0)
-                    {
-                        return Succes(null, NewComment.Id, 201);
-                    }
-                    else
-                    {
-                        return Error(null, null, null, 1001);
-                    }
-                }
-                else
-                {
-                    return Error("Tartışmanın başlatılacağı kampanya yok veya burada tartışma başlatılamaz",null,null,404);
-                }
+                return Error("Tartışmanın başlatılacağı kampanya yok",null,null,404);
             }
             else  //[reply] add relational comment
             {
-                var repliedComment = await Context.NeedComment.Include(comment => comment.Need).FirstOrDefaultAsync(x => x.Id == model.RelatedCommentId && !x.IsRemoved && !x.Need.IsRemoved && x.Need.IsConfirmed);
+                var repliedComment = await Context.NeedComment.Include(comment => comment.Need).FirstOrDefaultAsync(x => x.Id == model.RelatedCommentId && !x.IsRemoved && !x.Need.IsRemoved);
 
                 if (repliedComment != null)
                 {
+                    if (repliedComment.Need.Stage != 3)
+                    {
+                        return Error("Burada cevap yazılamaz");
+                    }
+
                     var NewReply = new NeedComment
                     {
                         Comment = model.Comment,
@@ -120,7 +121,7 @@ namespace Okurdostu.Web.Controllers.Api
                     }
                 }
 
-                return Error("Cevaplanacak yorum yok, silinmiş veya burada cevap verilemez", null, null, 404);
+                return Error("Cevaplanacak yorum yok", null, null, 404);
             }
         }
 
@@ -165,9 +166,14 @@ namespace Okurdostu.Web.Controllers.Api
                 return Error(ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage);
             }
 
-            var EditedComment = await Context.NeedComment.FirstOrDefaultAsync(x => x.Id == model.Id && !x.IsRemoved && x.UserId == Guid.Parse(User.Identity.GetUserId()));
+            var EditedComment = await Context.NeedComment.Include(comment => comment.Need).FirstOrDefaultAsync(x => x.Id == model.Id && !x.IsRemoved && x.UserId == Guid.Parse(User.Identity.GetUserId()));
             if (EditedComment != null)
             {
+                if(EditedComment.Need.Stage != 3)
+                {
+                    return Error("Burada yorum düzenlenemez");
+                }
+
                 if (EditedComment.Comment != model.Comment)
                 {
                     EditedComment.Comment = model.Comment;
