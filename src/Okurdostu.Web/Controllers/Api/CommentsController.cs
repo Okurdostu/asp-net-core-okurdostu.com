@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Okurdostu.Data;
 using Okurdostu.Web.Base;
+using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Filters;
 using Okurdostu.Web.Models;
 using System;
@@ -55,7 +56,7 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPost("")]
         public async Task<IActionResult> PostAdd(CommentModel model) //doing comment or reply
         {
-            if (model.NeedId == null && model.RelatedCommentId == null || model.NeedId == Guid.Empty && model.RelatedCommentId == null)
+            if (model.NeedId == null && model.RelatedCommentId == null || model.NeedId == Guid.Empty && model.RelatedCommentId == Guid.Empty )
             {
                 return Error("Yorum yapmak istediğiniz kampanyayı veya cevaplamak istedğiniz yorumu kontrol edin");
             }
@@ -77,7 +78,7 @@ namespace Okurdostu.Web.Controllers.Api
 
                     var NewComment = new NeedComment
                     {
-                        Comment = model.Comment,
+                        Comment = model.Comment.RemoveLessGreaterSigns(),
                         NeedId = (Guid)model.NeedId,
                         UserId = Guid.Parse(User.Identity.GetUserId())
                     };
@@ -102,23 +103,15 @@ namespace Okurdostu.Web.Controllers.Api
 
                     var NewReply = new NeedComment
                     {
-                        Comment = model.Comment,
+                        Comment = model.Comment.RemoveLessGreaterSigns(),
                         UserId = Guid.Parse(User.Identity.GetUserId()),
                         NeedId = repliedComment.NeedId,
                         RelatedCommentId = repliedComment.Id
                     };
 
                     await Context.AddAsync(NewReply);
-                    var result = Context.SaveChanges();
-
-                    if (result > 0)
-                    {
-                        return Succes(null, NewReply.Id, 201);
-                    }
-                    else
-                    {
-                        return Error(null, null, null, 1001);
-                    }
+                    await Context.SaveChangesAsync();
+                    return Succes(null, NewReply.Id, 201);
                 }
 
                 return Error("Cevaplanacak yorum yok", null, null, 404);
@@ -166,7 +159,10 @@ namespace Okurdostu.Web.Controllers.Api
                 return Error(ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage);
             }
 
-            var EditedComment = await Context.NeedComment.Include(comment => comment.Need).FirstOrDefaultAsync(x => x.Id == model.Id && !x.IsRemoved && x.UserId == Guid.Parse(User.Identity.GetUserId()));
+            var EditedComment = await Context.NeedComment.Include(comment => comment.Need).FirstOrDefaultAsync(x => 
+            x.Id == model.Id && 
+            !x.IsRemoved && 
+            x.UserId == Guid.Parse(User.Identity.GetUserId()));
             if (EditedComment != null)
             {
                 if(EditedComment.Need.Stage != 3)
@@ -176,7 +172,7 @@ namespace Okurdostu.Web.Controllers.Api
 
                 if (EditedComment.Comment != model.Comment)
                 {
-                    EditedComment.Comment = model.Comment;
+                    EditedComment.Comment = model.Comment.RemoveLessGreaterSigns();
                     await Context.SaveChangesAsync();
                     return Succes("Yorum içeriğiniz düzenlendi");
                 }

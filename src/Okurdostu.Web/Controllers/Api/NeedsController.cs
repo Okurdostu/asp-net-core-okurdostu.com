@@ -162,7 +162,7 @@ namespace Okurdostu.Web.Controllers.Api
             {
                 return Error(ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage);
             }
-
+            
             var Need = await Context.Need.Include(need => need.User).FirstOrDefaultAsync(x => 
             x.Id == model.Id 
             && !x.IsRemoved 
@@ -174,8 +174,6 @@ namespace Okurdostu.Web.Controllers.Api
                 {
                     if (model.Title != Need.Title)
                     {
-                        var oldTitle = Need.Title;
-                        var oldFriendlyTitle = Need.FriendlyTitle;
                         model.Title = model.Title.ClearBlanks();
                         model.Title = model.Title.ToLower().UppercaseFirstCharacters();
 
@@ -228,7 +226,6 @@ namespace Okurdostu.Web.Controllers.Api
             {
                 return Error(ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage);
             }
-
             var Need = await Context.Need.FirstOrDefaultAsync(x => 
             x.Id == model.Id 
             && !x.IsRemoved 
@@ -240,7 +237,7 @@ namespace Okurdostu.Web.Controllers.Api
                 {
                     if (Need.Description != model.Description)
                     {
-                        Need.Description = model.Description;
+                        Need.Description = model.Description.RemoveLessGreaterSigns();
                         await Context.SaveChangesAsync();
                         var description = Need.Description.ReplaceRandNsToBR();
                         

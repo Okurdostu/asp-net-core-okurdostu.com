@@ -172,17 +172,17 @@ namespace Okurdostu.Web.Controllers.Api
             {
                 if (AuthenticatedUser.ContactEmail != model.ContactEmail)
                 {
-                    AuthenticatedUser.ContactEmail = model.ContactEmail;
+                    AuthenticatedUser.ContactEmail = model.ContactEmail.RemoveLessGreaterSigns();
                     AuthenticatedUser.LastChangedOn = DateTime.Now;
                 }
                 if (AuthenticatedUser.Twitter != model.Twitter)
                 {
-                    AuthenticatedUser.Twitter = model.Twitter;
+                    AuthenticatedUser.Twitter = model.Twitter.RemoveLessGreaterSigns();
                     AuthenticatedUser.LastChangedOn = DateTime.Now;
                 }
                 if (AuthenticatedUser.Github != model.Github)
                 {
-                    AuthenticatedUser.Github = model.Github;
+                    AuthenticatedUser.Github = model.Github.RemoveLessGreaterSigns();
                     AuthenticatedUser.LastChangedOn = DateTime.Now;
                 }
 
@@ -222,12 +222,12 @@ namespace Okurdostu.Web.Controllers.Api
             {
                 if (AuthenticatedUser.Biography != model.Biography)
                 {
-                    AuthenticatedUser.Biography = model.Biography;
+                    AuthenticatedUser.Biography = model.Biography.RemoveLessGreaterSigns();
                     AuthenticatedUser.LastChangedOn = DateTime.Now;
                 }
                 if (AuthenticatedUser.FullName != model.FullName)
                 {
-                    AuthenticatedUser.FullName = model.FullName;
+                    AuthenticatedUser.FullName = model.FullName.RemoveLessGreaterSigns();
                     AuthenticatedUser.LastChangedOn = DateTime.Now;
                 }
 

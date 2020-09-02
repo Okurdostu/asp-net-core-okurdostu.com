@@ -199,5 +199,10 @@ namespace Okurdostu.Web.Extensions
         {
             return text.Replace("\r\n","<br/>").Replace("\r", "<br/>").Replace("\n", "<br/>");
         }
+
+        public static string RemoveLessGreaterSigns(this string text)
+        {
+            return text.Replace(">","").Replace("<","");
+        }
     }
 }

@@ -56,19 +56,16 @@ namespace Okurdostu.Web.Controllers.Api.Me
             {
                 UserId = Guid.Parse(AuthenticatedUserId),
                 UniversityId = Model.UniversityId,
-                Department = Model.Department.ClearBlanks(),
-                ActivitiesSocieties = Model.ActivitiesSocieties.ClearBlanks(),
-                StartYear = Model.StartYear.ToString(),
-                EndYear = Model.EndYear.ToString(),
+                Department = Model.Department.ClearBlanks().RemoveLessGreaterSigns(),
+                ActivitiesSocieties = Model.ActivitiesSocieties.ClearBlanks().RemoveLessGreaterSigns(),
+                StartYear = Model.StartYear.ToString().RemoveLessGreaterSigns(),
+                EndYear = Model.EndYear.ToString().RemoveLessGreaterSigns(),
             };
             await Context.AddAsync(NewEducation);
             try
             {
-                var result = await Context.SaveChangesAsync();
-                if (result > 0)
-                    return Succes("Eğitim bilgisi kaydedildi", null, 201);
-                else
-                    return Error(null, null, null, 1001);
+                await Context.SaveChangesAsync();
+                return Succes("Eğitim bilgisi kaydedildi", null, 201);
             }
             catch (Exception e)
             {
@@ -183,14 +180,14 @@ namespace Okurdostu.Web.Controllers.Api.Me
 
             if (editedEducation != null)
             {
-                editedEducation.StartYear = Model.StartYear.ToString();
-                editedEducation.EndYear = Model.EndYear.ToString();
-                editedEducation.ActivitiesSocieties = Model.ActivitiesSocieties.ClearBlanks();
+                editedEducation.StartYear = Model.StartYear.ToString().RemoveLessGreaterSigns();
+                editedEducation.EndYear = Model.EndYear.ToString().RemoveLessGreaterSigns();
+                editedEducation.ActivitiesSocieties = Model.ActivitiesSocieties.ClearBlanks().RemoveLessGreaterSigns();
 
                 if (editedEducation.AreUniNameOrDepartmentCanEditable())
                 {
                     editedEducation.UniversityId = Model.UniversityId;
-                    editedEducation.Department = Model.Department.ClearBlanks();
+                    editedEducation.Department = Model.Department.ClearBlanks().RemoveLessGreaterSigns();
                 }
             }
             else
@@ -199,15 +196,8 @@ namespace Okurdostu.Web.Controllers.Api.Me
             }
             try
             {
-                var result = await Context.SaveChangesAsync();
-                if (result > 0)
-                {
-                    return Succes("Eğitim bilgisi kaydedildi", null, 201);
-                }
-                else
-                {
-                    return Error(null, null, null, 1001);
-                }
+                await Context.SaveChangesAsync();
+                return Succes("Eğitim bilgisi kaydedildi", null, 201);
             }
             catch (Exception e)
             {

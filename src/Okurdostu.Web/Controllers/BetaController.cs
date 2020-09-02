@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Okurdostu.Data;
+using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Models;
 using System.Linq;
 using System.Threading.Tasks;
@@ -35,7 +36,7 @@ namespace Okurdostu.Web.Controllers
             var Feedback = new Feedback
             {
                 Email = Model.Email,
-                Message = Model.Message
+                Message = Model.Message.RemoveLessGreaterSigns()
             };
             await Context.AddAsync(Feedback).ConfigureAwait(false);
             await Context.SaveChangesAsync().ConfigureAwait(false);

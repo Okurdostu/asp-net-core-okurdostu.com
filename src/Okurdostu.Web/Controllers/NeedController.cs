@@ -274,22 +274,17 @@ namespace Okurdostu.Web.Controllers
 
                     var Need = new Need
                     {
-                        Title = Model.Title,
-                        FriendlyTitle = Model.Title.FriendlyUrl(),
-                        Description = Model.Description,
+                        Title = Model.Title.RemoveLessGreaterSigns(),
+                        FriendlyTitle = Model.Title.FriendlyUrl().RemoveLessGreaterSigns(),
+                        Description = Model.Description.RemoveLessGreaterSigns(),
                         UserId = AuthUser.Id,
                     };
 
                     try
                     {
-
                         await Context.Need.AddAsync(Need);
-                        var result = await Context.SaveChangesAsync();
-                        if (result > 0)
-                        {
-                            return Redirect("/" + Need.Link);
-                        }
-
+                        await Context.SaveChangesAsync();
+                        return Redirect("/" + Need.Link);
                     }
                     catch (Exception e)
                     {
