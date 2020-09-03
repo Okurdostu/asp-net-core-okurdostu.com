@@ -39,10 +39,7 @@
                 <div class="modal-body bg-light" style="border-radius: 25px;">
                     <h4 class="text-center text-black-50"> Onaylama </h4> <hr /> <div>
                         <p class="text-black-50 font-weight-bold text-md-left text-center"> Seçtiğiniz başlığa ve hedeflerinize son bir kez göz atıp onay için yollayabilirsiniz. </p>
-                        @using (Html.BeginForm("SendToConfirmation", "Need", FormMethod.Post))
-                        {
-                            @Html.Hidden("NeedId", Model.Id) <button type="submit" class="btn btn-primary btn-block font-weight-bold rounded-custom"> Tamamdır, onay için yolla </button>
-                        }
+                        <button type="submit" class="btn btn-primary btn-block font-weight-bold rounded-custom" onclick="sendToConfirmation('@Model.Id')">Tamamdır, onay için yolla</button>
                         <hr /> <button type="button" class="btn btn-outline-secondary btn-block rounded-custom font-weight-bold" data-dismiss="modal">Vazgeçtim</button>
                     </div>
                 </div>

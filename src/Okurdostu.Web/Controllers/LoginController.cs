@@ -30,7 +30,7 @@ namespace Okurdostu.Web.Controllers
                 return Redirect("/");
             }
 
-            var User = await AuthenticateAsync(Model).ConfigureAwait(false);
+            var User = await AuthenticateAsync(Model);
             if (User != null)
             {
                 await SignInWithCookie(User);
@@ -47,9 +47,7 @@ namespace Okurdostu.Web.Controllers
         public async Task<User> AuthenticateAsync(LoginModel Model)
         {
             var User = await Context.User.Where(x => x.Username == Model.Username || x.Telephone == Model.Username || x.Email == Model.Username).FirstOrDefaultAsync();
-            //modelden username olarak aldığımız input, aslında Username,Telephone veya Email ile eş olabilir bunlardan her hangi birine uyuyorsa User'i seçip
-            //ardından passwordunu kontrol ediyor
-            return User != null && User.Password == Model.Password.SHA512() ? User : null;
+            return User != null && User.PasswordCheck(Model.Password) ? User : null;
         }
     }
 }

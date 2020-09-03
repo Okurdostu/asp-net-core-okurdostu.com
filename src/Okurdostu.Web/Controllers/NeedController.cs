@@ -17,49 +17,6 @@ namespace Okurdostu.Web.Controllers
 {
     public class NeedController : BaseController<NeedController>
     {
-        [NonAction]
-        public async Task<bool> IsThereAnyProblemtoCreateNeed()
-        {
-            var AnyActiveEducation = await Context.UserEducation.AnyAsync(x => !x.IsRemoved && x.UserId == Guid.Parse(User.Identity.GetUserId()) && x.IsActiveEducation && x.IsConfirmed);
-
-            if (AnyActiveEducation)
-            {
-                Need ErrorNeed = null;
-                var notRemovednotCompletedNeeds = await Context.Need.Where(x => x.UserId == Guid.Parse(User.Identity.GetUserId()) && !x.IsRemoved && !x.IsCompleted).ToListAsync();
-                if (notRemovednotCompletedNeeds.Count > 0)
-                {
-                    var Stage1 = notRemovednotCompletedNeeds.Where(x => x.Stage == 1).FirstOrDefault();
-                    if (Stage1 != null)
-                    {
-                        ErrorNeed = Stage1;
-                        TempData["CreateNeedError"] = "Oluşturduğunuz ama onay için gönderilmemiş bir kampanyanız var<br/>Onu tamamlayıp, onaylanması için gönderin";
-                    }
-                    var Stage2 = notRemovednotCompletedNeeds.Where(x => x.Stage == 2).FirstOrDefault();
-                    if (Stage2 != null)
-                    {
-                        ErrorNeed = Stage2;
-                        TempData["CreateNeedError"] = "Onaylanmamış bir kampanyanız var onun onaylanmasını bekleyin";
-                    }
-                    var Stage3 = notRemovednotCompletedNeeds.Where(x => x.Stage == 3).FirstOrDefault();
-                    if (Stage3 != null)
-                    {
-                        ErrorNeed = Stage3;
-                        TempData["CreateNeedError"] = "Hedefine ulaşmamış bir kampanyanız var<br/>Aynı anda iki kampanya sergiletemezsiniz";
-                    }
-
-                    TempData["CausingErrorNeedLink"] = ErrorNeed.Link;
-                    return true;
-                }
-            }
-            else
-            {
-                TempData["CreateNeedError"] = "Active education";
-                return true;
-            }
-
-            return false;
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("needcheck")]
@@ -145,8 +102,6 @@ namespace Okurdostu.Web.Controllers
             return Json(new { IsPageNeedRefresh });
         }
 
-        private User AuthUser;
-
         [Route("ihtiyaclar")]
         [Route("ihtiyaclar/{filtreText}")]
         [Route("ihtiyaclar/{filtreText}/{_}")]
@@ -202,58 +157,59 @@ namespace Okurdostu.Web.Controllers
             }
             return View(NeedDefaultList);
         }
-        #region --
         
-        [Authorize]
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task SendToConfirmation(Guid NeedId)
+        #region --
+        [NonAction]
+        public async Task<bool> IsThereAnyProblemtoCreateNeed()
         {
-            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+            var AnyActiveEducation = await Context.UserEducation.AnyAsync(x => !x.IsRemoved && x.UserId == Guid.Parse(User.Identity.GetUserId()) && x.IsActiveEducation && x.IsConfirmed);
 
-            var Need = await Context.Need.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == NeedId);
-
-            if (Need != null)
+            if (AnyActiveEducation)
             {
-
-                AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-                if (Need.UserId == AuthUser.Id)
+                Need ErrorNeed = null;
+                var notRemovednotCompletedNeeds = await Context.Need.Where(x => x.UserId == Guid.Parse(User.Identity.GetUserId()) && !x.IsRemoved && !x.IsCompleted).ToListAsync();
+                if (notRemovednotCompletedNeeds.Count > 0)
                 {
-                    var UnRemovedItems = await Context.NeedItem.Where(x => x.NeedId == Need.Id && !x.IsRemoved).ToListAsync();
-                    if (UnRemovedItems.Count() > 0 && UnRemovedItems.Count() <= 3)
+                    var Stage1 = notRemovednotCompletedNeeds.Where(x => x.Stage == 1).FirstOrDefault();
+                    if (Stage1 != null)
                     {
-                        decimal TotalCharge = 0;
-
-                        foreach (var item in UnRemovedItems)
-                        {
-                            TotalCharge += item.Price;
-                        }
-
-                        Need.TotalCharge = TotalCharge;
-                        Need.IsSentForConfirmation = true;
-
-                        await Context.SaveChangesAsync();
-
+                        ErrorNeed = Stage1;
+                        TempData["CreateNeedError"] = "Oluşturduğunuz ama onay için gönderilmemiş bir kampanyanız var<br/>Onu tamamlayıp, onaylanması için gönderin";
                     }
-                    else
+                    var Stage2 = notRemovednotCompletedNeeds.Where(x => x.Stage == 2).FirstOrDefault();
+                    if (Stage2 != null)
                     {
-                        TempData["NeedMessage"] = "Kampanyanızı onaya yollamak için en az bir, en fazla üç hedef belirlemelisiniz";
+                        ErrorNeed = Stage2;
+                        TempData["CreateNeedError"] = "Onaylanmamış bir kampanyanız var onun onaylanmasını bekleyin";
+                    }
+                    var Stage3 = notRemovednotCompletedNeeds.Where(x => x.Stage == 3).FirstOrDefault();
+                    if (Stage3 != null)
+                    {
+                        ErrorNeed = Stage3;
+                        TempData["CreateNeedError"] = "Hedefine ulaşmamış bir kampanyanız var<br/>Aynı anda iki kampanya sergiletemezsiniz";
                     }
 
-                    Response.Redirect("/" + Need.Link);
+                    TempData["CausingErrorNeedLink"] = ErrorNeed.Link;
+                    return true;
                 }
             }
+            else
+            {
+                TempData["CreateNeedError"] = "Active education";
+                return true;
+            }
+
+            return false;
         }
 
         [Authorize]
         [Route("ihtiyac-olustur")]
         public async Task<IActionResult> Create()
         {
-            AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
-
             if (await IsThereAnyProblemtoCreateNeed().ConfigureAwait(false) && TempData["CreateNeedError"] != null && TempData["CreateNeedError"].ToString() == "Active education")
             {
                 TempData["ProfileMessage"] = "İhtiyaç kampanyası oluşturmak için onaylanmış bir eğitim bilgisine ihtiyacınız vardır.";
-                return Redirect("/" + AuthUser.Username);
+                return Redirect("/" + User.Identity.GetUsername());
             }
             return View();
         }
@@ -265,7 +221,7 @@ namespace Okurdostu.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                AuthUser = await GetAuthenticatedUserFromDatabaseAsync();
+                
 
                 if (!await IsThereAnyProblemtoCreateNeed().ConfigureAwait(false))
                 {
@@ -277,7 +233,7 @@ namespace Okurdostu.Web.Controllers
                         Title = Model.Title.RemoveLessGreaterSigns(),
                         FriendlyTitle = Model.Title.FriendlyUrl().RemoveLessGreaterSigns(),
                         Description = Model.Description.RemoveLessGreaterSigns(),
-                        UserId = AuthUser.Id,
+                        UserId = Guid.Parse(User.Identity.GetUserId()),
                     };
 
                     try
@@ -305,7 +261,7 @@ namespace Okurdostu.Web.Controllers
                 {
 
                     TempData["ProfileMessage"] = "İhtiyaç kampanyası oluşturmak için onaylanmış bir eğitim bilgisine ihtiyacınız vardır.";
-                    return Redirect("/" + AuthUser.Username);
+                    return Redirect("/" + User.Identity.GetUsername());
 
                 }
             }

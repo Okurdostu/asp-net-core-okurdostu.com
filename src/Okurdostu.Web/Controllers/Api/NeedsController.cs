@@ -19,6 +19,7 @@ namespace Okurdostu.Web.Controllers.Api
         {
             return NotFound();
         }
+        sbyte maxItemCount = 3;
 
         [NonAction]
         public async Task AddNeedItem(Guid needId, string link, string name, double price, string picture, string platformName)
@@ -43,7 +44,6 @@ namespace Okurdostu.Web.Controllers.Api
         [HttpPost("item")]
         public async Task<IActionResult> AddItem(string itemLink, Guid needId)
         {
-            sbyte maxItemCount = 3;
             var AuthenticatedUserId = Guid.Parse(User.Identity.GetUserId());
 
             var Need = await Context.Need.Where(x => x.Id == needId
@@ -248,6 +248,40 @@ namespace Okurdostu.Web.Controllers.Api
                 return Error("Bu kampanyada değişiklik yapamazsın", "Stage must be lower than 4");
             }
             return Error("Kampanya yok", null, null, 404);
+        }
+                
+        [HttpPatch("SendToConfirmation")]
+        public async Task<IActionResult> SendToConfirmation(Guid Id)
+        {
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
+            var Need = await Context.Need.Include(x => x.User).FirstOrDefaultAsync(x => 
+            x.Id == Id && 
+            !x.IsRemoved && 
+            !x.IsSentForConfirmation &&
+            x.UserId == Guid.Parse(User.Identity.GetUserId()));
+
+            if (Need != null)
+            {
+                var Items = await Context.NeedItem.Where(x => x.NeedId == Need.Id && !x.IsRemoved).ToListAsync();
+                if (Items.Count() > 0 && Items.Count() <= maxItemCount)
+                {
+                    decimal TotalCharge = 0;
+                    foreach (var item in Items)
+                    {
+                        TotalCharge += item.Price;
+                    }
+
+                    Need.TotalCharge = TotalCharge;
+                    Need.IsSentForConfirmation = true;
+                    await Context.SaveChangesAsync();
+                    return Succes(null, null, 201);
+                }
+                
+                return Error("Onaya yollamak için en az bir, en fazla üç hedef belirlemelisiniz");
+            }
+            
+            return Error("Kampanyanıza ulaşamadık, tekrar deneyin", null ,null, 404);
         }
     }
 }
