@@ -202,7 +202,7 @@ namespace Okurdostu.Web.Extensions
 
         public static string RemoveLessGreaterSigns(this string text)
         {
-            return text.Replace(">","").Replace("<","");
+            return text != null ? text.Replace(">","").Replace("<","") : null;
         }
     }
 }

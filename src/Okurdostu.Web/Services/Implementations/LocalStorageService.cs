@@ -18,7 +18,7 @@ namespace Okurdostu.Web.Services
     {
         private static readonly string profilePhotoPath = "/image/profile/";
         private static readonly string educationDocumentPath = "/documents/";
-        private static readonly int acceptableFileSize = 1048576;
+        private static readonly int acceptableFileSize = 1048576 * 6;
         private static readonly string[] acceptableFileTypesForDocument = { "application/pdf", "image/png", "image/jpg", "image/jpeg" };
         private static readonly string[] acceptableFileTypesForPhoto = { "image/png", "image/jpg", "image/jpeg" };
 

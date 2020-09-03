@@ -157,7 +157,7 @@ function sendDocument() {
     var formData = new FormData();
     formData.append("File", $('#educationDocument')[0].files[0]);
     formData.append("Id", _educationIdForDocument);
-
+    $("#spinner-div").show();
     $.ajax({
         type: "POST",
         url: "/api/me/educationdocuments/",
@@ -165,6 +165,7 @@ function sendDocument() {
         processData: false,
         contentType: false,
         success: function (result) {
+            setTimeout(function () { $("#spinner-div").hide(); }, 250);
             Toast.fire({
                 icon: "success",
                 html: "<span class=\"font-weight-bold text-black-50 ml-1\">" + result.message + "</span>"
@@ -172,6 +173,7 @@ function sendDocument() {
             setTimeout(function () { location.reload(); }, 2000)
         },
         error: function (result) {
+            setTimeout(function () { $("#spinner-div").hide(); }, 10);
             Toast.fire({
                 icon: "warning",
                 html: "<span class=\"font-weight-bold text-black-50 ml-1 \">" + result.responseJSON.message + "</span>"

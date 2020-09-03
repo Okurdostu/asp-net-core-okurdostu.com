@@ -13,7 +13,7 @@ namespace Okurdostu.Data.ModelConfiguration
                     .HasName("Unique_Key_Title")
                     .IsUnique();
 
-            entity.HasIndex(e => e.Title)
+            entity.HasIndex(e => e.FriendlyTitle)
                     .HasName("Unique_Key_FriendlyTitle")
                     .IsUnique();
 

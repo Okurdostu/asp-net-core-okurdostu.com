@@ -4,7 +4,6 @@ using Okurdostu.Data;
 using Okurdostu.Web.Base;
 using Okurdostu.Web.Extensions;
 using Okurdostu.Web.Filters;
-using Okurdostu.Web.Models;
 using Okurdostu.Web.Services;
 using System;
 using System.Linq;
@@ -127,28 +126,21 @@ namespace Okurdostu.Web.Controllers.Api.Me
                 if (await IsCanRemovable(deletedEducation))
                 {
                     deletedEducation.IsRemoved = true;
-                    var result = await Context.SaveChangesAsync();
+                    await Context.SaveChangesAsync();
 
-                    if (result > 0)
+                    if (deletedEducation.IsSentToConfirmation)
                     {
-                        if (deletedEducation.IsSentToConfirmation)
+                        var educationDocuments = await Context.UserEducationDoc.Where(x => x.UserEducationId == deletedEducation.Id).ToListAsync();
+                        foreach (var item in educationDocuments)
                         {
-                            var educationDocuments = await Context.UserEducationDoc.Where(x => x.UserEducationId == deletedEducation.Id).ToListAsync();
-                            foreach (var item in educationDocuments)
+                            if (LocalStorage.DeleteIfExists(item.FullPath))
                             {
-                                if (LocalStorage.DeleteIfExists(item.FullPath))
-                                {
-                                    Context.Remove(item);
-                                }
+                                Context.Remove(item);
                             }
-                            await Context.SaveChangesAsync();
                         }
-                        return Succes("Eğitim bilgisi kaldırıldı");
+                        await Context.SaveChangesAsync();
                     }
-                    else
-                    {
-                        return Error(null, null, null, 1001);
-                    }
+                    return Succes("Eğitim bilgisi kaldırıldı");
                 }
                 else
                 {
@@ -194,6 +186,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
             {
                 return Error("Böyle bir eğitiminiz yok", null, null, 404);
             }
+            
             try
             {
                 await Context.SaveChangesAsync();
