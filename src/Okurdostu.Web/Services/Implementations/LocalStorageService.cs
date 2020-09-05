@@ -100,7 +100,7 @@ namespace Okurdostu.Web.Services
 
                             if (IsFileTypeAcceptable == false)
                             {
-                                returnStorageStatus.Message = "Sadece fotoğraf veya PDF dökümanı seçebilirsiniz";
+                                returnStorageStatus.Message = "Sadece resim veya PDF dökümanı seçebilirsiniz";
                             }
 
                             break;
@@ -111,7 +111,7 @@ namespace Okurdostu.Web.Services
 
                             if (IsFileTypeAcceptable == false)
                             {
-                                returnStorageStatus.Message = "Sadece fotoğraf seçebilirsiniz";
+                                returnStorageStatus.Message = "Sadece resim seçebilirsiniz";
                             }
 
                             break;

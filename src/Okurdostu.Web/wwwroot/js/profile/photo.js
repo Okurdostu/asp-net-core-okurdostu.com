@@ -4,6 +4,15 @@
 function PhotoSelected() {
     var formData = new FormData();
     formData.append("File", $("#photo-input").prop("files")[0]);
+    var size = formData.getAll("File")[0].size;
+    if(IsSizeAcceptable(size) === false){
+        Toast.fire({
+            icon: "warning",
+            html: "<span class=\"font-weight-bold text-black-50 ml-1 \">Dosya kabul edilebilir" + "(" + mb + "MB) boyutun üstünde</span>"
+        });
+        return;
+    }
+
     $("#photo-input").val("");
     $("#spinner-div").show();
     $.ajax({

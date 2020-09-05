@@ -20,6 +20,7 @@
 }
 @if (IsAuthenticatedUserEqualModelUser)
 {
+    <script src="~/js/filecontrol.js"></script>
     <script src="~/js/popper.min.js"></script>
     <partial name="~/Views/Shared/_ValidationScriptsPartial.cshtml" />
     <partial name="~/Views/Shared/_SweetAlertPartial.cshtml" />
@@ -191,10 +192,37 @@
             }
         </div>
     }
-    <div>
-        @if (IsAuthenticatedUserEqualModelUser)
+    <hr class="mb-1" />
+    @if (IsAuthenticatedUserEqualModelUser)
+    {
+        <div> <a class="btn btn-outline-purple font-weight-bold rounded-custom btn-block" href="/ihtiyac-olustur" style="font-size:16px">İhtiyaç oluştur</a> </div> <hr class="mt-1 mb-1" />
+    }
+    <div class="text-left-md text-lg-left text-xl-left text-center">
+        <h4 class="text-center">İhtiyaç kampanyaları</h4>
+        @if (Model.Need != null && Model.Need.Where(x=> !x.IsRemoved).ToList().Count() > 0)
         {
-            <hr class="mb-1" /> <div>  <a class="btn btn-outline-purple font-weight-bold rounded-custom btn-block" href="/ihtiyac-olustur" style="font-size:16px">İhtiyaç oluştur</a> </div>
+            foreach (var item in Model.Need.Where(x=> !x.IsRemoved).ToList())
+            {
+                <h5 class="m-0">@item.Title</h5>
+                @if(item.Stage == 3)
+                {
+                    <p class="mb-1"> <span class="font-weight-bold od-dark">@item.TotalCollectedMoney?.ToString().NormalizePrice() &#8378 </span> <span class="small text-black-50 font-weight-bold">toplandı, hedef </span> <span class="font-weight-bold od-dark">@item.TotalCharge?.ToString().NormalizePrice() &#8378 </span> </p>
+                }
+                else if(item.Stage == 4)
+                {
+                    <p class="font-weight-bold od mb-1">Tamamlandı !</p>
+                }
+                else
+                {
+                    <p class="font-weight-bold od-dark mb-0 small">Hazırlıyor...</p>
+                }
+                <span onclick="window.location.href='/@item.Link'" class="btn btn-link p-0 font-weight-bold od-dark" style="font-size:12.5px"><i class="fas fa-eye"></i> Kampanyaya gözat</span>
+                <hr class="mt-1 mb-1">
+            }
+        }
+        else
+        {
+            <h6 class="text-center">İhtiyaç kampanyası oluşturmamış</h6>
         }
     </div>
 </div>
@@ -202,10 +230,10 @@
 {
     <hr class="mb-1" />
     <div class="row">
-        <div class="col-auto"><h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim</h4></div>
+        <div class="col-auto"><h5 class="text-center text-xl-left text-lg-left text-black-50">Eğitim bilgileri</h5></div>
         <div class="col">
             <div class="float-right">
-                <a class="btn od rounded-custom p-0 font-weight-bold" data-toggle="modal" data-target="#AddEducation" style="cursor: pointer; font-size: 18px;"><i class="fas fa-plus"></i> Eğitim</a>
+                <a class="btn od rounded-custom p-0 font-weight-bold" data-toggle="modal" data-target="#AddEducation" style="cursor: pointer; font-size: 17px;"><i class="fas fa-plus"></i> Eğitim</a>
             </div>
         </div>
         <div class="modal fade" id="AddEducation" tabindex="-1" role="dialog" aria-hidden="true">@await Component.InvokeAsync("AddEducation")</div>
@@ -214,10 +242,10 @@
 else
 {
     <hr class="mb-1" />
-    <h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim</h4>
+    <h4 class="text-center text-xl-left text-lg-left text-black-50">Eğitim bilgileri</h4>
 }
 @if (Model.UserEducation.Where(x => !x.IsRemoved).ToList().Count == 0)
-{<h5 class="text-black-50 text-center">Eğitim bilgisi yok</h5> }
+{ <h5 class="text-black-50 text-center">Eğitim bilgisi yok</h5> }
 else
 {
     @foreach (var item in Model.UserEducation.Where(x => x.IsRemoved != true).ToList().OrderByDescending(x => x.StartYear))
@@ -286,8 +314,8 @@ else
                 <div class="modal-body bg-light" style="border-radius: 25px;">
                     <h3 class="text-black-50 text-center">Döküman yollama</h3>
                     <hr class="mb-1" />
-                    <p class="p-0 font-weight-bold">
-                        açıklama yapılacak
+                    <p class="p-0 font-weight-bold text-black-50 text-center">
+                        Eğitiminize ait e-devlet dökümanını yollamalısınız.
                     </p>
                     <hr class="mb-1 mt-1" />
                     <input id="educationId" name="educationId" hidden="hidden" value="test" />

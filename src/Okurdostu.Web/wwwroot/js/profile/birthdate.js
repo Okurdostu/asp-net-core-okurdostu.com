@@ -89,11 +89,11 @@ birtDateForm.submit(function (e) {
         type: 'PATCH',
         data: { Year: dropdownYear.val(), Month: dropdownMonth.val(), Day: dropdownDay.val(), BDSecretLevel: Privacy.val() },
         success: function (result) {
-            AccountSettingsModal.modal('hide');
             Toast.fire({
                 icon: "success",
                 html: "<span class=\"font-weight-bold text-black-50 ml-1\">" + result.message + "</span>"
             });
+            setInterval(function () { location.reload() }, 1000);
         },
         error: function (result) {
             Toast.fire({
@@ -104,5 +104,3 @@ birtDateForm.submit(function (e) {
     });
 
 });
-
-

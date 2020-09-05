@@ -167,7 +167,7 @@ namespace Okurdostu.Web.Controllers
             if (AnyActiveEducation)
             {
                 Need ErrorNeed = null;
-                var notRemovednotCompletedNeeds = await Context.Need.Where(x => x.UserId == Guid.Parse(User.Identity.GetUserId()) && !x.IsRemoved && !x.IsCompleted).ToListAsync();
+                var notRemovednotCompletedNeeds = await Context.Need.Include(need => need.User).Where(x => x.UserId == Guid.Parse(User.Identity.GetUserId()) && !x.IsRemoved && !x.IsCompleted).ToListAsync();
                 if (notRemovednotCompletedNeeds.Count > 0)
                 {
                     var Stage1 = notRemovednotCompletedNeeds.Where(x => x.Stage == 1).FirstOrDefault();
@@ -221,13 +221,10 @@ namespace Okurdostu.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                
-
                 if (!await IsThereAnyProblemtoCreateNeed().ConfigureAwait(false))
                 {
                     Model.Title = Model.Title.ClearBlanks();
                     Model.Title = Model.Title.ToLower().UppercaseFirstCharacters();
-
                     var Need = new Need
                     {
                         Title = Model.Title.RemoveLessGreaterSigns(),
@@ -235,23 +232,24 @@ namespace Okurdostu.Web.Controllers
                         Description = Model.Description.RemoveLessGreaterSigns(),
                         UserId = Guid.Parse(User.Identity.GetUserId()),
                     };
-
                     try
                     {
                         await Context.Need.AddAsync(Need);
                         await Context.SaveChangesAsync();
+                        Need = await Context.Need.Include(need => need.User).FirstOrDefaultAsync(x=> x.Id == Need.Id);
                         return Redirect("/" + Need.Link);
                     }
                     catch (Exception e)
                     {
+                        string innerMessage = (e.InnerException != null) ? e.InnerException.Message.ToLower() : "";
 
-                        if (e.InnerException.Message != null && e.InnerException.Message.Contains("Unique_Key_Title") || e.InnerException.Message.Contains("Unique_Key_FriendlyTitle"))
+                        if (innerMessage.Contains("Unique_Key_Title") || innerMessage.Contains("Unique_Key_FriendlyTitle"))
                         {
                             TempData["CreateNeedError"] = "Bu başlığı seçemezsiniz";
                         }
                         else
                         {
-                            Logger.LogError("Error create need. Ex.message : {ex.message}, Ex.innermessage: {ex.inner}", e.Message, e.InnerException.Message);
+                            Logger.LogError("Error create need. Ex.message : {ex.message}, Ex.innermessage: {ex.inner}", e?.Message, e?.InnerException?.Message);
                             TempData["CreateNeedError"] = "Başaramadık, ne olduğunu bilmiyoruz";
                         }
 

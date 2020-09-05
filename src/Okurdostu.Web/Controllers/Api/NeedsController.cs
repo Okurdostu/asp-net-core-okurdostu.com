@@ -19,7 +19,7 @@ namespace Okurdostu.Web.Controllers.Api
         {
             return NotFound();
         }
-        sbyte maxItemCount = 3;
+        readonly sbyte maxItemCount = 3;
 
         [NonAction]
         public async Task AddNeedItem(Guid needId, string link, string name, double price, string picture, string platformName)
@@ -266,13 +266,7 @@ namespace Okurdostu.Web.Controllers.Api
                 var Items = await Context.NeedItem.Where(x => x.NeedId == Need.Id && !x.IsRemoved).ToListAsync();
                 if (Items.Count() > 0 && Items.Count() <= maxItemCount)
                 {
-                    decimal TotalCharge = 0;
-                    foreach (var item in Items)
-                    {
-                        TotalCharge += item.Price;
-                    }
-
-                    Need.TotalCharge = TotalCharge;
+                    Need.TotalCharge = Items.Sum(x=> x.Price);
                     Need.IsSentForConfirmation = true;
                     await Context.SaveChangesAsync();
                     return Succes(null, null, 201);

@@ -13,7 +13,8 @@ namespace Okurdostu.Web.Controllers
             {
                 var _User = await Context.User.
                     Include(user => user.UserEducation).
-                    ThenInclude(x => x.University).
+                        ThenInclude(user => user.University).
+                    Include(user => user.Need).
                     FirstOrDefaultAsync(x => x.Username == username && x.IsActive);
 
                 if (_User != null)

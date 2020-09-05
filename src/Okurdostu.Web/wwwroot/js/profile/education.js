@@ -157,6 +157,15 @@ function sendDocument() {
     var formData = new FormData();
     formData.append("File", $('#educationDocument')[0].files[0]);
     formData.append("Id", _educationIdForDocument);
+    var size = formData.getAll("File")[0].size;
+    if(IsSizeAcceptable(size) === false){
+        Toast.fire({
+            icon: "warning",
+            html: "<span class=\"font-weight-bold text-black-50 ml-1 \">Dosya kabul edilebilir" + "(" + mb + "MB) boyutun üstünde</span>"
+        });
+        return;
+    }
+
     $("#spinner-div").show();
     $.ajax({
         type: "POST",
