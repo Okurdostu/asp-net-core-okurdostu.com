@@ -28,14 +28,14 @@ namespace Okurdostu.Web.Controllers
             bool IsPageNeedRefresh = false;
             if (Need != null && Need.ShouldBeCheck)
             {
-                Need.IsWrong = false; //need önceden hatalı olarak işaretlenmiş olabilir her ihtimale karşı hatasının gitmiş olabileceğini var sayarak, 
+                Need.IsWrong = false; //need önceden hatalı olarak işaretlenmiş olabilir her ihtimale karşı hatasının gitmiş olabileceğini var sayarak,
                                       //false'lıyoruz eğer ki hala hatalıysa zaten tekrar hatalı olarak işaretlenecektir.
                 var NeedItems = Need.NeedItem.Where(x => !x.IsRemoved).ToList();
 
                 decimal TotalCharge = 0;
                 foreach (var item in NeedItems)
                 {
-                    item.IsWrong = false;   //item önceden hatalı olarak işaretlenmiş olabilir her ihtimale karşı hatasının gitmiş olabileceğini var sayarak, 
+                    item.IsWrong = false;   //item önceden hatalı olarak işaretlenmiş olabilir her ihtimale karşı hatasının gitmiş olabileceğini var sayarak,
                                             //false'lıyoruz eğer ki hala hatalıysa zaten tekrar hatalı olarak işaretlenecektir.
                     if (item.PlatformName == "Amazon")
                     {
@@ -157,7 +157,7 @@ namespace Okurdostu.Web.Controllers
             }
             return View(NeedDefaultList);
         }
-        
+
         #region --
         [NonAction]
         public async Task<bool> IsThereAnyProblemtoCreateNeed()
@@ -223,12 +223,11 @@ namespace Okurdostu.Web.Controllers
             {
                 if (!await IsThereAnyProblemtoCreateNeed().ConfigureAwait(false))
                 {
-                    Model.Title = Model.Title.ClearBlanks();
-                    Model.Title = Model.Title.ToLower().UppercaseFirstCharacters();
+                    Model.Title = Model.Title.ClearExtraBlanks().CapitalizeFirstCharOfWords().RemoveLessGreaterSigns();
                     var Need = new Need
                     {
-                        Title = Model.Title.RemoveLessGreaterSigns(),
-                        FriendlyTitle = Model.Title.FriendlyUrl().RemoveLessGreaterSigns(),
+                        Title = Model.Title,
+                        FriendlyTitle = Model.Title.FriendlyUrl(),
                         Description = Model.Description.RemoveLessGreaterSigns(),
                         UserId = Guid.Parse(User.Identity.GetUserId()),
                     };

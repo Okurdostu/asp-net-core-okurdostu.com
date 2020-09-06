@@ -102,16 +102,16 @@ namespace Okurdostu.Web.Controllers.Api
                                 return Error(Pandora.Error);
                             }
                         }
-                        
+
                         return Error("Pandora.com.tr'den sadece kitap seçebilirsiniz");
                     }
-                
+
                     return Error("İhtiyaç duyduğunuz ürünü seçerken desteklenen platformları kullanın");
                 }
-                
+
                 return Error("Bu kampanyada değişiklik yapamazsın", "Stage must be 1");
             }
-            
+
             return Error("Kampanyanıza ulaşamadık, tekrar deneyin", "There is no campaign to add new item" ,null, 404);
         }
 
@@ -122,9 +122,9 @@ namespace Okurdostu.Web.Controllers.Api
             {
                 return Error();
             }
-            
+
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-            var item = await Context.NeedItem.Include(needitem => needitem.Need).FirstOrDefaultAsync(x => 
+            var item = await Context.NeedItem.Include(needitem => needitem.Need).FirstOrDefaultAsync(x =>
                 x.Id == Id
             &&  !x.Need.IsRemoved
             &&  x.Need.UserId == Guid.Parse(User.Identity.GetUserId()));
@@ -136,13 +136,13 @@ namespace Okurdostu.Web.Controllers.Api
                     item.Need.TotalCharge -= item.Price;
                     Context.Remove(item);
                     await Context.SaveChangesAsync();
-                    
+
                     return Succes(null, null , 201);
                 }
 
                 return Error("Bu kampanyada değişiklik yapamazsın", "Stage must be 1");
             }
-            
+
             return Error("Kampanya ürünü yok", null, null, 404);
         }
         public class TitleModel
@@ -162,11 +162,11 @@ namespace Okurdostu.Web.Controllers.Api
             {
                 return Error(ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage);
             }
-            
-            var Need = await Context.Need.Include(need => need.User).FirstOrDefaultAsync(x => 
-            x.Id == model.Id 
-            && !x.IsRemoved 
-            && x.UserId == Guid.Parse(User.Identity.GetUserId()));
+
+            var Need = await Context.Need.Include(need => need.User).FirstOrDefaultAsync(x =>
+            x.Id == model.Id &&
+            !x.IsRemoved &&
+            x.UserId == Guid.Parse(User.Identity.GetUserId()));
 
             if (Need != null)
             {
@@ -174,15 +174,11 @@ namespace Okurdostu.Web.Controllers.Api
                 {
                     if (model.Title != Need.Title)
                     {
-                        model.Title = model.Title.ClearBlanks();
-                        model.Title = model.Title.ToLower().UppercaseFirstCharacters();
-
-                        Need.Title = model.Title;
+                        Need.Title = model.Title.ClearExtraBlanks().CapitalizeFirstCharOfWords().RemoveLessGreaterSigns();
                         Need.FriendlyTitle = Need.Title.FriendlyUrl();
                         try
                         {
                             await Context.SaveChangesAsync();
-
                             return Succes("Düzenlendi", new { Need.Link }, 201);
                         }
                         catch (Exception e)
@@ -197,13 +193,13 @@ namespace Okurdostu.Web.Controllers.Api
                             return Error("Başaramadık, ne olduğunu bilmiyoruz");
                         }
                     }
-                    
+
                     return Error("Hiç bir değişiklik yapılmadı");
                 }
 
                 return Error("Bu kampanyada değişiklik yapamazsın", "Stage must be 1");
             }
-            
+
             return Error("Kampanya yok", null, null, 404);
         }
 
@@ -226,10 +222,10 @@ namespace Okurdostu.Web.Controllers.Api
             {
                 return Error(ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault().ErrorMessage);
             }
-            var Need = await Context.Need.FirstOrDefaultAsync(x => 
-            x.Id == model.Id 
-            && !x.IsRemoved 
-            && x.UserId == Guid.Parse(User.Identity.GetUserId()));
+            var Need = await Context.Need.FirstOrDefaultAsync(x =>
+            x.Id == model.Id &&
+            !x.IsRemoved &&
+            x.UserId == Guid.Parse(User.Identity.GetUserId()));
 
             if (Need != null)
             {
@@ -240,7 +236,7 @@ namespace Okurdostu.Web.Controllers.Api
                         Need.Description = model.Description.RemoveLessGreaterSigns();
                         await Context.SaveChangesAsync();
                         var description = Need.Description.ReplaceRandNsToBR();
-                        
+
                         return Succes("Düzenlendi", new{ description }, 201);
                     }
                     return Error("Hiç bir değişiklik yapılmadı");
@@ -249,15 +245,15 @@ namespace Okurdostu.Web.Controllers.Api
             }
             return Error("Kampanya yok", null, null, 404);
         }
-                
+
         [HttpPatch("SendToConfirmation")]
         public async Task<IActionResult> SendToConfirmation(Guid Id)
         {
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
-            var Need = await Context.Need.Include(x => x.User).FirstOrDefaultAsync(x => 
-            x.Id == Id && 
-            !x.IsRemoved && 
+            var Need = await Context.Need.Include(x => x.User).FirstOrDefaultAsync(x =>
+            x.Id == Id &&
+            !x.IsRemoved &&
             !x.IsSentForConfirmation &&
             x.UserId == Guid.Parse(User.Identity.GetUserId()));
 
@@ -271,10 +267,10 @@ namespace Okurdostu.Web.Controllers.Api
                     await Context.SaveChangesAsync();
                     return Succes(null, null, 201);
                 }
-                
+
                 return Error("Onaya yollamak için en az bir, en fazla üç hedef belirlemelisiniz");
             }
-            
+
             return Error("Kampanyanıza ulaşamadık, tekrar deneyin", null ,null, 404);
         }
     }

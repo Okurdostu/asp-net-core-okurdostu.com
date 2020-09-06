@@ -55,8 +55,8 @@ namespace Okurdostu.Web.Controllers.Api.Me
             {
                 UserId = Guid.Parse(AuthenticatedUserId),
                 UniversityId = Model.UniversityId,
-                Department = Model.Department.ClearBlanks().RemoveLessGreaterSigns(),
-                ActivitiesSocieties = Model.ActivitiesSocieties.ClearBlanks().RemoveLessGreaterSigns(),
+                Department = Model.Department.ClearExtraBlanks().CapitalizeFirstCharOfWords().RemoveLessGreaterSigns(),
+                ActivitiesSocieties = Model.ActivitiesSocieties.ClearExtraBlanks().RemoveLessGreaterSigns(),
                 StartYear = Model.StartYear.ToString().RemoveLessGreaterSigns(),
                 EndYear = Model.EndYear.ToString().RemoveLessGreaterSigns(),
             };
@@ -98,7 +98,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
 
                 return Succes(null, education);
             }
-            
+
             return Error(null, null, null, 404);
         }
         public async Task<bool> IsCanRemovable(UserEducation edu)
@@ -155,7 +155,7 @@ namespace Okurdostu.Web.Controllers.Api.Me
                     return Error("Bu eğitimi silemezsiniz");
                 }
             }
-            
+
             return Error("Böyle bir eğitiminiz yok", null, null, 404);
         }
 
@@ -174,19 +174,19 @@ namespace Okurdostu.Web.Controllers.Api.Me
             {
                 editedEducation.StartYear = Model.StartYear.ToString().RemoveLessGreaterSigns();
                 editedEducation.EndYear = Model.EndYear.ToString().RemoveLessGreaterSigns();
-                editedEducation.ActivitiesSocieties = Model.ActivitiesSocieties.ClearBlanks().RemoveLessGreaterSigns();
+                editedEducation.ActivitiesSocieties = Model.ActivitiesSocieties.ClearExtraBlanks().RemoveLessGreaterSigns();
 
                 if (editedEducation.AreUniNameOrDepartmentCanEditable())
                 {
                     editedEducation.UniversityId = Model.UniversityId;
-                    editedEducation.Department = Model.Department.ClearBlanks().RemoveLessGreaterSigns();
+                    editedEducation.Department = Model.Department.ClearExtraBlanks().CapitalizeFirstCharOfWords().RemoveLessGreaterSigns();
                 }
             }
             else
             {
                 return Error("Böyle bir eğitiminiz yok", null, null, 404);
             }
-            
+
             try
             {
                 await Context.SaveChangesAsync();

@@ -7,6 +7,11 @@ namespace Okurdostu.Web.Extensions
     {
         public static string SHA512(this String str)
         {
+            if(string.IsNullOrEmpty(str))
+            {
+                return str;
+            }
+
             using var hash = System.Security.Cryptography.SHA512.Create();
             var StringBytes = hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(str));
             var StringBuilder = new System.Text.StringBuilder(128);
@@ -17,98 +22,93 @@ namespace Okurdostu.Web.Extensions
             return (StringBuilder.ToString());
         }
 
-        public static string UppercaseFirstCharacters(this String str)
+        public static string CapitalizeFirstCharOfWords(this String str)
         {
-            char[] charArray = str.ToCharArray();
-            if (char.IsLower(charArray[0]))
+            if(string.IsNullOrEmpty(str))
             {
-                charArray[0] = char.ToUpper(charArray[0]);
+                return str;
             }
-            for (int i = 1; i < charArray.Length; i++)
+
+            char[] strArray = str.ToLower().ToCharArray();
+            if (char.IsLower(strArray[0]))
             {
-                if (charArray[i - 1] == ' ' && char.IsLower(charArray[i]))
+                strArray[0] = char.ToUpper(strArray[0]);
+            }
+            for (int i = 1; i < strArray.Length; i++)
+            {
+                if (strArray[i - 1] == ' ' && char.IsLower(strArray[i]))
                 {
-
-                    if (charArray[i] == 'i')
+                    switch (strArray[i])
                     {
-                        charArray[i] = 'İ';
+                        case 'i':
+                            strArray[i] = 'İ';
+                            break;
+                        case 'ı':
+                            strArray[i] = 'I';
+                            break;
+                        case 'ş':
+                            strArray[i] = 'Ş';
+                            break;
+                        case 'ç':
+                            strArray[i] = 'Ç';
+                            break;
+                        case 'ğ':
+                            strArray[i] = 'Ğ';
+                            break;
+                        case 'ü':
+                            strArray[i] = 'Ü';
+                            break;
+                        case 'ö':
+                            strArray[i] = 'Ö';
+                            break;
+                        default:
+                            strArray[i] = char.ToUpper(strArray[i]);
+                            break;
                     }
-                    else if (charArray[i] == 'ı')
-                    {
-                        charArray[i] = 'I';
-                    }
-                    else if (charArray[i] == 'ş')
-                    {
-                        charArray[i] = 'Ş';
-                    }
-                    else if (charArray[i] == 'ç')
-                    {
-                        charArray[i] = 'Ç';
-                    }
-                    else if (charArray[i] == 'ğ')
-                    {
-                        charArray[i] = 'Ğ';
-                    }
-                    else if (charArray[i] == 'ü')
-                    {
-                        charArray[i] = 'Ü';
-                    }
-                    else if (charArray[i] == 'ö')
-                    {
-                        charArray[i] = 'Ö';
-                    }
-                    else
-                    {
-                        charArray[i] = char.ToUpper(charArray[i]);
-                    }
-
                 }
             }
-            return new string(charArray);
+            return new string(strArray);
         }
 
-        public static string ClearBlanks(this String str)
+        public static string ClearExtraBlanks(this String str)
         {
             if (string.IsNullOrEmpty(str))
             {
-                return null;
+                return str;
             }
+
             //example input: "            asd       asd              asd           "
             char[] charArray = str.ToCharArray();
             for (int i = 0; i < charArray.Length - 1; i++)
             {
                 if (charArray[i] == ' ' && charArray[i + 1] == ' ')
                 {
-                    charArray[i] = '_'; // converts spaces to _
+                    charArray[i] = '_'; // converts blanks to _
                 }
             }
 
-            //" asd asd asd "
-            str = new string(charArray).Replace("_", ""); // delete '_' [space] characters
-
-            charArray = str.ToCharArray();
+            //last and first character checks
             if (charArray[0] == ' ')
             {
                 charArray[0] = '_';
             }
-
             if (charArray[^1] == ' ')
             {
                 charArray[^1] = '_';
             }
 
-            //last output: "asd asd asd"
             return new string(charArray).Replace("_", ""); // delete '_' [space] characters and return
         }
 
-        //bora kaşmer
+        //FriendlyUrl author: Bora Kaşmer
         //http://www.borakasmer.com/net-core-mvcde-bir-haber-basligini-urle-koyma/
         public static string FriendlyUrl(this String url)
         {
             if (string.IsNullOrEmpty(url))
             {
-                return "";
+                return url;
             }
+
             url = url.ToLower();
             url = url.Trim();
             if (url.Length > 100)
@@ -153,8 +153,12 @@ namespace Okurdostu.Web.Extensions
 
         public static string NormalizePrice(this String price)
         {
-            //7'ye bir tanım bulamadım.
+            if (string.IsNullOrEmpty(price))
+            {
+                return price;
+            }
 
+            //7'ye bir tanım bulamadım.
             //7;    örnek olarak 1500,00 gibi bir price geldiği zaman
             //      1.500,00 olarak döndürmek için kullanılıyor
             price = price.Replace(".", ",");
@@ -182,6 +186,11 @@ namespace Okurdostu.Web.Extensions
 
         public static string StarsToEmail(this String email)
         {
+            if (string.IsNullOrEmpty(email))
+            {
+                return email;
+            }
+
             //input     halil.i.kocaoz@gmail.com
             //output    ha************@g*****com
             char[] emailArray = email.ToCharArray();
@@ -195,14 +204,11 @@ namespace Okurdostu.Web.Extensions
             return new string(emailArray);
         }
 
-        public static string ReplaceRandNsToBR(this string text)
-        {
-            return text.Replace("\r\n","<br/>").Replace("\r", "<br/>").Replace("\n", "<br/>");
-        }
+        public static string ReplaceRandNsToBR(this String text)  =>
+        !string.IsNullOrEmpty(text) ? text.Replace("\r\n", "<br/>").Replace("\r", "<br/>").Replace("\n", "<br/>") : text;
 
-        public static string RemoveLessGreaterSigns(this string text)
-        {
-            return text != null ? text.Replace(">","").Replace("<","") : null;
-        }
+        public static string RemoveLessGreaterSigns(this String text) =>
+        !string.IsNullOrEmpty(text) ? text.Replace(">", "").Replace("<", "") : text;
+
     }
 }
