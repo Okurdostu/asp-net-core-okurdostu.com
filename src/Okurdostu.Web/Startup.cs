@@ -89,14 +89,14 @@ namespace Okurdostu.Web
                     name: "usernameredirect",
                     pattern: "{username}",
                     constraints: new { user = new UserConstraint() },
-                    defaults: new { controller = "Profile", action = "Index", });
+                    defaults: new { controller = "Profile", action = "Index" });
             });
         }
         public class UserConstraint : IRouteConstraint
         {
             public bool Match(HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection)
             {
-                var ValueFromRoute = values["username"].ToString().ToLower();
+                var ValueFromRoute = values["username"].ToString();
 
                 var Context = (OkurdostuContext)httpContext?.RequestServices.GetService(typeof(OkurdostuContext));
 
@@ -110,7 +110,7 @@ namespace Okurdostu.Web
 
                 if (IsComingValueEqualAnyBlockedRoute)
                 {
-                    return !IsComingValueEqualAnyBlockedRoute;
+                    return false;
                 }
                 else
                 {
@@ -118,7 +118,7 @@ namespace Okurdostu.Web
                     {
                         x.Username
                     }).ToList();
-                    return Usernames.Any(x => x.Username.ToLower() == ValueFromRoute);
+                    return Usernames.Any(x => x.Username == ValueFromRoute);
                 }
             }
         }
