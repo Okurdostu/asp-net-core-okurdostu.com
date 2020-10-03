@@ -40,18 +40,12 @@ namespace Okurdostu.Data
                 {
                     return PassedTime.Hours + " saat önce yazdı";
                 }
-                else if (PassedTime.Days < 1 && PassedTime.Hours < 1)
+                else if (PassedTime.Minutes <= 3)
                 {
-                    if (PassedTime.Minutes == 0)
-                    {
-                        return "Biraz önce yazdı";
-                    }
-                    else
-                    {
-                        return PassedTime.Minutes + " dakika önce yazdı";
-                    }
+                    return "Biraz önce yazdı";
                 }
-                return "";
+
+                return PassedTime.Minutes + " dakika önce yazdı";
             }
         }
         public virtual Need Need { get; set; }

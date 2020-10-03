@@ -22,7 +22,7 @@ descriptionForm.submit(function(e){
     else
     {
         $.ajax({
-            url: "/api/needs/description",
+            url: "/api/me/needs/description",
             type: 'Patch',
             data: { Description: newDescription, Id: Id},
             success: function (result) {
@@ -42,7 +42,7 @@ descriptionForm.submit(function(e){
                 });
             }
         });
-        
+
     }
-    
+
 });

@@ -11,7 +11,7 @@ function getInformation(id){
 function sendToConfirmation(id) {
     $("#spinner-div").show();
     $.ajax({
-        url: "/api/needs/SendToConfirmation",
+        url: "/api/me/needs/SendToConfirmation",
         type: 'Patch',
         data: { Id: id },
         success: function () { location.reload(); },

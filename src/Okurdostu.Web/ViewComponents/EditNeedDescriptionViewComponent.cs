@@ -12,7 +12,7 @@ namespace Okurdostu.Web.ViewComponents
     {
         public IViewComponentResult Invoke(string description)
         {
-            var descriptionModel = new Controllers.Api.NeedsController.DescriptionModel
+            var descriptionModel = new Controllers.Api.Me.NeedsController.DescriptionModel
             {
                 Description = description
             };

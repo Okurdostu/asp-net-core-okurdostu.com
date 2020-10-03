@@ -21,7 +21,7 @@ titleForm.submit(function(e){
     else
     {
         $.ajax({
-            url: "/api/needs/title",
+            url: "/api/me/needs/title",
             type: 'Patch',
             data: { Title: newTitle, Id: Id},
             success: function (result) {
@@ -41,7 +41,7 @@ titleForm.submit(function(e){
                 });
             }
         });
-        
+
     }
-    
+
 });

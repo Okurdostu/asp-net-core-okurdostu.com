@@ -44,9 +44,14 @@ namespace Okurdostu.Data
         {
             get
             {
-                if(IsCompleted)             return 4; // tamamlanmış, para toplaması kapatılmış
-                if (IsConfirmed)            return 3; // onaylanmış - sergilenen - kampanya için para toplama durumunda olan
-                if (IsSentForConfirmation)  return 2; // onay için yollanmış
+                if (IsCompleted)
+                    return 4; // tamamlanmış, para toplaması kapatılmış
+
+                if (IsConfirmed)
+                    return 3; // onaylanmış - sergilenen - kampanya için para toplama durumunda olan
+
+                if (IsSentForConfirmation)
+                    return 2; // onay için yollanmış
 
                 return 1; // yeni oluşturulmuş: onay için yollanmamış
             }

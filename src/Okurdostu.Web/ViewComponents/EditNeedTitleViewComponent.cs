@@ -12,7 +12,7 @@ namespace Okurdostu.Web.ViewComponents
     {
         public IViewComponentResult Invoke(string Title)
         {
-            var titleModel = new Controllers.Api.NeedsController.TitleModel
+            var titleModel = new Controllers.Api.Me.NeedsController.TitleModel
             {
                 Title = Title
             };

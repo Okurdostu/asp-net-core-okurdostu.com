@@ -5,7 +5,7 @@
     if (inputLink.includes("amazon.com.tr") || inputLink.includes("pandora.com.tr") || inputLink.includes("udemy")) {
         button.attr("disabled", "true");
         $("#spinner-div").show();
-        $.post("/api/needs/item", { itemLink: inputLink, needId: Id, __RequestVerificationToken: validatetoken })
+        $.post("/api/me/needs/item", { itemLink: inputLink, needId: Id, __RequestVerificationToken: validatetoken })
             .done(function () { location.reload(); })
             .fail(function (result) {
                 button.removeAttr("disabled");
@@ -27,7 +27,7 @@
 function RemoveItem(Id) {
     $("#spinner-div").show();
     $.ajax({
-        url: "/api/needs/removeitem",
+        url: "/api/me/needs/removeitem",
         type: 'Patch',
         data: { Id: Id },
         success: function () { location.reload(); },

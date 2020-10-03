@@ -15,11 +15,11 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
         public InputModel Input { get; set; }
         public class InputModel
         {
-            [Required(ErrorMessage = "Parola seçmelisiniz")]
+            [Required(ErrorMessage = "Parola seÃ§melisiniz")]
             [Display(Name = "Parola")]
             [DataType(DataType.Password)]
-            [MinLength(7, ErrorMessage = "En az 7 karakterden oluþan bir parola oluþturun")]
-            [MaxLength(30, ErrorMessage = "Çok uzun, en fazla 30 karakter")]
+            [MinLength(7, ErrorMessage = "En az 7 karakterden oluÅŸan bir parola oluÅŸturun")]
+            [MaxLength(30, ErrorMessage = "Ã‡ok uzun, en fazla 30 karakter")]
             public string Password { get; set; }
         }
 
@@ -47,7 +47,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                     await Context.SaveChangesAsync();
                 }
             }
-            return NotFound("Böyle bir þey yok");
+            return NotFound("BÃ¶yle bir ÅŸey yok");
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -83,13 +83,13 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                                 _UserPaswordReset.UsedOn = DateTime.Now;
                                 _UserPaswordReset.IsUsed = true;
                                 await Context.SaveChangesAsync();
-                                TempData["LoginMessage"] = "Giriþ için yeni þifrenizi kullanabilirsiniz";
+                                TempData["LoginMessage"] = "GiriÅŸ iÃ§in yeni ÅŸifrenizi kullanabilirsiniz";
                                 return Redirect("/girisyap");
                             }
                             else
                             {
-                                TempData["ChangePasswordMessage"] = "Þifrenizi deðiþtiremedik, lütfen tekrar deneyin<br />" +
-                                    "Þuan ki þifreniz ile ayný þifreyi giriyor olabilirsiniz";
+                                TempData["ChangePasswordMessage"] = "Åžifrenizi deÄŸiÅŸtiremedik, lÃ¼tfen tekrar deneyin<br />" +
+                                    "Åžuan ki ÅŸifreniz ile aynÄ± ÅŸifreyi giriyor olabilirsiniz";
                                 return Redirect("~/account/passwordreset/changepassword/" + _UserPaswordReset.GUID);
                             }
                         }
@@ -101,7 +101,7 @@ namespace Okurdostu.Web.Pages.Account.PasswordReset
                     }
                 }
             }
-            return NotFound("Böyle bir þey yok");
+            return NotFound("BÃ¶yle bir ÅŸey yok");
         }
     }
 }
