@@ -3,7 +3,7 @@
 {
     foreach (var item in Model)
     {
-        <div class="row pt-1" style="cursor:pointer;" onclick="window.location='@item.Link'"> <div class="col-auto pr-1 pl-4"> <img src="@item.User.PictureUrl" class="rounded border" style="width:110px!important; height:120px !important;" /> </div> <div class="col p-0"> <h6 style="font-size:15px !important">@item.Title<br /> <span class="text-black-50">(@Html.Raw("@" + item.User.Username))</span> </h6> </div> </div>
+        <div class="row pt-1" style="cursor:pointer;" onclick="window.location='/@item.Link'"> <div class="col-auto pr-1 pl-4"> <img src="@item.User.PictureUrl" class="rounded border" style="width:110px!important; height:120px !important;" /> </div> <div class="col p-0"> <h6 style="font-size:15px !important">@item.Title<br /> <span class="text-black-50">(@Html.Raw("@" + item.User.Username))</span> </h6> </div> </div>
         <hr class="mb-1 mt-1" />
     }
 }

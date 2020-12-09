@@ -240,8 +240,7 @@ namespace Okurdostu.Web.Controllers
                     }
                     catch (Exception e)
                     {
-                        string innerMessage = (e.InnerException != null) ? e.InnerException.Message.ToLower() : "";
-
+                        string innerMessage = (e.InnerException != null) ? e.InnerException.Message : "";
                         if (innerMessage.Contains("Unique_Key_Title") || innerMessage.Contains("Unique_Key_FriendlyTitle"))
                         {
                             TempData["CreateNeedError"] = "Bu başlığı seçemezsiniz";
@@ -251,7 +250,6 @@ namespace Okurdostu.Web.Controllers
                             Logger.LogError("Error create need. Ex.message : {ex.message}, Ex.innermessage: {ex.inner}", e?.Message, e?.InnerException?.Message);
                             TempData["CreateNeedError"] = "Başaramadık, ne olduğunu bilmiyoruz";
                         }
-
                     }
                 }
                 else if (TempData["CreateNeedError"] != null && TempData["CreateNeedError"].ToString() == "Active education")
